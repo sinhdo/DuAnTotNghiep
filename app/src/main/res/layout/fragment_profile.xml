@@ -60,19 +60,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/textViewName"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="3dp"
                 android:layout_centerHorizontal="true"
                 android:text="0123456789"
-                android:textSize="18sp" />
+                android:textSize="19sp" />
             <TextView
                 android:id="@+id/textViewEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/textSDT"
-                android:layout_marginTop="8dp"
                 android:layout_centerHorizontal="true"
                 android:text="FPT@fpt.edu.vn"
-                android:textSize="18sp" />
+                android:textSize="19sp" />
+            <TextView
+                android:id="@+id/textFixInfor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_below="@id/textViewEmail"
+                android:layout_centerHorizontal="true"
+                android:text="Chỉnh sửa thông tin >>"
+                android:textStyle="italic"
+                android:textColor="@color/white"
+                android:textSize="17sp" />
         </LinearLayout>
     </LinearLayout>
     <ScrollView
