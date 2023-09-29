@@ -14,20 +14,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DuAnTotNghiep"
         tools:targetApi="31">
-        <activity
-            android:name=".Activity.orderDetailsActivity"
+        <activity        
+            android:name=".Activity.SplashScreen_Activity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".Activity.Login_Activity"
-            android:exported="false">
-
+            android:exported="true">
+        </activity>
+      <activity
+           android:name=".Activity.orderDetailsActivity"
+            android:exported="true">
         </activity>
         <activity
             android:name=".MainActivity"
