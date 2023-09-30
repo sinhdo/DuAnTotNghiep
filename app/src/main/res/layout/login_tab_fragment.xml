@@ -29,6 +29,7 @@
         android:background="@drawable/shape_edittext"
         app:layout_constraintHorizontal_bias=".5"
         android:hint="Password"
+        android:inputType="textPassword"
         android:id="@+id/txt_pass_Log"
         android:layout_marginTop="20dp"
         android:paddingLeft="20dp"
