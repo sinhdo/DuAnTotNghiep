@@ -87,7 +87,7 @@
     </LinearLayout>
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="450dp"
+        android:layout_height="470dp"
         android:layout_marginTop="5dp">
 
         <LinearLayout
@@ -360,7 +360,7 @@
 
         </androidx.cardview.widget.CardView>
             <androidx.cardview.widget.CardView
-                android:id="@+id/cvSetting"
+                android:id="@+id/cvOut"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
@@ -381,14 +381,14 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_gravity="center_horizontal"
-                        android:src="@drawable/baseline_settings_24" />
+                        android:src="@drawable/baseline_output_24" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
                         android:gravity="center"
-                        android:text="Cài Đặt"
+                        android:text="Thoát ứng dụng"
                         android:textAlignment="center"
                         android:textSize="24sp"
                         android:textStyle="bold" />
