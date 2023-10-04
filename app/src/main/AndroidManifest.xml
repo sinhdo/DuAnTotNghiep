@@ -15,11 +15,8 @@
         android:theme="@style/Theme.DuAnTotNghiep"
         tools:targetApi="31">
         <activity
-            android:name=".Activity.DetailProductActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activity.SplashScreen_Activity"
-            android:exported="true">
+            android:name=".Activity.ManagerProductActivity"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,11 +24,22 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".Activity.TrackOrderActivity"
+            android:exported="false">
+
+        </activity>
+        <activity
+            android:name=".Activity.DetailProductActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.SplashScreen_Activity"
+            android:exported="false"></activity>
+        <activity
             android:name=".Activity.Login_Activity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".Activity.orderDetailsActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />

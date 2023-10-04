@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="19.5sp"
+        tools:context=".MemberActivity">
+
+        <LinearLayout
+            android:layout_width="104dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="39dp"
+                android:text="Name Product:"
+                android:gravity="center|start"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="39dp"
+                android:text="fdsa:"
+                android:gravity="center|start"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="39dp"
+                android:text="dsfa:"
+                android:gravity="center|start"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="39dp"
+                android:text="dfs:"
+                android:gravity="center|start"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="39dp"
+                android:text="Category:"
+                android:gravity="center|start"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="39dp"
+                android:text="Hình ảnh:"
+                android:gravity="center|start"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/edName"
+                android:layout_width="match_parent"
+                android:layout_height="33.8dp"
+                android:paddingStart="6.5dp"
+                android:layout_marginTop="2.6dp"
+                android:layout_marginBottom="2.6dp"
+                android:textSize="13sp"
+                android:background="@drawable/shape_edittext" />
+
+            <EditText
+                android:id="@+id/edBirthday"
+                android:layout_width="match_parent"
+                android:layout_height="33.8dp"
+                android:paddingStart="6.5dp"
+                android:layout_marginTop="2.6dp"
+                android:layout_marginBottom="2.6dp"
+                android:textSize="13sp"
+                android:background="@drawable/shape_edittext"/>
+
+            <EditText
+                android:id="@+id/edCitizenIdentification"
+                android:layout_width="match_parent"
+                android:layout_height="33.8dp"
+                android:paddingStart="6.5dp"
+                android:layout_marginTop="2.6dp"
+                android:layout_marginBottom="2.6dp"
+                android:textSize="13sp"
+                android:background="@drawable/shape_edittext" />
+
+            <EditText
+                android:id="@+id/edPhone"
+                android:layout_width="match_parent"
+                android:layout_height="33.8dp"
+                android:paddingStart="6.5dp"
+                android:layout_marginTop="2.6dp"
+                android:layout_marginBottom="2.6dp"
+                android:textSize="13sp"
+                android:background="@drawable/shape_edittext" />
+            <Spinner
+                android:id="@+id/edHometown"
+                android:layout_width="match_parent"
+                android:layout_height="33.8dp"
+                android:paddingStart="6.5dp"
+                android:layout_marginTop="2.6dp"
+                android:layout_marginBottom="2.6dp"
+                android:textSize="13sp"
+                android:background="@drawable/shape_edittext" />
+            <ImageView
+                android:id="@+id/imgProduct"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="19.5dp"
+                android:layout_marginBottom="52dp"
+                android:layout_gravity="center"
+                android:src="@drawable/stone" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_margin="13dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="32.5dp"
+            android:layout_marginEnd="19.5dp"
+            android:background="@drawable/button_bg"
+            android:fontFamily="sans-serif"
+            android:text="Hủy bỏ"
+            android:textColor="@color/gray"
+            android:textStyle="bold"
+            android:textSize="10.4sp"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="32.5dp"
+            android:layout_marginEnd="19.5dp"
+            android:background="@drawable/button_bg"
+            android:fontFamily="sans-serif"
+            android:text="Hủy bỏ"
+            android:textColor="@color/gray"
+            android:textStyle="bold"
+            android:textSize="10.4sp"/>
+    </LinearLayout>
+</LinearLayout>
