@@ -1,8 +1,6 @@
 package com.example.duantotnghiep.fragment;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -19,12 +17,25 @@ import androidx.fragment.app.Fragment;
 
 import com.example.duantotnghiep.MainActivity;
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.database.FireBaseType;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginTabFragment extends Fragment {
-    EditText user, pass;
+    EditText email, pass;
     TextView fg_Text;
     float v = 0;
     Button btn_Log;
+    private FirebaseAuth firebaseAuth;
 
     private RegTabFragment regTabFragment;
 
@@ -32,25 +43,26 @@ public class LoginTabFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.login_tab_fragment, container, false);
-        user = root.findViewById(R.id.txt_Name_log);
+        email = root.findViewById(R.id.txt_Email_log);
         pass = root.findViewById(R.id.txt_pass_Log);
         fg_Text = root.findViewById(R.id.fg_pass_log);
         btn_Log = root.findViewById(R.id.btn_log);
+        firebaseAuth = FirebaseAuth.getInstance();
 
         regTabFragment = new RegTabFragment();
 
-        user.setTranslationX(800);
+        email.setTranslationX(800);
         pass.setTranslationX(800);
         fg_Text.setTranslationX(800);
         btn_Log.setTranslationX(800);
 
-        user.setAlpha(v);
+        email.setAlpha(v);
         pass.setAlpha(v);
         fg_Text.setAlpha(v);
         btn_Log.setAlpha(v);
 
 
-        user.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(300).start();
+        email.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(300).start();
         pass.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(500).start();
         fg_Text.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(500).start();
         btn_Log.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(700).start();
@@ -58,19 +70,45 @@ public class LoginTabFragment extends Fragment {
         btn_Log.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String username = user.getText().toString();
-                String password = pass.getText().toString();
+                String txtemail  = email.getText().toString();
+                String txtpassword = pass.getText().toString();
 
-                if(validateInput(username, password)) {
-                    boolean isLoginValid = performLogin(username, password);
+                if(validateInput(txtemail, txtpassword)) {
+                        firebaseAuth = FirebaseAuth.getInstance();
+                        firebaseAuth.signInWithEmailAndPassword(txtemail,txtpassword)
+                                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        FirebaseUser user = firebaseAuth.getCurrentUser();
+                                        String id = user.getUid();
+                                        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(id);
+                                        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                if (snapshot.exists()){
+                                                    boolean isAdmin = FireBaseType.isAdmin(snapshot);
+                                                    if (isAdmin){
+                                                        startActivity(new Intent(getContext(), MainActivity.class));
+                                                    }else {
+                                                        startActivity(new Intent(getContext(), MainActivity.class));
+                                                    }
+                                                }
 
-                    if (isLoginValid) {
-                        Toast.makeText(getContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(getContext(), MainActivity.class);
-                        startActivity(intent);
-                    } else {
-                        Toast.makeText(getContext(), "Thông tin đăng nhập không đúng", Toast.LENGTH_SHORT).show();
-                    }
+                                            }
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(getContext(), "Vui lòng kiểm tra email hoặc mật khẩu", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                 }
             }
         });
@@ -80,7 +118,12 @@ public class LoginTabFragment extends Fragment {
 
     private boolean validateInput(String username, String password) {
         if (TextUtils.isEmpty(username)) {
-            user.setError("Vui lòng nhập tên đăng nhập");
+            email.setError("Vui lòng nhập tên đăng nhập");
+            return false;
+        }
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        if (!username.matches(emailRegex)) {
+            email.setError("Email không hợp lệ");
             return false;
         }
 
@@ -91,11 +134,6 @@ public class LoginTabFragment extends Fragment {
 
         return true;
     }
-    private boolean performLogin(String username, String password) {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("RegistrationInfo", Context.MODE_PRIVATE);
-        String savedUsername = sharedPreferences.getString("username", "");
-        String savedPassword = sharedPreferences.getString("password", "");
-        return (username.equals(savedUsername) && password.equals(savedPassword));
-    }
+
 
 }

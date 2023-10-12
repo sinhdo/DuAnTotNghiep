@@ -1,0 +1,98 @@
+package com.example.duantotnghiep.model;
+
+import java.util.List;
+
+public class User {
+    private String id,username,email,address,phone,wallet;
+    private String img;
+    private Boolean user_type;
+    private List<Location> location;
+    public Boolean getUser_type() {
+        return user_type;
+    }
+
+    public void setUser_type(Boolean user_type) {
+        this.user_type = user_type;
+    }
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+
+
+    public String getWallet() {
+        return wallet;
+    }
+
+    public void setWallet(String wallet) {
+        this.wallet = wallet;
+    }
+
+    public User() {
+    }
+
+    public List<Location> getLocation() {
+        return location;
+    }
+
+    public void setLocation(List<Location> location) {
+        this.location = location;
+    }
+
+    public User(String id, String username, String email, String address, String phone, String wallet, String img, Boolean user_type, List<Location> location) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.address = address;
+        this.phone = phone;
+        this.wallet = wallet;
+        this.img = img;
+        this.user_type = user_type;
+        this.location = location;
+    }
+}

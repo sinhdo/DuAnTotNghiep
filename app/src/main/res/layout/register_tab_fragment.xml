@@ -19,7 +19,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.106"
-        app:layout_constraintWidth_percent=".8"></EditText>
+        app:layout_constraintWidth_percent=".8">
+    </EditText>
 
     <EditText
         android:id="@+id/txt_pass_re"
@@ -38,7 +39,29 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txt_User_re"
         app:layout_constraintVertical_bias="0"
-        app:layout_constraintWidth_percent=".8"></EditText>
+        app:layout_constraintWidth_percent=".8">
+
+    </EditText>
+    <EditText
+        android:id="@+id/txt_repass_re"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/shape_edittext"
+        android:contentDescription="txt_pass"
+        android:hint="Repass"
+        android:paddingLeft="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_pass_re"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintWidth_percent=".8">
+
+    </EditText>
     <EditText
         android:id="@+id/txt_phone_re"
         android:layout_width="0dp"
@@ -54,9 +77,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias=".5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_pass_re"
+        app:layout_constraintTop_toBottomOf="@+id/txt_repass_re"
         app:layout_constraintVertical_bias="0"
-        app:layout_constraintWidth_percent=".8"></EditText>
+        app:layout_constraintWidth_percent=".8">
+
+    </EditText>
     <EditText
         android:id="@+id/txt_Email_re"
         android:layout_width="0dp"
@@ -74,22 +99,43 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txt_phone_re"
         app:layout_constraintVertical_bias="0"
-        app:layout_constraintWidth_percent=".8"></EditText>
-    <Button
+        app:layout_constraintWidth_percent=".8">
+
+    </EditText>
+    <EditText
+        android:id="@+id/txt_Address_re"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintWidth_percent=".8"
-        app:layout_constraintVertical_bias=".7"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/shape_edittext"
+        android:contentDescription="txt_pass"
+        android:hint="Address"
+        android:paddingLeft="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_Email_re"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintWidth_percent=".8">
+    </EditText>
+
+    <Button
+        android:id="@+id/btn_reg"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_bg"
         android:text="Register"
         android:textSize="16sp"
-        android:id="@+id/btn_reg"
-
         android:textStyle="bold"
-        android:background="@drawable/button_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_Email_re"/>
+        app:layout_constraintTop_toBottomOf="@+id/txt_Address_re"
+        app:layout_constraintVertical_bias="0.82"
+        app:layout_constraintWidth_percent=".8" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
