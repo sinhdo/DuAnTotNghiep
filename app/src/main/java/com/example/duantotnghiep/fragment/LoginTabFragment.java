@@ -92,6 +92,7 @@ public class LoginTabFragment extends Fragment {
                                                     }else {
                                                         startActivity(new Intent(getContext(), MainActivity.class));
                                                     }
+                                                    Toast.makeText(getContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
                                                 }
 
                                             }
