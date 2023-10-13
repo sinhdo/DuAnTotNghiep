@@ -10,7 +10,7 @@ import com.example.duantotnghiep.adapter.LoginAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
-public class Login_Activity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 TabLayout tabLayout;
 ViewPager viewPager;
 FloatingActionButton gg,fb,ins;
