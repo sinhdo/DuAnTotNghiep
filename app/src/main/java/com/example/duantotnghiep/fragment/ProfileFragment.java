@@ -1,16 +1,25 @@
 package com.example.duantotnghiep.fragment;
 
+import static android.content.Intent.getIntent;
+
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,10 +27,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.duantotnghiep.Activity.ManHinhChoActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.database.FireBaseType;
+import com.example.duantotnghiep.model.User;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -39,7 +51,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private ImageView imgUser;
   private   CardView cvOut,cvOder,cvPayment,cvReview,cvTK,cvPromotion,cvQLUser,cvQLProduct,cvChangePass;
     private TextView textViewName,textSDT,textViewEmail,textFixInfor;
+    private ImageView imageViewAvatar;
     private Picasso picasso = Picasso.get();
+    private static final int PICK_IMAGE_REQUEST = 1;
     public ProfileFragment() {
         // Required empty public constructor
     }
@@ -79,6 +93,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         cvQLUser = view.findViewById(R.id.cvQLUser);
         cvQLProduct = view.findViewById(R.id.cvQLProduct);
         cvChangePass = view.findViewById(R.id.cvChangePass);
+        imageViewAvatar = view.findViewById(R.id.imageViewAvatar);
         //ánh xạ các textview
         imgUser = view.findViewById(R.id.imageViewAvatar);
         textViewName = view.findViewById(R.id.textViewName);
@@ -119,6 +134,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         cvReview.setOnClickListener(this);
         cvTK.setOnClickListener(this);
         cvQLUser.setOnClickListener(this);
+        textFixInfor.setOnClickListener(this);
     }
     private void setInfoProfile() {
         String id = firebaseUser.getUid();
@@ -158,6 +174,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
 
+
     private void showDialogOut(){
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = getLayoutInflater();
@@ -185,6 +202,102 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         alertDialog.show();
     }
+    private void showDialogFigProfile() {
+        // Tạo dialog và thiết lập layout
+        Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.dialog_fix_profile);
+
+        // Ánh xạ các view trong dialog
+
+        TextInputEditText edUserName = dialog.findViewById(R.id.edUserName);
+        TextInputEditText edPhone = dialog.findViewById(R.id.edPhone);
+        TextInputEditText edMail = dialog.findViewById(R.id.edMail);
+        Button btnCancel = dialog.findViewById(R.id.btnCancel);
+        Button btnConfirm = dialog.findViewById(R.id.btnConfirm);
+
+        // Lấy dữ liệu từ Firebase và hiển thị lên dialog
+        // Ví dụ:
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        String userId = firebaseUser.getUid();
+
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("user").child(userId);
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if (user != null) {
+                        edUserName.setText(user.getUsername());
+                        edPhone.setText(user.getPhone());
+                        edMail.setText(user.getEmail());
+//                        Picasso.get().load(user.getImg()).into(imageViewAvatar);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Xử lý lỗi khi không thể lấy dữ liệu từ Firebase
+            }
+        });
+//        imageViewAvatar.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                // Mở Intent để chọn ảnh từ kho ảnh trong máy
+//                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                startActivityForResult(intent, PICK_IMAGE_REQUEST);
+//            }
+//        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        btnConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String newUserName = edUserName.getText().toString().trim();
+                String newPhone = edPhone.getText().toString().trim();
+                String newEmail = edMail.getText().toString().trim();
+
+                // Kiểm tra tính hợp lệ của dữ liệu
+                // ...
+
+                // Cập nhật thông tin người dùng trên Firebase
+                userRef.child("username").setValue(newUserName);
+                userRef.child("phone").setValue(newPhone);
+                userRef.child("email").setValue(newEmail);
+
+                Toast.makeText(getActivity(), "Thay đổi thông tin thành công", Toast.LENGTH_SHORT).show();
+                replaceFragment(new ProfileFragment());
+                dialog.dismiss();
+            }
+
+            private void replaceFragment(ProfileFragment profileFragment) {
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.frame_layout, profileFragment);
+                fragmentTransaction.commit();
+            }
+        });
+        dialog.show();
+    }
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+//            Uri selectedImageUri = data.getData();
+//
+//            // Sử dụng thư viện Picasso, Glide, hoặc các phương pháp tương tự để tải ảnh từ URI và hiển thị lên ImageView
+//            // Ví dụ sử dụng Picasso:
+//            Picasso.get().load(selectedImageUri).into(imageViewAvatar);
+//        }
+//    }
     public void setRoleListUser(){
         String id = firebaseUser.getUid();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(id);
@@ -237,6 +350,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
             }else if (view.getId()==R.id.cvChangePass){
 
+            } else if (view.getId()==R.id.textFixInfor) {
+                showDialogFigProfile();
             }
     }
 }
