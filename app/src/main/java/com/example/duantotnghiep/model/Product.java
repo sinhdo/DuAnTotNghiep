@@ -1,8 +1,50 @@
 package com.example.duantotnghiep.model;
 
 public class Product {
-    private String id,sellerId,name,color,size,price,categoryID,brand,description,reviewID;
+    private String id,sellerId,name,color,size,categoryID,brand,description,reviewID;
     private String imgProduct;
+    private int quantity,sold;
+    private double price;
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public int getSold() {
+        return sold;
+    }
+
+    public void setSold(int sold) {
+        this.sold = sold;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public Product(String id, String sellerId, String name, String color, String size, String categoryID, String brand, String description, String reviewID, String imgProduct, int quantity, int sold, double price) {
+        this.id = id;
+        this.sellerId = sellerId;
+        this.name = name;
+        this.color = color;
+        this.size = size;
+        this.categoryID = categoryID;
+        this.brand = brand;
+        this.description = description;
+        this.reviewID = reviewID;
+        this.imgProduct = imgProduct;
+        this.quantity = quantity;
+        this.sold = sold;
+        this.price = price;
+    }
 
     public String getId() {
         return id;
@@ -44,13 +86,7 @@ public class Product {
         this.size = size;
     }
 
-    public String getPrice() {
-        return price;
-    }
 
-    public void setPrice(String price) {
-        this.price = price;
-    }
 
     public String getCategoryID() {
         return categoryID;
@@ -87,19 +123,6 @@ public class Product {
     public Product() {
     }
 
-    public Product(String id, String sellerId, String name, String color, String size, String price, String categoryID, String brand, String description, String reviewID, String imgProduct) {
-        this.id = id;
-        this.sellerId = sellerId;
-        this.name = name;
-        this.color = color;
-        this.size = size;
-        this.price = price;
-        this.categoryID = categoryID;
-        this.brand = brand;
-        this.description = description;
-        this.reviewID = reviewID;
-        this.imgProduct = imgProduct;
-    }
 
     public String getImgProduct() {
         return imgProduct;
