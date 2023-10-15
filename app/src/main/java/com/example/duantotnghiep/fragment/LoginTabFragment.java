@@ -70,38 +70,40 @@ public class LoginTabFragment extends Fragment {
         btn_Log.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                firebaseAuth = FirebaseAuth.getInstance();
                 String txtemail  = email.getText().toString();
                 String txtpassword = pass.getText().toString();
 
                 if(validateInput(txtemail, txtpassword)) {
-                        firebaseAuth = FirebaseAuth.getInstance();
+
                         firebaseAuth.signInWithEmailAndPassword(txtemail,txtpassword)
                                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
-                                        FirebaseUser user = firebaseAuth.getCurrentUser();
-                                        String id = user.getUid();
-                                        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(id);
-                                        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                if (snapshot.exists()){
-                                                    boolean isAdmin = FireBaseType.isAdmin(snapshot);
-                                                    if (isAdmin){
-                                                        startActivity(new Intent(getContext(), MainActivity.class));
-                                                    }else {
-                                                        startActivity(new Intent(getContext(), MainActivity.class));
+                                        if (task.isSuccessful()){
+                                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                                            String id = user.getUid();
+                                            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(id);
+                                            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    if (snapshot.exists()){
+                                                        boolean isAdmin = FireBaseType.isAdmin(snapshot);
+                                                        if (isAdmin){
+                                                            startActivity(new Intent(getContext(), MainActivity.class));
+                                                        }else {
+                                                            startActivity(new Intent(getContext(), MainActivity.class));
+                                                        }
+                                                        Toast.makeText(getContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
                                                     }
-                                                    Toast.makeText(getContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+
                                                 }
-
-                                            }
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError error) {
-                                                Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+                                                    Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        }
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {

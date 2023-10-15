@@ -69,6 +69,7 @@ public class RegTabFragment extends Fragment {
                                         User user = new User();
                                         user.setId(id);
                                         user.setUsername(username);
+                                        user.setPassword(pass);
                                         user.setAddress(address);
                                         user.setEmail(email);
                                         user.setPhone(phone);
