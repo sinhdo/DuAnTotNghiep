@@ -2,6 +2,7 @@ package com.example.duantotnghiep.model;
 
 public class Product {
     private String id,sellerId,name,color,size,price,categoryID,brand,description,reviewID;
+    private String imgProduct;
 
     public String getId() {
         return id;
@@ -86,7 +87,7 @@ public class Product {
     public Product() {
     }
 
-    public Product(String id, String sellerId, String name, String color, String size, String price, String categoryID, String brand, String description, String reviewID) {
+    public Product(String id, String sellerId, String name, String color, String size, String price, String categoryID, String brand, String description, String reviewID, String imgProduct) {
         this.id = id;
         this.sellerId = sellerId;
         this.name = name;
@@ -97,5 +98,14 @@ public class Product {
         this.brand = brand;
         this.description = description;
         this.reviewID = reviewID;
+        this.imgProduct = imgProduct;
+    }
+
+    public String getImgProduct() {
+        return imgProduct;
+    }
+
+    public void setImgProduct(String imgProduct) {
+        this.imgProduct = imgProduct;
     }
 }
