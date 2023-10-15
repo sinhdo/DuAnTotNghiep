@@ -3,16 +3,14 @@ package com.example.duantotnghiep.database;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class FireBaseHelper {
+public class FireBaseProductHelper {
     private DatabaseReference databaseReference;
 
-    public FireBaseHelper(){
+    public FireBaseProductHelper(){
         databaseReference = FirebaseDatabase.getInstance().getReference();
     }
 
-    public DatabaseReference getUsersRef(){
-        return databaseReference.child("user");
+    public DatabaseReference getProductRef(){
+        return databaseReference.child("product");
     }
-
-
 }
