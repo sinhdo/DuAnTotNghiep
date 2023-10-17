@@ -33,6 +33,8 @@ import com.example.duantotnghiep.Activity.ManHinhChoActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.database.FireBaseType;
 import com.example.duantotnghiep.model.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -55,7 +57,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private Picasso picasso = Picasso.get();
     private static final int PICK_IMAGE_REQUEST = 1;
     public ProfileFragment() {
-        // Required empty public constructor
+
     }
 
     public static ProfileFragment newInstance() {
@@ -72,18 +74,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-
-
-
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-//      //ánh xạ các cardview
+
         cvOut = view.findViewById(R.id.cvOut);
         cvOder = view.findViewById(R.id.cvOder);
         cvPayment = view.findViewById(R.id.cvPayment);
@@ -93,14 +91,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         cvQLUser = view.findViewById(R.id.cvQLUser);
         cvQLProduct = view.findViewById(R.id.cvQLProduct);
         cvChangePass = view.findViewById(R.id.cvChangePass);
-        imageViewAvatar = view.findViewById(R.id.imageViewAvatar);
-        //ánh xạ các textview
+
         imgUser = view.findViewById(R.id.imageViewAvatar);
         textViewName = view.findViewById(R.id.textViewName);
         textSDT = view.findViewById(R.id.textSDT);
         textViewEmail = view.findViewById(R.id.textViewEmail);
         textFixInfor = view.findViewById(R.id.textFixInfor);
-        //set thông tin và phân quyền
+
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
         mReference = FirebaseDatabase.getInstance().getReference();
@@ -148,6 +145,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 String img = snapshot.child("img").getValue(String.class);
                 textViewName.setText(name);
                 textViewEmail.setText(email);
+
                 if (img.equals("")||img.isEmpty()) {
                     imgUser.setImageResource(R.drawable.baseline_person_24);
                 } else {
@@ -162,7 +160,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     editor.putString("img", img);
                     editor.apply();
                 } else {
-                    // Xử lý trường hợp Fragment chưa được gắn vào Activity
+
                 }
             }
 
@@ -172,8 +170,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
         });
     }
-
-
 
     private void showDialogOut(){
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -203,20 +199,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         alertDialog.show();
     }
     private void showDialogFigProfile() {
-        // Tạo dialog và thiết lập layout
         Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.dialog_fix_profile);
-
-        // Ánh xạ các view trong dialog
 
         TextInputEditText edUserName = dialog.findViewById(R.id.edUserName);
         TextInputEditText edPhone = dialog.findViewById(R.id.edPhone);
         TextInputEditText edMail = dialog.findViewById(R.id.edMail);
+        TextInputEditText edAddress = dialog.findViewById(R.id.edAddress);
+        TextInputEditText edImg = dialog.findViewById(R.id.edImg);
         Button btnCancel = dialog.findViewById(R.id.btnCancel);
         Button btnConfirm = dialog.findViewById(R.id.btnConfirm);
 
-        // Lấy dữ liệu từ Firebase và hiển thị lên dialog
-        // Ví dụ:
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
         String userId = firebaseUser.getUid();
@@ -231,24 +224,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         edUserName.setText(user.getUsername());
                         edPhone.setText(user.getPhone());
                         edMail.setText(user.getEmail());
-//                        Picasso.get().load(user.getImg()).into(imageViewAvatar);
+                        edAddress.setText(user.getAddress());
+                        edImg.setText(user.getImg());
                     }
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Xử lý lỗi khi không thể lấy dữ liệu từ Firebase
+
             }
         });
-//        imageViewAvatar.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // Mở Intent để chọn ảnh từ kho ảnh trong máy
-//                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//                startActivityForResult(intent, PICK_IMAGE_REQUEST);
-//            }
-//        });
 
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -263,14 +248,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 String newUserName = edUserName.getText().toString().trim();
                 String newPhone = edPhone.getText().toString().trim();
                 String newEmail = edMail.getText().toString().trim();
+                String newAddress = edAddress.getText().toString().trim();
+                String newImgUrl = edImg.getText().toString().trim();
 
-                // Kiểm tra tính hợp lệ của dữ liệu
-                // ...
-
-                // Cập nhật thông tin người dùng trên Firebase
                 userRef.child("username").setValue(newUserName);
                 userRef.child("phone").setValue(newPhone);
                 userRef.child("email").setValue(newEmail);
+                userRef.child("address").setValue(newAddress);
+                userRef.child("img").setValue(newImgUrl);
+
+                if (!newImgUrl.isEmpty()) {
+                    // Sử dụng Picasso để tải và hiển thị ảnh từ URL
+                    Picasso.get().load(newImgUrl).into(imgUser);
+                }
+
 
                 Toast.makeText(getActivity(), "Thay đổi thông tin thành công", Toast.LENGTH_SHORT).show();
                 replaceFragment(new ProfileFragment());
@@ -286,18 +277,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         });
         dialog.show();
     }
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-//            Uri selectedImageUri = data.getData();
-//
-//            // Sử dụng thư viện Picasso, Glide, hoặc các phương pháp tương tự để tải ảnh từ URI và hiển thị lên ImageView
-//            // Ví dụ sử dụng Picasso:
-//            Picasso.get().load(selectedImageUri).into(imageViewAvatar);
-//        }
-//    }
     public void setRoleListUser(){
         String id = firebaseUser.getUid();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(id);
