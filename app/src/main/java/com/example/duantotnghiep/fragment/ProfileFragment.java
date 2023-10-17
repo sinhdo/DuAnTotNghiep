@@ -20,6 +20,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -209,6 +210,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         TextInputEditText edImg = dialog.findViewById(R.id.edImg);
         Button btnCancel = dialog.findViewById(R.id.btnCancel);
         Button btnConfirm = dialog.findViewById(R.id.btnConfirm);
+        ImageView dialog_AVT = dialog.findViewById(R.id.dialog_AVT);
 
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
@@ -226,6 +228,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         edMail.setText(user.getEmail());
                         edAddress.setText(user.getAddress());
                         edImg.setText(user.getImg());
+
+                        String imgUrl = user.getImg();
+                        if (!TextUtils.isEmpty(imgUrl)) {
+                            Picasso.get().load(imgUrl).into(dialog_AVT);
+                        }
                     }
                 }
             }
