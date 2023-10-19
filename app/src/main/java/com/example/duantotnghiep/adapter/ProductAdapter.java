@@ -12,17 +12,21 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.databinding.ItemProductBinding;
+import com.example.duantotnghiep.model.Product;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
 
     Context context;
-    public ProductAdapter(Context context) {
-
+    private List<Product> productList;
+    public ProductAdapter(Context context, List<Product> productList) {
         this.context = context;
+        this.productList = productList;
     }
 
     @NonNull
@@ -30,12 +34,27 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     public ProductAdapter.ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ProductAdapter.ProductViewHolder(ItemProductBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
+    public void updateProductList(List<Product> productList) {
+        this.productList = productList;
+        notifyDataSetChanged();
+    }
+
 
     @Override
     public void onBindViewHolder(@NonNull ProductAdapter.ProductViewHolder holder, int position) {
+        Product product = productList.get(position);
+        holder.binding.tvProduct.setText(product.getName());
+        holder.binding.priceProduct.setText(String.valueOf(product.getPrice()));
+        holder.binding.quantity.setText("Số lượng "+product.getQuantity());
+        holder.binding.sold.setText(String.valueOf(product.getSold()));
+        if (product.getImgProduct() != null && !product.getImgProduct().isEmpty()) {
+            Uri firstImageUri = Uri.parse(product.getImgProduct().get(0));
 
-        holder.binding.tvProduct.setText("hi"+position);
-        holder.binding.priceProduct.setText("555");
+            Glide.with(context).load(firstImageUri).into(holder.binding.imageProduct);
+        } else {
+
+            holder.binding.imageProduct.setImageResource(R.drawable.tnf);
+        }
 
         holder.binding.imgEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +76,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public int getItemCount() {
-        return 5;
+        return productList.size();
     }
 
 

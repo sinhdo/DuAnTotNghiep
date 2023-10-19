@@ -6,56 +6,92 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.adapter.ManagerSellerAdapter;
 import com.example.duantotnghiep.adapter.ProductAdapter;
 import com.example.duantotnghiep.databinding.ActivityManagerProductBinding;
 import com.example.duantotnghiep.fragment.AddProductFragment;
+import com.google.android.material.tabs.TabLayout;
 
 public class ManagerProductActivity extends AppCompatActivity {
-ActivityManagerProductBinding binding;
+    ActivityManagerProductBinding binding;
+    private boolean isInAddProductFragment = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         binding = ActivityManagerProductBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        binding.rvManager.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+        binding.tabLayoutSeller.addTab(binding.tabLayoutSeller.newTab().setText("Còn hàng"));
+        binding.tabLayoutSeller.addTab(binding.tabLayoutSeller.newTab().setText("Hết hàng"));
+        binding.tabLayoutSeller.setTabTextColors(Color.parseColor("#D3D3D3"), Color.parseColor("#E91E63"));
+        binding.tabLayoutSeller.setSelectedTabIndicatorColor(Color.parseColor("#E91E63"));
+        binding.tabLayoutSeller.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        binding.tabLayoutSeller.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0) {
-                    binding.floatAddProduct.hide();
-                } else {
-                    binding.floatAddProduct.show();
-                }
-                super.onScrolled(recyclerView, dx, dy);
+            public void onTabSelected(TabLayout.Tab tab) {
+
+                int position = tab.getPosition();
+
+
+                binding.viewPaperSeller.setCurrentItem(position);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
             }
         });
-        ProductAdapter productAdapter =new ProductAdapter(this);
-        binding.rvManager.setLayoutManager(new LinearLayoutManager(this));
+        binding.viewPaperSeller.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(binding.tabLayoutSeller));
+        binding.viewPaperSeller.setAdapter(new ManagerSellerAdapter(getSupportFragmentManager(), this, binding.tabLayoutSeller.getTabCount()));
 
-        binding.rvManager.setAdapter(productAdapter);
+
         binding.floatAddProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideFloatingActionButton();
+                isInAddProductFragment = true;
                 FragmentManager fragmentManager = getSupportFragmentManager();
-
-                // Tạo một fragment mới
                 AddProductFragment addProductFragment = new AddProductFragment();
-
-                // Bắt đầu giao dịch fragment
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-                // Thay thế fragment hiện tại bằng fragment mới
-                transaction.replace(R.id.layout, addProductFragment); // R.id.fragment_container là ID của container fragment trong layout của bạn
-
-                // Hoàn thành giao dịch fragment
+                transaction.replace(R.id.layout, addProductFragment);
+                transaction.addToBackStack(null);
                 transaction.commit();
             }
         });
 
+
+    }
+
+    private void hideFloatingActionButton() {
+        binding.floatAddProduct.hide();
+    }
+
+    private void showFloatingActionButton() {
+        binding.floatAddProduct.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (isInAddProductFragment) {
+            isInAddProductFragment = false;
+            showFloatingActionButton();
+        }
+        super.onBackPressed();
     }
 }
