@@ -21,6 +21,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     Context context;
     private List<Product> productList;
     DatabaseReference databaseReference;
+    FirebaseStorage storage;
     Product product;
 
     public ProductAdapter(Context context, List<Product> productList) {
@@ -85,13 +88,17 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                     notifyDataSetChanged();
 
 
-                    deleteProduct(productId);
+                    deleteProduct(productId,product.getImgProduct());
                 }
             }
         });
 
 
+
     }
+
+
+
 
     private void showDialogEdit() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -103,13 +110,36 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         alertDialog.show();
     }
 
-    private void deleteProduct(String productId) {
+    private void deleteProduct(String productId, List<String> imageUrls) {
         databaseReference = FirebaseDatabase.getInstance().getReference("products");
+        storage = FirebaseStorage.getInstance();
+
+       
         databaseReference.child(productId).removeValue()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        
 
+                       
+                        for (String imageUrl : imageUrls) {
+                            StorageReference imageRef = storage.getReferenceFromUrl(imageUrl);
+                            imageRef.delete()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                         
+                                        }
+                                    });
+                        }
+
+                       
                         Product productToRemove = null;
                         int positionToRemove = -1;
                         for (int i = 0; i < productList.size(); i++) {
@@ -124,19 +154,19 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                             notifyDataSetChanged();
                         }
 
-
                         if (productList.isEmpty()) {
-
+                            
                         }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-
+                      
                     }
                 });
     }
+
 
 
     @Override
