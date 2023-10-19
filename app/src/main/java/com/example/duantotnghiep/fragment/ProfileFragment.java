@@ -29,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.duantotnghiep.Activity.ChangePassword_Activity;
 import com.example.duantotnghiep.Activity.ManHinhChoActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.database.FireBaseType;
@@ -349,6 +350,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }else if (view.getId()==R.id.cvReView){
 
             }else if (view.getId()==R.id.cvChangePass){
+                startActivity(new Intent(getContext(), ChangePassword_Activity.class));
 
             } else if (view.getId()==R.id.textFixInfor) {
                 showDialogFigProfile();
