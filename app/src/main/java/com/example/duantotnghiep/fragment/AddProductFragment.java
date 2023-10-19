@@ -23,9 +23,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.duantotnghiep.Activity.ManagerProductActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.MutilpleColorAdapter;
 import com.example.duantotnghiep.adapter.MutilpleImgAdapter;
@@ -88,6 +90,7 @@ public class AddProductFragment extends Fragment {
             }
         });
 
+        ((ManagerProductActivity) requireActivity()).hideFloatingActionButton();
 
         chooseImg.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -222,6 +225,7 @@ public class AddProductFragment extends Fragment {
                 alertDialog.dismiss();
             }
         });
+
     }
 
     private void saveProductToRealtimeDatabase() {
@@ -270,7 +274,14 @@ public class AddProductFragment extends Fragment {
 
                         productsRef.child(productId).setValue(product);
                         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-                        fragmentManager.popBackStack();
+                        FragmentTransaction transaction = fragmentManager.beginTransaction();
+                        transaction.remove(this);
+                        transaction.addToBackStack(null);
+
+                        transaction.commit();
+
+                        ((ManagerProductActivity) requireActivity()).showFloatingActionButton();
+
                     }
                 });
             });

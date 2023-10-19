@@ -23,6 +23,8 @@ public class ManagerProductActivity extends AppCompatActivity {
     ActivityManagerProductBinding binding;
     private boolean isInAddProductFragment = false;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +65,7 @@ public class ManagerProductActivity extends AppCompatActivity {
         binding.floatAddProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideFloatingActionButton();
+                hideFloatingActionButton(); // Ẩn FAB
                 isInAddProductFragment = true;
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 AddProductFragment addProductFragment = new AddProductFragment();
@@ -75,23 +77,40 @@ public class ManagerProductActivity extends AppCompatActivity {
         });
 
 
+
     }
 
-    private void hideFloatingActionButton() {
+    public void hideFloatingActionButton() {
         binding.floatAddProduct.hide();
     }
 
-    private void showFloatingActionButton() {
+    public void showFloatingActionButton() {
         binding.floatAddProduct.show();
     }
 
     @Override
     public void onBackPressed() {
-
-        if (isInAddProductFragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        int backStackEntryCount = fragmentManager.getBackStackEntryCount();
+        if (backStackEntryCount > 0) {
+            // Nếu có fragment trong ngăn xếp, pop ra và kiểm tra lại trạng thái Floating Action Button
+            fragmentManager.popBackStack();
             isInAddProductFragment = false;
+            if (backStackEntryCount == 1) {
+                showFloatingActionButton();
+            }
+        } else {
+            super.onBackPressed();
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!isInAddProductFragment) {
             showFloatingActionButton();
         }
-        super.onBackPressed();
     }
+
+
+
 }
