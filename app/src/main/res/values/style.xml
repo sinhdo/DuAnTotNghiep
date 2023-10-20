@@ -6,4 +6,8 @@
         <item name="color">@color/white</item>
 
     </style>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Chỉnh sửa màu thanh trạng thái -->
+        <item name="android:statusBarColor">@color/status_bar_color</item>
+    </style>
 </resources>

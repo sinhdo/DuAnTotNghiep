@@ -6,4 +6,5 @@
     <color name="placeorder">#E91E63</color>
     <color name="processed">#383C51</color>
     <color name="backgroud">#EFEFEF</color>
+    <color name="status_bar_color">#D97E14</color>
 </resources>

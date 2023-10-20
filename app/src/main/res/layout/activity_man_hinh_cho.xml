@@ -9,6 +9,6 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/z4728044307046_9757b69da76b79c98c826c7a832a4395"/>
+        android:src="@drawable/logo_app"/>
 
 </LinearLayout>
