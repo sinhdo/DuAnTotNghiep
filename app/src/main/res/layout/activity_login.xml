@@ -37,7 +37,7 @@
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/view_paper"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="430dp"
             android:contentDescription="view"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -119,9 +119,9 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:src="@drawable/google"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:src="@drawable/logo_app"
         app:layout_constraintBottom_toTopOf="@+id/constraint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -130,17 +130,17 @@
         app:layout_constraintVertical_bias=".3">
 
     </ImageView>
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Welcome to our app"
-    android:textColor="@color/white"
-    android:textStyle="bold"
-    android:textSize="16sp"
-    app:layout_constraintVertical_bias=".2"
-    app:layout_constraintBottom_toTopOf="@+id/constraint"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/imv3"></TextView>
+<!--<TextView-->
+<!--    android:layout_width="wrap_content"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:text="Welcome to our app"-->
+<!--    android:textColor="@color/white"-->
+<!--    android:textStyle="bold"-->
+<!--    android:textSize="16sp"-->
+<!--    app:layout_constraintVertical_bias=".2"-->
+<!--    app:layout_constraintBottom_toTopOf="@+id/constraint"-->
+<!--    app:layout_constraintEnd_toEndOf="parent"-->
+<!--    app:layout_constraintStart_toStartOf="parent"-->
+<!--    app:layout_constraintTop_toBottomOf="@+id/imv3"></TextView>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
