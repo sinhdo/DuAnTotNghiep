@@ -25,7 +25,7 @@
                 android:layout_height="110dp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/z4728044307046_9757b69da76b79c98c826c7a832a4395" />
+                android:src="@drawable/logo_app" />
         </androidx.cardview.widget.CardView>
 
         <LinearLayout
