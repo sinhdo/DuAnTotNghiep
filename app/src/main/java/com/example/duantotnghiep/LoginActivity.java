@@ -1,4 +1,4 @@
-package com.example.duantotnghiep.Activity;
+package com.example.duantotnghiep;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
