@@ -1,5 +1,6 @@
 package com.example.duantotnghiep.fragment;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -35,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.duantotnghiep.Activity.ListUserActivity;
+import com.example.duantotnghiep.Activity.ManagerProductActivity;
 import com.example.duantotnghiep.ManHinhChoActivity;
 
 import com.example.duantotnghiep.Activity.ChangePassword_Activity;
@@ -327,10 +329,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 boolean isAdmin = FireBaseType.isAdmin(dataSnapshot);
                 if (isAdmin) {
                     cvQLUser.setVisibility(View.VISIBLE);
-                    cvQLProduct.setVisibility(View.VISIBLE);
+                    cvQLProduct.setVisibility(View.GONE);
                 } else {
                     cvQLUser.setVisibility(View.GONE);
-                    cvQLProduct.setVisibility(View.GONE);
+                    cvQLProduct.setVisibility(View.VISIBLE);
                 }
             }
             @Override
@@ -354,13 +356,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
     @Override
     public void onClick(View view) {
-        cvPromotion.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), ManagerProductActivity.class);
-                startActivity(intent);
-            }
-        });
+
             if (view.getId()==R.id.cvOut){
                 showDialogOut();
                 firebaseAuth.signOut();
@@ -375,7 +371,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }else if (view.getId()==R.id.cvQLUser){
                 startActivity(new Intent(getContext(), ListUserActivity.class));
             }else if (view.getId()==R.id.cvQLProduct){
-
+                startActivity(new Intent(getContext(),ManagerProductActivity.class));
             }else if (view.getId()==R.id.cvReView){
 
             }else if (view.getId()==R.id.cvChangePass){

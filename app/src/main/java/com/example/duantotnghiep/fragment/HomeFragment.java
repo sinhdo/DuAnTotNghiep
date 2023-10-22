@@ -19,8 +19,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.adapter.ProductAdapter;
 import com.example.duantotnghiep.adapter.ProductHomeAdapter;
 import com.example.duantotnghiep.adapter.SliderImageAdapter;
+import com.example.duantotnghiep.model.Product;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
