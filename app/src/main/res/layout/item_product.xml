@@ -1,86 +1,238 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
 
-    android:layout_height="wrap_content">
+    android:orientation="vertical">
+
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        app:cardElevation="10dp"
+        android:layout_height="300dp"
         android:layout_margin="10dp"
-        app:cardCornerRadius="10dp"
         android:layout_marginTop="10dp"
-        android:outlineSpotShadowColor="#E91E63"
-        android:outlineAmbientShadowColor="#E91E63"
         android:layout_marginEnd="10dp"
+        android:outlineAmbientShadowColor="#E91E63"
+        android:outlineSpotShadowColor="#E91E63"
         app:cardBackgroundColor="@color/white"
-        >
+        app:cardCornerRadius="10dp"
+        app:cardElevation="10dp">
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:layout_margin="10dp"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:src="@drawable/stone"
-                android:id="@+id/imageProduct"
-                android:adjustViewBounds="true"
-
-
-
-
-
-                app:shapeAppearanceOverlay="@style/roundImg"
-                android:scaleType="fitCenter"/>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_weight="1"
-                android:paddingTop="15dp"
-                android:gravity="center"
-                android:paddingLeft="12dp"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imageProduct"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_margin="10dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+
+
+                    android:src="@drawable/stone"
+                    app:shapeAppearanceOverlay="@style/roundImg" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingLeft="12dp"
+                    android:paddingTop="15dp">
+
+                    <TextView
+                        android:id="@+id/tvProduct"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:text="jacket"
+                        android:textColor="#000"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/priceProduct"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:text="Price" />
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:background="#D3C0C0"
+
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
                 android:orientation="vertical">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:textColor="#000"
-                    android:id="@+id/tvProduct"
-                    android:textSize="20sp"
-                    android:text="jacket"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Price"
-                    android:id="@+id/priceProduct"
-                    android:layout_margin="10dp"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:id="@+id/imvDelete"
-                    android:src="@drawable/baseline_delete_24"
-                    android:layout_gravity="bottom"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:orientation="horizontal">
 
-                    android:paddingBottom="10dp"/>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+
+
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="4dp"
+                                android:src="@drawable/baseline_production_quantity_limits_24"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/quantity"
+                                android:text="Kho hàng" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginTop="16dp"
+
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="4dp"
+                                android:src="@drawable/baseline_star_24"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Thích" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="100dp"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+
+
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="4dp"
+                                android:src="@drawable/baseline_production_quantity_limits_24"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/sold"
+                                android:text="Đã bán" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginTop="16dp"
+
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="4dp"
+                                android:src="@drawable/baseline_star_24"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Lượt xem" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:background="#D3C0C0"
+
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="300dp"
+
+
+                android:orientation="horizontal">
+
                 <ImageView
+                    android:id="@+id/imgEdit"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:id="@+id/imgEdit"
-                    android:src="@drawable/baseline_edit_note_24"
                     android:layout_gravity="bottom"
-                    android:paddingBottom="10dp"/>
+                    android:paddingBottom="10dp"
+                    android:src="@drawable/baseline_edit_note_24" />
+
+                <ImageView
+                    android:id="@+id/imvDeleteProduct"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="bottom"
+                    android:paddingBottom="10dp"
+
+                    android:src="@drawable/baseline_delete_24" />
+
+
             </LinearLayout>
 
         </LinearLayout>
+
+
     </androidx.cardview.widget.CardView>
 </LinearLayout>
