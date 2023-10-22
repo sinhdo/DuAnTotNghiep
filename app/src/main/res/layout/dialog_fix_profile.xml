@@ -48,7 +48,7 @@
 
         <LinearLayout
             android:layout_width="320dp"
-            android:layout_height="410dp"
+            android:layout_height="340dp"
             android:layout_marginTop="20dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -100,25 +100,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:hint="Email"
-                app:counterMaxLength="20"
-                app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/baseline_email_24">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edMail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:focusable="true" />
-
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
                 android:hint="Địa Chỉ"
                 app:counterMaxLength="20"
                 app:endIconMode="clear_text"
@@ -132,27 +113,17 @@
 
 
             </com.google.android.material.textfield.TextInputLayout>
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <Button
+                android:id="@+id/btnImg"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:hint="Ảnh Đại Diện"
-                app:counterMaxLength="20"
-                app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/baseline_camera_alt_24">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edImg"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-
-
-            </com.google.android.material.textfield.TextInputLayout>
-
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:backgroundTint="#FFD24C"
+                android:text="Chọn ảnh"
+                android:textSize="17dp"
+                android:textStyle="bold"
+                tools:ignore="TouchTargetSizeCheck" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -5,6 +5,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+
+
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -36,6 +42,7 @@ import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.database.FireBaseType;
 import com.example.duantotnghiep.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,7 +52,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+
+import java.io.ByteArrayOutputStream;
 
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
@@ -55,9 +67,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private ImageView imgUser;
   private   CardView cvOut,cvOder,cvPayment,cvReview,cvTK,cvPromotion,cvQLUser,cvQLProduct,cvChangePass;
     private TextView textViewName,textSDT,textViewEmail,textFixInfor;
-    private ImageView imageViewAvatar;
-    private Picasso picasso = Picasso.get();
+    private ImageView dialog_AVT;
     private static final int PICK_IMAGE_REQUEST = 1;
+    private Picasso picasso = Picasso.get();
     public ProfileFragment() {
 
     }
@@ -108,6 +120,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         String phone = sharedPreferences.getString("phone", "");
         String email = sharedPreferences.getString("email", "");
         String img = sharedPreferences.getString("img", "");
+
+
         if (name.isEmpty()) {
             setInfoProfile();
         } else {
@@ -121,9 +135,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
         }
         firebaseAuth = FirebaseAuth.getInstance();
-
         setRoleListUser();
         setInfoProfile();
+
         cvOder.setOnClickListener(this);
         cvOut.setOnClickListener(this);
         cvPromotion.setOnClickListener(this);
@@ -161,18 +175,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     editor.putString("email", email);
                     editor.putString("img", img);
                     editor.apply();
-                } else {
-
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.d("Loi", "onCancelled: " + error.getMessage());
             }
         });
     }
-
     private void showDialogOut(){
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = getLayoutInflater();
@@ -183,7 +193,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         builder.setView(view);
         final AlertDialog alertDialog = builder.create();
-
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -206,12 +215,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         TextInputEditText edUserName = dialog.findViewById(R.id.edUserName);
         TextInputEditText edPhone = dialog.findViewById(R.id.edPhone);
-        TextInputEditText edMail = dialog.findViewById(R.id.edMail);
         TextInputEditText edAddress = dialog.findViewById(R.id.edAddress);
-        TextInputEditText edImg = dialog.findViewById(R.id.edImg);
         Button btnCancel = dialog.findViewById(R.id.btnCancel);
         Button btnConfirm = dialog.findViewById(R.id.btnConfirm);
-        ImageView dialog_AVT = dialog.findViewById(R.id.dialog_AVT);
+        dialog_AVT = dialog.findViewById(R.id.dialog_AVT);
+        Button btnImg= dialog.findViewById(R.id.btnImg);
 
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
@@ -226,9 +234,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     if (user != null) {
                         edUserName.setText(user.getUsername());
                         edPhone.setText(user.getPhone());
-                        edMail.setText(user.getEmail());
                         edAddress.setText(user.getAddress());
-                        edImg.setText(user.getImg());
 
                         String imgUrl = user.getImg();
                         if (!TextUtils.isEmpty(imgUrl)) {
@@ -242,45 +248,71 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
             }
         });
-
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
             }
         });
-
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String newUserName = edUserName.getText().toString().trim();
                 String newPhone = edPhone.getText().toString().trim();
-                String newEmail = edMail.getText().toString().trim();
                 String newAddress = edAddress.getText().toString().trim();
-                String newImgUrl = edImg.getText().toString().trim();
 
                 userRef.child("username").setValue(newUserName);
                 userRef.child("phone").setValue(newPhone);
-                userRef.child("email").setValue(newEmail);
                 userRef.child("address").setValue(newAddress);
-                userRef.child("img").setValue(newImgUrl);
 
-                if (!newImgUrl.isEmpty()) {
-                    // Sử dụng Picasso để tải và hiển thị ảnh từ URL
-                    Picasso.get().load(newImgUrl).into(imgUser);
+                if (dialog_AVT.getDrawable() != null) {
+                    Bitmap bitmap = ((BitmapDrawable) dialog_AVT.getDrawable()).getBitmap();
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+                    byte[] imageData = baos.toByteArray();
+                    StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("images").child(userId + ".jpg");
+                    UploadTask uploadTask = storageRef.putBytes(imageData);
+                    uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        String imageUrl = uri.toString();
+                                        userRef.child("img").setValue(imageUrl);
+                                        Toast.makeText(getActivity(), "Thay đổi thông tin thành công", Toast.LENGTH_SHORT).show();
+                                        replaceFragment(new ProfileFragment());
+                                        dialog.dismiss();
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(getActivity(), "Lỗi khi tải lên ảnh", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                } else {
+
+                    Toast.makeText(getActivity(), "Thay đổi thông tin thành công", Toast.LENGTH_SHORT).show();
+                    replaceFragment(new ProfileFragment());
+                    dialog.dismiss();
                 }
-
-
-                Toast.makeText(getActivity(), "Thay đổi thông tin thành công", Toast.LENGTH_SHORT).show();
-                replaceFragment(new ProfileFragment());
-                dialog.dismiss();
             }
-
             private void replaceFragment(ProfileFragment profileFragment) {
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.frame_layout, profileFragment);
                 fragmentTransaction.commit();
+            }
+        });
+
+        btnImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_REQUEST);
             }
         });
 
@@ -294,29 +326,32 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 boolean isAdmin = FireBaseType.isAdmin(dataSnapshot);
                 if (isAdmin) {
-                    // Người dùng là Admin
                     cvQLUser.setVisibility(View.VISIBLE);
                     cvQLProduct.setVisibility(View.VISIBLE);
                 } else {
-                    // Người dùng không phải là Admin
                     cvQLUser.setVisibility(View.GONE);
                     cvQLProduct.setVisibility(View.GONE);
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d("Loi", "onCancelled: " + databaseError.getMessage());
             }
         });
     }
-
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+            Uri imageUri = data.getData();
+            Picasso.get().load(imageUri).into(dialog_AVT);
+        }
+    }
     @Override
     public void onResume() {
         super.onResume();
         setInfoProfile();
     }
-
     @Override
     public void onClick(View view) {
             if (view.getId()==R.id.cvOut){
@@ -338,7 +373,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
             }else if (view.getId()==R.id.cvChangePass){
                 startActivity(new Intent(getContext(), ChangePassword_Activity.class));
-
             } else if (view.getId()==R.id.textFixInfor) {
                 showDialogFigProfile();
             }
