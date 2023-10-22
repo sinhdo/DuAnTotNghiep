@@ -7,23 +7,41 @@
     android:layout_margin="8dp"
     android:background="@drawable/border_gray">
 
+<LinearLayout
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/line"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="1.0"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias="0.0"
+    android:layout_height="150dp">
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/imvProductHome"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
 
-    <ImageView
-        android:id="@+id/imageView13"
-        android:layout_width="155dp"
-        android:layout_height="155dp"
-        android:layout_marginStart="47dp"
+
+
+
         android:layout_marginBottom="112dp"
+
         android:src="@drawable/product"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/line"
+        app:layout_constraintEnd_toEndOf="@id/line"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/line"
+        app:layout_constraintTop_toTopOf="@id/line"
         app:layout_constraintVertical_bias="0.0" />
+</LinearLayout>
+
 
     <TextView
-        android:id="@+id/textView9"
+        android:id="@+id/tvTitleHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -33,7 +51,7 @@
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView13"
+        app:layout_constraintTop_toBottomOf="@+id/line"
         app:layout_constraintVertical_bias="0.095" />
 
     <ImageView
@@ -45,10 +63,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.029"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView9" />
+        app:layout_constraintTop_toBottomOf="@+id/tvTitleHome" />
 
     <TextView
-        android:id="@+id/textView17"
+        android:id="@+id/tvPriceHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -60,7 +78,7 @@
         app:layout_constraintVertical_bias="0.631" />
 
     <TextView
-        android:id="@+id/textView18"
+        android:id="@+id/tvSoldHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sold 30,4k"
@@ -68,8 +86,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.901"
-        app:layout_constraintStart_toEndOf="@+id/textView17"
-        app:layout_constraintTop_toBottomOf="@+id/textView9"
+        app:layout_constraintStart_toEndOf="@+id/tvPriceHome"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitleHome"
         app:layout_constraintVertical_bias="0.865" />
 
     <TextView
@@ -81,5 +99,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.032"
         app:layout_constraintStart_toEndOf="@+id/imageView14"
-        app:layout_constraintTop_toBottomOf="@+id/textView9" />
+        app:layout_constraintTop_toBottomOf="@+id/tvTitleHome" />
 </androidx.constraintlayout.widget.ConstraintLayout>

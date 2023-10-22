@@ -29,11 +29,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
 public class HomeFragment extends Fragment {
     private TextView textViewName;
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
+    RecyclerView rvManager;
 
+    ProductAdapter productAdapter;
+    List<Product> productList;
+    DatabaseReference databaseReference;
+
+    ProductHomeAdapter productHomeAdapter;
     public static HomeFragment newInstance() {
         HomeFragment fragment = new HomeFragment();
         return fragment;
@@ -44,18 +52,23 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         mReference = FirebaseDatabase.getInstance().getReference();
+        productList = new ArrayList<>();
+
+
+        loadDataFromFirebase();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Handler handler = new Handler();     
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         textViewName = view.findViewById(R.id.txtName);
         RecyclerView recyclerView = view.findViewById(R.id.view1);
         RecyclerView recyclerView2 = view.findViewById(R.id.view2);
 
-        ProductHomeAdapter productHomeAdapter = new ProductHomeAdapter(getContext());
+         productHomeAdapter = new ProductHomeAdapter(getContext(), productList);
         recyclerView.setAdapter(productHomeAdapter);
         recyclerView2.setAdapter(productHomeAdapter);
         LinearLayoutManager layoutManager2 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -81,7 +94,7 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView2.setLayoutManager(layoutManager2);
 
-        Handler handler = new Handler();
+        
         Runnable sliderRunnable = new Runnable() {
             @Override
             public void run() {
@@ -100,7 +113,30 @@ public class HomeFragment extends Fragment {
 
         return view;
     }
+    private void loadDataFromFirebase() {
+        databaseReference = FirebaseDatabase.getInstance().getReference("products");
 
+       
+       databaseReference.addValueEventListener(new ValueEventListener() {
+           @Override
+           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+               productList.clear(); 
+
+               for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                   Product product = snapshot.getValue(Product.class);
+                   productList.add(product);
+               }
+
+             
+               productHomeAdapter.updateProductList(productList);
+           }
+
+           @Override
+           public void onCancelled(@NonNull DatabaseError databaseError) {
+              
+           }
+       });
+   }
     private void setInfoProfile() {
         String id = firebaseUser.getUid();
         DatabaseReference userRef = mReference.child("user").child(id);
