@@ -181,8 +181,6 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="180dp"
                     android:layout_height="wrap_content"
-
-
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:hint="Price"
@@ -193,6 +191,7 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/priceProductSeller"
                         android:layout_width="match_parent"
+                        android:inputType="number"
                         android:layout_height="wrap_content">
 
 
@@ -214,6 +213,7 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/QuantityProduct"
+                        android:inputType="number"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
