@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 
-
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,9 +20,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-
-import android.os.Handler;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import android.util.Log;
@@ -61,7 +57,6 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 
-
 public class ProfileFragment extends Fragment implements View.OnClickListener {
     private FirebaseAuth firebaseAuth;
     private DatabaseReference mReference;
@@ -70,30 +65,27 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
   private   CardView cvOut,cvOder,cvPayment,cvReview,cvTK,cvPromotion,cvQLUser,cvQLProduct,cvChangePass;
     private TextView textViewName,textSDT,textViewEmail,textFixInfor;
     private ImageView dialog_AVT;
+    private TextInputEditText edImg;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Picasso picasso = Picasso.get();
     public ProfileFragment() {
 
     }
-
     public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
         return fragment;
     }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         return view;
     }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -222,6 +214,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         Button btnConfirm = dialog.findViewById(R.id.btnConfirm);
         dialog_AVT = dialog.findViewById(R.id.dialog_AVT);
         Button btnImg= dialog.findViewById(R.id.btnImg);
+        edImg = dialog.findViewById(R.id.edImg);
 
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
@@ -237,6 +230,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         edUserName.setText(user.getUsername());
                         edPhone.setText(user.getPhone());
                         edAddress.setText(user.getAddress());
+                        edImg.setText(user.getImg());
 
                         String imgUrl = user.getImg();
                         if (!TextUtils.isEmpty(imgUrl)) {
@@ -262,12 +256,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 String newUserName = edUserName.getText().toString().trim();
                 String newPhone = edPhone.getText().toString().trim();
                 String newAddress = edAddress.getText().toString().trim();
+                String newImgUrl = edImg.getText().toString().trim();
 
                 userRef.child("username").setValue(newUserName);
                 userRef.child("phone").setValue(newPhone);
                 userRef.child("address").setValue(newAddress);
+                userRef.child("img").setValue(newImgUrl);
 
-                if (dialog_AVT.getDrawable() != null) {
+                if (!newImgUrl.isEmpty()) {
+                    Picasso.get().load(newImgUrl).into(imgUser);
+                }else if (dialog_AVT.getDrawable() != null) {
                     Bitmap bitmap = ((BitmapDrawable) dialog_AVT.getDrawable()).getBitmap();
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
@@ -293,12 +291,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                             }
                         }
                     });
-                } else {
-
-                    Toast.makeText(getActivity(), "Thay đổi thông tin thành công", Toast.LENGTH_SHORT).show();
-                    replaceFragment(new ProfileFragment());
-                    dialog.dismiss();
                 }
+                Toast.makeText(getActivity(), "Thay đổi thông tin thành công", Toast.LENGTH_SHORT).show();
+                replaceFragment(new ProfileFragment());
+                dialog.dismiss();
             }
             private void replaceFragment(ProfileFragment profileFragment) {
                 FragmentManager fragmentManager = getFragmentManager();
@@ -307,7 +303,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 fragmentTransaction.commit();
             }
         });
-
         btnImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -319,6 +314,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         });
 
         dialog.show();
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+            Uri imageUri = data.getData();
+            Picasso.get().load(imageUri).into(dialog_AVT);
+            String imageUrl = imageUri.toString();
+            edImg.setText(imageUrl);
+        }
     }
     public void setRoleListUser(){
         String id = firebaseUser.getUid();
@@ -340,14 +345,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 Log.d("Loi", "onCancelled: " + databaseError.getMessage());
             }
         });
-    }
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
-            Uri imageUri = data.getData();
-            Picasso.get().load(imageUri).into(dialog_AVT);
-        }
     }
     @Override
     public void onResume() {
