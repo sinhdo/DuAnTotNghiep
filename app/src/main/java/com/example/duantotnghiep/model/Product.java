@@ -7,21 +7,16 @@ public class Product {
     private String id;
     private String sellerId;
     private String name;
-
-
     private ProductType productType;
     private String categoryID;
     private String brand;
     private String description;
     private List<String> imgProduct;
-
     private List<Integer> color;
     private int sold;
     private String reviewId;
-
     private int quantity;
     private double price;
-
     private List<String> size;
 
     public enum ProductType {

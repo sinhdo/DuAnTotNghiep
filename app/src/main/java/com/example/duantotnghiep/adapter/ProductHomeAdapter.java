@@ -1,14 +1,17 @@
 package com.example.duantotnghiep.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.duantotnghiep.Activity.OderActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.databinding.ItemProductHomeBinding;
 import com.example.duantotnghiep.model.Product;
@@ -33,6 +36,7 @@ public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.
     @Override
     public void onBindViewHolder(@NonNull ProductHomeViewHolder holder, int position) {
         Product product = productList.get(position);
+
         holder.binding.tvPriceHome.setText(String.valueOf(product.getPrice()) + " $");
         holder.binding.tvTitleHome.setText(product.getName());
         holder.binding.tvSoldHome.setText(String.valueOf(product.getSold()));
@@ -42,6 +46,14 @@ public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.
         } else {
             holder.binding.imvProductHome.setImageResource(R.drawable.tnf);
         }
+        holder.binding.ctlProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               Intent intent = new Intent(context, OderActivity.class);
+               intent.putExtra("idPro",product.getId());
+               context.startActivity(intent);
+            }
+        });
     }
 
     @Override
