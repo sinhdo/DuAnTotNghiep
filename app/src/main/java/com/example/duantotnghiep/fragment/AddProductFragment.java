@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.Activity.ManagerProductActivity;
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.adapter.ColorAdapter;
 import com.example.duantotnghiep.adapter.MutilpleColorAdapter;
 import com.example.duantotnghiep.adapter.MutilpleImgAdapter;
 import com.example.duantotnghiep.model.Product;
@@ -193,6 +194,7 @@ public class AddProductFragment extends Fragment {
     private void showDialogColor() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         LayoutInflater layoutInflater = LayoutInflater.from(requireContext());
+
         View view = layoutInflater.inflate(R.layout.dialog_color, null);
         builder.setView(view);
 
@@ -200,6 +202,7 @@ public class AddProductFragment extends Fragment {
         alertDialog.show();
 
         GridLayout gridLayout = view.findViewById(R.id.grid);
+        final List<Integer> selectedColors = new ArrayList<>();
 
         for (int i = 0; i < gridLayout.getChildCount(); i++) {
             final ImageButton button = (ImageButton) gridLayout.getChildAt(i);
@@ -212,25 +215,24 @@ public class AddProductFragment extends Fragment {
                     } else {
                         selectedColors.add(color);
                     }
-
+                    updateRecyclerView(view, selectedColors);
                 }
             });
         }
-
         Button addButton = view.findViewById(R.id.b21);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<String> colorStrings = new ArrayList<>();
-                for (Integer color : selectedColors) {
-                    String colorString = String.format("#%06X", (0xFFFFFF & color));
-                    colorStrings.add(colorString);
-                }
                 mAdapter.updateSelectedColors(selectedColors);
                 alertDialog.dismiss();
             }
         });
-
+    }
+    private void updateRecyclerView(View view, List<Integer> selectedColors) {
+        RecyclerView recyclerView = view.findViewById(R.id.rvChosseCL);
+        ColorAdapter colorAdapter = new ColorAdapter(selectedColors);
+        recyclerView.setAdapter(colorAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
     }
 
     private void saveProductToRealtimeDatabase() {

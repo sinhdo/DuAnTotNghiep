@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.duantotnghiep.Activity.OderActivity;
+import com.example.duantotnghiep.Activity.OrderActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.databinding.ItemProductHomeBinding;
 import com.example.duantotnghiep.model.Product;
@@ -49,9 +49,9 @@ public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.
         holder.binding.ctlProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               Intent intent = new Intent(context, OderActivity.class);
-               intent.putExtra("idPro",product.getId());
-               context.startActivity(intent);
+                Intent intent = new Intent(context, OrderActivity.class);
+                intent.putExtra("idPro",product.getId());
+                context.startActivity(intent);
             }
         });
     }
