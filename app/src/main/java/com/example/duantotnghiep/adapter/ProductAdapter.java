@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -24,7 +23,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
@@ -114,32 +112,32 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         databaseReference = FirebaseDatabase.getInstance().getReference("products");
         storage = FirebaseStorage.getInstance();
 
-       
+
         databaseReference.child(productId).removeValue()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        
 
-                       
+
+
                         for (String imageUrl : imageUrls) {
                             StorageReference imageRef = storage.getReferenceFromUrl(imageUrl);
                             imageRef.delete()
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            
+
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                         
+
                                         }
                                     });
                         }
 
-                       
+
                         Product productToRemove = null;
                         int positionToRemove = -1;
                         for (int i = 0; i < productList.size(); i++) {
@@ -155,14 +153,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                         }
 
                         if (productList.isEmpty()) {
-                            
+
                         }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                      
+
                     }
                 });
     }
