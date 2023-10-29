@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.duantotnghiep.Activity.ListUserActivity;
+import com.example.duantotnghiep.Activity.LocationActivity;
 import com.example.duantotnghiep.Activity.ManagerProductActivity;
 import com.example.duantotnghiep.ManHinhChoActivity;
 
@@ -62,7 +63,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private DatabaseReference mReference;
     private FirebaseUser firebaseUser;
     private ImageView imgUser;
-  private   CardView cvOut,cvOder,cvPayment,cvReview,cvTK,cvPromotion,cvQLUser,cvQLProduct,cvChangePass;
+  private   CardView cvOut,cvOder,cvPayment,cvReview,cvTK,cvPromotion,cvQLUser,cvQLProduct,cvChangePass,cvAdddiachi;
     private TextView textViewName,textSDT,textViewEmail,textFixInfor;
     private ImageView dialog_AVT;
     private TextInputEditText edImg;
@@ -99,6 +100,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         cvQLUser = view.findViewById(R.id.cvQLUser);
         cvQLProduct = view.findViewById(R.id.cvQLProduct);
         cvChangePass = view.findViewById(R.id.cvChangePass);
+        cvAdddiachi = view.findViewById(R.id.cvAdddiachi);
 
         imgUser = view.findViewById(R.id.imageViewAvatar);
         textViewName = view.findViewById(R.id.textViewName);
@@ -141,6 +143,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         cvReview.setOnClickListener(this);
         cvTK.setOnClickListener(this);
         cvQLUser.setOnClickListener(this);
+        cvAdddiachi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), LocationActivity.class);
+                startActivity(intent);
+            }
+        });
         textFixInfor.setOnClickListener(this);
     }
     private void setInfoProfile() {
