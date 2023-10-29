@@ -71,10 +71,9 @@ public class LocationActivity extends AppCompatActivity {
 
                     Location locationObj = new Location(userId, name, phone, location);
 
-                    DatabaseReference locationReference = databaseReference.child("location").push(); // This will create a new unique ID
-                    locationObj.setId(locationReference.getKey()); // Set the ID of the location object to the newly created ID
-
-                    locationReference.setValue(locationObj).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    // Add the location to the user's location list
+                    DatabaseReference locationListReference = userReference.child("location");
+                    locationListReference.push().setValue(locationObj).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Toast.makeText(LocationActivity.this, "Location added successfully!", Toast.LENGTH_SHORT).show();
@@ -90,4 +89,5 @@ public class LocationActivity extends AppCompatActivity {
         }
     }
 }
+
 
