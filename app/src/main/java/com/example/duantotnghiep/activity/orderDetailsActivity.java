@@ -1,21 +1,17 @@
-package com.example.duantotnghiep.Activity;
+package com.example.duantotnghiep.activity;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.example.duantotnghiep.MainActivity;
 import com.example.duantotnghiep.R;
-import com.google.android.material.tabs.TabLayout;
 
 public class orderDetailsActivity extends AppCompatActivity {
 

@@ -23,11 +23,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.duantotnghiep.Activity.ManagerProductActivity;
+import com.example.duantotnghiep.activity.ManagerProductActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.ColorAdapter;
 import com.example.duantotnghiep.adapter.MutilpleColorAdapter;

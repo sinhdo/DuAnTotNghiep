@@ -81,74 +81,19 @@
                     app:layout_constraintTop_toTopOf="@+id/imageView4" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <EditText
-                android:id="@+id/edSearch"
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/silde_image"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="24dp"
-                android:background="@drawable/edittext_search"
-                android:drawableStart="@drawable/baseline_search_24"
-                android:drawablePadding="8dp"
-                android:ems="10"
-                android:hint="Search"
-                android:inputType="text"
-                android:padding="8dp" />
+                android:layout_height="180dp" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <me.relex.circleindicator.CircleIndicator
+                android:id="@+id/circle_indicator"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraintLayout2"
-                    android:layout_width="match_parent"
-                    android:layout_height="180dp"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginBottom="16dp"
-                    android:background="@drawable/red_banner"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <TextView
-                        android:id="@+id/textView5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:text="Discount 20% For\nJackets"
-                        android:textColor="@color/white"
-                        android:textSize="25sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <ImageView
-                        android:id="@+id/imageView5"
-                        android:layout_width="150dp"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/women"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="100dp"
-                    android:layout_height="30dp"
-                    android:background="@drawable/orange_btn"
-                    android:gravity="center"
-                    android:text="Click"
-                    android:textColor="@color/white"
-                    app:layout_constraintBottom_toBottomOf="@+id/constraintLayout2"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_height="40dp"
+                android:layout_gravity="center|bottom"
+                android:layout_marginBottom="10dp"
+                app:ci_drawable="@drawable/indicator"
+                app:ci_drawable_unselected="@drawable/indicator_null_select" />
 
             <TextView
                 android:id="@+id/textView6"

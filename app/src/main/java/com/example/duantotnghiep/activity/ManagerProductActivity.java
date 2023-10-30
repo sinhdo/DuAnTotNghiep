@@ -1,12 +1,8 @@
-package com.example.duantotnghiep.Activity;
+package com.example.duantotnghiep.activity;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,7 +10,6 @@ import android.view.View;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.ManagerSellerAdapter;
-import com.example.duantotnghiep.adapter.ProductAdapter;
 import com.example.duantotnghiep.databinding.ActivityManagerProductBinding;
 import com.example.duantotnghiep.fragment.AddProductFragment;
 import com.google.android.material.tabs.TabLayout;

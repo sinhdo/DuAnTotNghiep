@@ -1,4 +1,4 @@
-package com.example.duantotnghiep.Activity;
+package com.example.duantotnghiep.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;

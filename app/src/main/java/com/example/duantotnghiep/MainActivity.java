@@ -12,6 +12,7 @@ import com.example.duantotnghiep.databinding.ActivityMainBinding;
 import com.example.duantotnghiep.fragment.CartFragment;
 import com.example.duantotnghiep.fragment.HomeFragment;
 import com.example.duantotnghiep.fragment.ProfileFragment;
+import com.example.duantotnghiep.fragment.SearchProductFragment;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
@@ -24,8 +25,8 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         fragmentManager = getSupportFragmentManager();
-        HomeFragment homeFragment =new HomeFragment();
-        fragmentManager.beginTransaction().replace(R.id.frame_layout,homeFragment).commit();
+        HomeFragment homeFragment = new HomeFragment();
+        fragmentManager.beginTransaction().replace(R.id.frame_layout, homeFragment).commit();
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
@@ -35,12 +36,15 @@ public class MainActivity extends AppCompatActivity {
                 replaceFragment(new CartFragment());
             } else if (id == R.id.profile) {
                 replaceFragment(new ProfileFragment());
-            }else {
+            } else if (id==R.id.search) {
+                replaceFragment(new SearchProductFragment());
+            } else {
                 replaceFragment(new HomeFragment());
             }
             return true;
         });
     }
+
     private void replaceFragment(Fragment fragment) {
         fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
