@@ -64,7 +64,7 @@ public class MutilpleColorAdapter extends RecyclerView.Adapter<MutilpleColorAdap
             super(binding.getRoot());
             this.binding = binding;
             this.context = context;
-            colorImageView = binding.colorImageView;
+            colorImageView = binding.colorImageView1;
         }
 
         public void bind(Integer color) {
