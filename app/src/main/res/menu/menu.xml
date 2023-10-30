@@ -5,11 +5,16 @@
             android:id="@+id/home"
             android:icon="@drawable/baseline_home_24"
             android:title="Home" />
+        <item
+            android:id="@+id/search"
+            android:icon="@drawable/baseline_search_24"
+            android:title="Tìm kiếm" />
 
         <item
             android:id="@+id/cart"
             android:icon="@drawable/baseline_shopping_cart_24"
             android:title="Giỏ hàng" />
+
         <item
             android:id="@+id/profile"
             android:icon="@drawable/baseline_person_24"

@@ -1,10 +1,9 @@
-package com.example.duantotnghiep.Activity;
+package com.example.duantotnghiep.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import com.baoyachi.stepview.HorizontalStepView;
 import com.baoyachi.stepview.VerticalStepView;
 import com.example.duantotnghiep.R;
 

@@ -31,12 +31,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.duantotnghiep.Activity.ListUserActivity;
-import com.example.duantotnghiep.Activity.LocationActivity;
-import com.example.duantotnghiep.Activity.ManagerProductActivity;
-import com.example.duantotnghiep.ManHinhChoActivity;
+import com.example.duantotnghiep.activity.ListUserActivity;
+import com.example.duantotnghiep.activity.LocationActivity;
+import com.example.duantotnghiep.activity.ManagerProductActivity;
+import com.example.duantotnghiep.activity.ManHinhChoActivity;
 
-import com.example.duantotnghiep.Activity.ChangePassword_Activity;
+import com.example.duantotnghiep.activity.ChangePassword_Activity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.database.FireBaseType;
 import com.example.duantotnghiep.model.User;
