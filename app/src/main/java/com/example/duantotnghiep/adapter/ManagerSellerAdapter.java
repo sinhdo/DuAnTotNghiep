@@ -8,9 +8,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.example.duantotnghiep.fragment.InStockFragment;
-import com.example.duantotnghiep.fragment.LoginTabFragment;
 import com.example.duantotnghiep.fragment.OutStockFragment;
-import com.example.duantotnghiep.fragment.RegTabFragment;
 
 public class ManagerSellerAdapter extends FragmentPagerAdapter {
     private Context context;

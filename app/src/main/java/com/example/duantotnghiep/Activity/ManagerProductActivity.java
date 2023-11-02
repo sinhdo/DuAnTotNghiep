@@ -1,4 +1,4 @@
-package com.example.duantotnghiep.activity;
+package com.example.duantotnghiep.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -10,8 +10,8 @@ import android.view.View;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.ManagerSellerAdapter;
-import com.example.duantotnghiep.databinding.ActivityManagerProductBinding;
 import com.example.duantotnghiep.fragment.AddProductFragment;
+import com.example.duantotnghiep.databinding.ActivityManagerProductBinding;
 import com.google.android.material.tabs.TabLayout;
 
 public class ManagerProductActivity extends AppCompatActivity {

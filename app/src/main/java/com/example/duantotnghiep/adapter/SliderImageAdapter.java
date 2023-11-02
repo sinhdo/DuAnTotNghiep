@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.databinding.SliderItemContainerBinding;
-import com.makeramen.roundedimageview.RoundedImageView;
 
 public class SliderImageAdapter extends RecyclerView.Adapter<SliderImageAdapter.ViewHolder> {
 

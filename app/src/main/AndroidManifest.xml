@@ -17,19 +17,19 @@
         android:theme="@style/Theme.DuAnTotNghiep"
         tools:targetApi="31">
         <activity
-            android:name=".activity.OrderActivity"
+            android:name=".Activity.OrderActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.LocationActivity"
+            android:name=".Activity.LocationActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.ListUserActivity"
+            android:name=".Activity.ListUserActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.ChangePassword_Activity"
+            android:name=".Activity.ChangePassword_Activity"
             android:exported="false" />
         <activity
-            android:name=".activity.ManHinhChoActivity"
+            android:name=".Activity.ManHinhChoActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,19 +38,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.ManagerProductActivity"
+            android:name=".Activity.ManagerProductActivity"
             android:exported="true" />
         <activity
-            android:name=".activity.TrackOrderActivity"
+            android:name=".Activity.TrackOrderActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.DetailProductActivity"
+            android:name=".Activity.DetailProductActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.LoginActivity"
+            android:name=".Activity.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.orderDetailsActivity"
+            android:name=".Activity.OrderDetailsActivity"
             android:exported="true" />
         <activity
             android:name=".MainActivity"

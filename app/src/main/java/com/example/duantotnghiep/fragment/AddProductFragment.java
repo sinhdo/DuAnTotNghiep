@@ -26,7 +26,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.duantotnghiep.activity.ManagerProductActivity;
+import com.example.duantotnghiep.Activity.ManagerProductActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.ColorAdapter;
 import com.example.duantotnghiep.adapter.MutilpleColorAdapter;
@@ -101,7 +101,7 @@ public class AddProductFragment extends Fragment {
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Chọn hình ảnh"), REQUEST_CODE_SELECT_IMAGES);
+                startActivityForResult(Intent.createChooser(intent, "Chọn hình ảnh (IMG)"), REQUEST_CODE_SELECT_IMAGES);
             }
         });
 
@@ -262,8 +262,6 @@ public class AddProductFragment extends Fragment {
                 imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     String imageUrl = uri.toString();
                     imageUrls.add(imageUrl);
-
-
                     if (imageUrls.size() == selectedImageUris.size()) {
 
                         String userId = firebaseAuth.getCurrentUser().getUid();
@@ -271,12 +269,10 @@ public class AddProductFragment extends Fragment {
 
                         userProductsRef.child(productId).setValue(product);
 
-
                         product = new Product(
                                 productId, userId, Title, productType,
                                 "categoryID", Brand, Des, imageUrls, selectedColors, 1000, "ngon", Quantity, Price, selectedSize
                         );
-
 
                         productsRef.child(productId).setValue(product);
                         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
@@ -287,11 +283,6 @@ public class AddProductFragment extends Fragment {
                     }
                 });
             });
-
         }
-
-
     }
-
-
 }

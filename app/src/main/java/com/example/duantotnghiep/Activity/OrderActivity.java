@@ -1,4 +1,4 @@
-package com.example.duantotnghiep.activity;
+package com.example.duantotnghiep.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,6 +38,8 @@ public class OrderActivity extends AppCompatActivity {
     private ImageView imgProduct;
     private TextView tvNameProduct,tvPriceProduct,tvDescriptionPro;
     private Button btnAddToCart,btnBuyProduct;
+
+    private ColorAdapter selectedColorAdapter;
     private int num;
     List<String> sizeList;
     ArrayList<Integer> colors;
@@ -149,15 +151,15 @@ public class OrderActivity extends AppCompatActivity {
         RecyclerView rvMutilpeSize = dialog.findViewById(R.id.rvOpsionSize);
 
         rvMutilpeColor.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-
         ColorAdapter colorAdapter = new ColorAdapter(colors);
         rvMutilpeColor.setAdapter(colorAdapter);
 
-
         rvMutilpeSize.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-
-        SizeAdapter sizeAdapter = new SizeAdapter(sizeList); // sizeList là danh sách size từ dữ liệu sản phẩm
+        SizeAdapter sizeAdapter = new SizeAdapter(sizeList);
         rvMutilpeSize.setAdapter(sizeAdapter);
+
+        selectedColorAdapter = colorAdapter;
+
         num=1;
         imgMinus.setOnClickListener(view -> {
             if (num > 1){
@@ -184,11 +186,19 @@ public class OrderActivity extends AppCompatActivity {
         btnBuy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), orderDetailsActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("productName", productName);
+                bundle.putDouble("productPrice", productPrice);
+                bundle.putString("productImageUrl", productImageUrl);
+                bundle.putString("selectedSize", sizeAdapter.getSelectedSize());
+                bundle.putString("selectedColor", selectedColorAdapter.getSelectedColor());
+                bundle.putInt("selectedQuantity", num);
+
+                Intent intent = new Intent(OrderActivity.this, OrderDetailsActivity.class);
+                intent.putExtra("productData", bundle);
                 startActivity(intent);
             }
         });
         dialog.show();
     }
-
 }

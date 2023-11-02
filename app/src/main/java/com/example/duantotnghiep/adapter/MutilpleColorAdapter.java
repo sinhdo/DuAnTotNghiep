@@ -1,8 +1,6 @@
 package com.example.duantotnghiep.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -30,31 +28,26 @@ public class MutilpleColorAdapter extends RecyclerView.Adapter<MutilpleColorAdap
         this.colorList = colorList;
         notifyDataSetChanged();
     }
+
     @NonNull
     @Override
-
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext(); // Get the Context
         CircleColorBinding binding = CircleColorBinding.inflate(LayoutInflater.from(context), parent, false);
         return new ViewHolder(binding, context);
     }
 
-
     @Override
-
     public void onBindViewHolder(@NonNull MutilpleColorAdapter.ViewHolder holder, int position) {
         Integer color = colorList.get(position);
 
         holder.bind(color);
     }
 
-
     @Override
-
     public int getItemCount() {
         return colorList.size();
     }
-
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final CircleColorBinding binding;
@@ -76,10 +69,6 @@ public class MutilpleColorAdapter extends RecyclerView.Adapter<MutilpleColorAdap
             LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{context.getResources().getDrawable(R.drawable.circle_background), circle});
             colorImageView.setBackground(layerDrawable);
         }
-
-
-
-
     }
     public void updateSelectedColors(List<Integer> selectedColors) {
         if (selectedColors != null) {
@@ -90,7 +79,4 @@ public class MutilpleColorAdapter extends RecyclerView.Adapter<MutilpleColorAdap
         }
         notifyDataSetChanged();
     }
-
-
-
 }

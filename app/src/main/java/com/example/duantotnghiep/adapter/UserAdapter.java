@@ -31,8 +31,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import javax.security.auth.callback.Callback;
-
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHoder> {
     private Context context;
     private List<User> list;
