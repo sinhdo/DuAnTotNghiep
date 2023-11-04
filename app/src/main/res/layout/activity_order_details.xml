@@ -87,7 +87,7 @@
                     app:layout_constraintEnd_toEndOf="@id/txtSubtotal"
                     app:layout_constraintTop_toTopOf="@id/txt3"
                     style="@style/textStyle"
-                    android:text="2$"/>
+                    android:text="5000 VND"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
                     app:layout_constraintEnd_toEndOf="@id/txtDelivery"
                     app:layout_constraintTop_toTopOf="@id/txt5"
                     style="@style/textStyle"
-                    android:text="1$"/>
+                    android:text="100 VND"/>
                 <View
                     android:layout_width="wrap_content"
                     android:layout_height="1dp"

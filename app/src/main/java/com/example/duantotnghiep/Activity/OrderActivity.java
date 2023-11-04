@@ -41,6 +41,8 @@ public class OrderActivity extends AppCompatActivity {
 
     private ColorAdapter selectedColorAdapter;
     private int num;
+
+    private String idProduct;
     List<String> sizeList;
     ArrayList<Integer> colors;
     private Picasso picasso = Picasso.get();
@@ -59,7 +61,7 @@ public class OrderActivity extends AppCompatActivity {
         tvDescriptionPro =findViewById(R.id.tvDescriptionPro);
         btnAddToCart =findViewById(R.id.btnAddToCart);
         btnBuyProduct =findViewById(R.id.btnBuyProduct);
-        String idProduct = getIntent().getStringExtra("idPro");
+        idProduct = getIntent().getStringExtra("idPro");
 
         btnBuyProduct.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,7 +79,7 @@ public class OrderActivity extends AppCompatActivity {
         });
     }
     private void loadDataFromFirebase() {
-        String idProduct = getIntent().getStringExtra("idPro");
+        idProduct = getIntent().getStringExtra("idPro");
         DatabaseReference productRef = FirebaseDatabase.getInstance().getReference().child("products").child(idProduct);
         productRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -97,7 +99,7 @@ public class OrderActivity extends AppCompatActivity {
                     imgProduct.setTag(imgUrl);
                 }
 
-                 colors = new ArrayList<>();
+                colors = new ArrayList<>();
                 DataSnapshot colorsSnapshot = snapshot.child("color");
                 for (DataSnapshot colorSnapshot : colorsSnapshot.getChildren()) {
                     Integer color = colorSnapshot.getValue(Integer.class);
@@ -187,15 +189,14 @@ public class OrderActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
-                bundle.putString("productName", productName);
-                bundle.putDouble("productPrice", productPrice);
-                bundle.putString("productImageUrl", productImageUrl);
-                bundle.putString("selectedSize", sizeAdapter.getSelectedSize());
-                bundle.putString("selectedColor", selectedColorAdapter.getSelectedColor());
-                bundle.putInt("selectedQuantity", num);
+                bundle.putString("Size", sizeAdapter.getSelectedSize());
+                ArrayList<Integer> selectedColors = new ArrayList<>(selectedColorAdapter.getSelectedColorList());
+                bundle.putIntegerArrayList("Color", selectedColors);
+                bundle.putInt("Quantity", num);
 
                 Intent intent = new Intent(OrderActivity.this, OrderDetailsActivity.class);
                 intent.putExtra("productData", bundle);
+                intent.putExtra("idPro", idProduct);
                 startActivity(intent);
             }
         });

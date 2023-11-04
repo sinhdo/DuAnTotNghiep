@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ColorViewHolder> {
@@ -29,6 +30,7 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ColorViewHol
             return null;
         }
     }
+
     @NonNull
     @Override
     public ColorViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -45,6 +47,14 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ColorViewHol
     @Override
     public int getItemCount() {
         return colors.size();
+    }
+
+    public List<Integer> getSelectedColorList() {
+        List<Integer> selectedColors = new ArrayList<>();
+        if (selectedItem != RecyclerView.NO_POSITION) {
+            selectedColors.add(colors.get(selectedItem));
+        }
+        return selectedColors;
     }
 
     public class ColorViewHolder extends RecyclerView.ViewHolder {
