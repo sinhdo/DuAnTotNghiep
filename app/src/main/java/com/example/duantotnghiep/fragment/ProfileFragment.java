@@ -39,6 +39,7 @@ import com.example.duantotnghiep.activity.ManHinhChoActivity;
 import com.example.duantotnghiep.activity.ChangePassword_Activity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.activity.OrderOfShopActivity;
+import com.example.duantotnghiep.activity.TopUpCardActivity;
 import com.example.duantotnghiep.database.FireBaseType;
 import com.example.duantotnghiep.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -138,7 +139,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         cvOder.setOnClickListener(this);
         cvOut.setOnClickListener(this);
         cvPromotion.setOnClickListener(this);
-        cvPayment.setOnClickListener(this);
+        cvPayment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), TopUpCardActivity.class);
+                startActivity(intent);
+            }
+        });
         cvChangePass.setOnClickListener(this);
         cvQLProduct.setOnClickListener(this);
         cvReview.setOnClickListener(this);
