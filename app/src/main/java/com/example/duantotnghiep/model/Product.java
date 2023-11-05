@@ -17,14 +17,11 @@ public class Product {
     private int quantity;
     private double price;
     private List<String> size;
-
     private boolean paid;
-
     public enum ProductType {
         CLOTHING,
         FOOTWEAR
     }
-
     public Product(){
 
     }
@@ -36,7 +33,6 @@ public class Product {
         this.color = color;
         this.quantity = quantity;
     }
-
     public Product(String id, String sellerId, String name, ProductType productType, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int sold, String reviewId, int quantity, double price, List<String> size) {
         this.id = id;
         this.sellerId = sellerId;
