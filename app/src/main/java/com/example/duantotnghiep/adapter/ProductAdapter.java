@@ -59,7 +59,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.binding.sold.setText(String.valueOf(product.getSold()));
         if (product.getImgProduct() != null && !product.getImgProduct().isEmpty()) {
             Uri firstImageUri = Uri.parse(product.getImgProduct().get(0));
-
             Glide.with(context).load(firstImageUri).into(holder.binding.imageProduct);
         } else {
 

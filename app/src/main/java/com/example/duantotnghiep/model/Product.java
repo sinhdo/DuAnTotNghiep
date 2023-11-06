@@ -1,6 +1,5 @@
 package com.example.duantotnghiep.model;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class Product {
@@ -18,6 +17,8 @@ public class Product {
     private int quantity;
     private double price;
     private List<String> size;
+    private boolean paid;
+    private Discount discount;
 
     public enum ProductType {
         CLOTHING,
@@ -25,9 +26,27 @@ public class Product {
     }
 
     public Product() {
+
     }
 
-    public Product(String id, String sellerId, String name, ProductType productType, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int sold, String reviewId, int quantity, double price, List<String> size) {
+
+    public boolean isPaid() {
+        return paid;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
+    }
+
+    public Discount getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Discount discount) {
+        this.discount = discount;
+    }
+
+    public Product(String id, String sellerId, String name, ProductType productType, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int sold, String reviewId, int quantity, double price, List<String> size, boolean paid, Discount discount) {
         this.id = id;
         this.sellerId = sellerId;
         this.name = name;
@@ -42,21 +61,8 @@ public class Product {
         this.quantity = quantity;
         this.price = price;
         this.size = size;
-
-    }
-
-
-    public Product(String id, String name, ProductType size, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int quantity, double price) {
-        this.id = id;
-        this.name = name;
-        this.productType = size;
-        this.categoryID = categoryID;
-        this.brand = brand;
-        this.description = description;
-        this.imgProduct = imgProduct;
-        this.color = color;
-        this.quantity = quantity;
-        this.price = price;
+        this.paid = paid;
+        this.discount = discount;
     }
 
     public List<String> getSize() {

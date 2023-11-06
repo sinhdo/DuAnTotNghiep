@@ -6,30 +6,23 @@
     android:layout_height="match_parent"
     android:background="#f3f3f3"
     tools:context=".activity.orderDetailsActivity">
-
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-
+        android:layout_height="match_parent">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="24dp">
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
-
                 <ImageView
                     android:id="@+id/imageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="2dp"
-
-
                     tools:src="@drawable/baseline_arrow_back_24" />
                 <TextView
                     android:layout_width="wrap_content"
@@ -41,12 +34,11 @@
                     android:textStyle="bold"
                     android:textAlignment="center"
                     android:textColor="@color/black"/>
-
             </LinearLayout>
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/rcvOrder"/>
+                android:layout_height="wrap_content"
+                android:id="@+id/rcvOrder_dt"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -55,15 +47,14 @@
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 android:textSize="18sp"
-                android:layout_marginTop="16dp"
-                />
+                android:layout_marginTop="16dp" />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:background="@color/white"
                 android:layout_marginTop="8dp"
                 android:padding="12dp"
                 android:layout_height="match_parent">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -75,7 +66,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/txt2"
+                    android:id="@+id/txtSubtotal"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/txt1"
                     style="@style/textStyle"
@@ -92,11 +83,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/txt4"
-                    app:layout_constraintEnd_toEndOf="@id/txt2"
+                    android:id="@+id/txtDelivery"
+                    app:layout_constraintEnd_toEndOf="@id/txtSubtotal"
                     app:layout_constraintTop_toTopOf="@id/txt3"
                     style="@style/textStyle"
-                    android:text="2$"/>
+                    android:text="5000 VND"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -109,11 +100,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/txt6"
-                    app:layout_constraintEnd_toEndOf="@id/txt4"
+                    android:id="@+id/txtTax"
+                    app:layout_constraintEnd_toEndOf="@id/txtDelivery"
                     app:layout_constraintTop_toTopOf="@id/txt5"
                     style="@style/textStyle"
-                    android:text="1$"/>
+                    android:text="100 VND"/>
                 <View
                     android:layout_width="wrap_content"
                     android:layout_height="1dp"
@@ -121,7 +112,7 @@
                     android:background="#D3C0C0"
                     android:id="@+id/View"
                     app:layout_constraintTop_toBottomOf="@id/txt5"
-                    app:layout_constraintEnd_toEndOf="@id/txt6"
+                    app:layout_constraintEnd_toEndOf="@id/txtTax"
                     app:layout_constraintStart_toStartOf="@id/txt5"
                     />
                 <TextView
@@ -137,13 +128,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/txt8"
-                    app:layout_constraintEnd_toEndOf="@id/txt6"
+                    android:id="@+id/txtTotal"
+                    app:layout_constraintEnd_toEndOf="@id/txtTax"
                     app:layout_constraintTop_toTopOf="@id/txt7"
                     style="@style/textStyleBold"
                     android:text="13$"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
-
 
             <TextView
                 android:id="@+id/Voucher"
@@ -160,7 +150,6 @@
                 android:layout_width="match_parent"
                 android:background="@color/white"
                 android:padding="8dp"
-
                 android:layout_height="match_parent">
                 <TextView
                     android:layout_width="wrap_content"
@@ -195,7 +184,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/txtVoucher"
                     android:src="@drawable/baseline_navigate_next_24"/>
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
@@ -213,7 +201,6 @@
                 android:layout_width="match_parent"
                 android:background="@color/white"
                 android:padding="8dp"
-
                 android:layout_height="match_parent">
                 <TextView
                     android:layout_width="wrap_content"
@@ -271,7 +258,6 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/imgPayment"
                     android:layout_marginTop="8dp"
-
                     app:layout_constraintStart_toStartOf="@id/txtB"
                     app:layout_constraintTop_toBottomOf="@id/txtB"
                     android:src="@drawable/baseline_payment_24"/>
@@ -302,7 +288,7 @@
                 android:background="@drawable/shape_edittext"
                 android:paddingLeft="10dp"
                 android:hint="Tin nhắn lưu ý cho người bán"/>
-><androidx.appcompat.widget.AppCompatButton
+            ><androidx.appcompat.widget.AppCompatButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Order Now"
@@ -313,8 +299,6 @@
             android:layout_marginBottom="16dp"
             android:background="@drawable/button_bg"
             />
-
         </LinearLayout>
-
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

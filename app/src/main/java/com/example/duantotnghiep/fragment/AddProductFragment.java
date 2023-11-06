@@ -274,7 +274,7 @@ public class AddProductFragment extends Fragment {
 
                         product = new Product(
                                 productId, userId, Title, productType,
-                                "categoryID", Brand, Des, imageUrls, selectedColors, 1000, "ngon", Quantity, Price, selectedSize
+                                "categoryID", Brand, Des, imageUrls, selectedColors, 1000, "ngon", Quantity, Price, selectedSize,false,null
                         );
 
 

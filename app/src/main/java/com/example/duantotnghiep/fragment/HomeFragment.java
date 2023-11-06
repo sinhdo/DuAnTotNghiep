@@ -1,6 +1,7 @@
 package com.example.duantotnghiep.fragment;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,9 +19,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.activity.CartActivity;
 import com.example.duantotnghiep.adapter.ProductAdapter;
 import com.example.duantotnghiep.adapter.ProductHomeAdapter;
 import com.example.duantotnghiep.adapter.SlideImageAdapter;
@@ -46,6 +49,7 @@ public class HomeFragment extends Fragment {
     private ViewPager slideImage;
     private CircleIndicator circleIndicator;
     private TextView textViewName;
+    private ImageView imgCart;
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
     RecyclerView rvManager;
@@ -79,10 +83,18 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         textViewName = view.findViewById(R.id.txtName);
+        imgCart = view.findViewById(R.id.imageView4);
         slideImage = view.findViewById(R.id.silde_image);
         circleIndicator = view.findViewById(R.id.circle_indicator);
         RecyclerView recyclerView = view.findViewById(R.id.view1);
         RecyclerView recyclerView2 = view.findViewById(R.id.view2);
+        imgCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               Intent intent = new Intent(getContext(), CartActivity.class);
+               startActivity(intent);
+            }
+        });
 
          productHomeAdapter = new ProductHomeAdapter(getContext(), productList);
         recyclerView.setAdapter(productHomeAdapter);
@@ -153,6 +165,7 @@ public class HomeFragment extends Fragment {
                 handler.postDelayed(sliderRunnable, 3000);
             }
         });
+
 
         return view;
     }
