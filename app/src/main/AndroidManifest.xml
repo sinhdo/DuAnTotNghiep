@@ -19,6 +19,9 @@
         android:theme="@style/Theme.DuAnTotNghiep"
         tools:targetApi="31">
         <activity
+            android:name=".activity.CartActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.AddLocationActivity"
             android:exported="false" />
         <activity

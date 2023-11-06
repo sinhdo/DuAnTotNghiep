@@ -7,6 +7,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
+
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -43,11 +45,10 @@ public class orderDetailsActivity extends AppCompatActivity {
     private List<Product> productList;
     private List<Integer> colorList;
     private OrderDetailsAdapter adapter;
-
     private String idProduct;
-
     private DatabaseReference productRef;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,7 +91,8 @@ public class orderDetailsActivity extends AppCompatActivity {
                         sizeList.add(size);
 
                         // Tạo một đối tượng Product từ dữ liệu nhận được
-                        Product product = new Product(name, price, imgProduct, Collections.singletonList(size), colorList, quantity);
+
+                        Product product = new Product();
 
                         productList = new ArrayList<>();
                         productList.add(product);

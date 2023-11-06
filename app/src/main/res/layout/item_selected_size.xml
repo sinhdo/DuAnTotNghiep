@@ -8,7 +8,6 @@
         android:layout_width="50dp"
         android:id="@+id/sizeTextView"
         android:layout_height="40dp"
-
         android:background="@drawable/btn_shop"
         android:text="Size"
         android:textColor="#E91E63" />

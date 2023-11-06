@@ -14,6 +14,9 @@ import com.example.duantotnghiep.databinding.ActivityMainBinding;
 import com.example.duantotnghiep.fragment.CartFragment;
 import com.example.duantotnghiep.fragment.HomeFragment;
 import com.example.duantotnghiep.fragment.ProfileFragment;
+
+import com.example.duantotnghiep.fragment.SearchProductFragment;
+
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.normal.TedPermission;
 

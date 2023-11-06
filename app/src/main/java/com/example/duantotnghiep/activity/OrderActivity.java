@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -23,6 +24,9 @@ import com.example.duantotnghiep.R;
 
 import com.example.duantotnghiep.adapter.ColorAdapter;
 import com.example.duantotnghiep.adapter.SizeAdapter;
+import com.example.duantotnghiep.model.AddProductToCart;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -46,11 +50,14 @@ public class OrderActivity extends AppCompatActivity {
     List<String> sizeList;
     ArrayList<Integer> colors;
     private Picasso picasso = Picasso.get();
+    private FirebaseUser firebaseUser;
+    private DatabaseReference mReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         AnhXa();
         loadDataFromFirebase();
     }
@@ -70,13 +77,28 @@ public class OrderActivity extends AppCompatActivity {
                 Double productPrice = Double.parseDouble(tvPriceProduct.getText().toString().replace("$ ", ""));
                 String productImageUrl = imgProduct.getTag().toString();
                 if (productImageUrl != null && !productImageUrl.isEmpty()) {
-                    dialogToBuy(productName, productPrice, productImageUrl);
+                    dialogToBuy(productName, productPrice, productImageUrl,0);
                 } else {
                     // Xử lý khi không có URL hình ảnh
                     Toast.makeText(OrderActivity.this, "Không tìm thấy hình ảnh sản phẩm", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+        btnAddToCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String productName = tvNameProduct.getText().toString();
+                Double productPrice = Double.parseDouble(tvPriceProduct.getText().toString().replace("$ ", ""));
+                String productImageUrl = imgProduct.getTag().toString();
+                if (productImageUrl != null && !productImageUrl.isEmpty()) {
+                    dialogToBuy(productName, productPrice, productImageUrl,1);
+                } else {
+                    // Xử lý khi không có URL hình ảnh
+                    Toast.makeText(OrderActivity.this, "Không tìm thấy hình ảnh sản phẩm", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
     private void loadDataFromFirebase() {
         idProduct = getIntent().getStringExtra("idPro");
@@ -132,7 +154,7 @@ public class OrderActivity extends AppCompatActivity {
             }
         });
     }
-    private void dialogToBuy(String productName, Double productPrice, String productImageUrl) {
+    private void dialogToBuy(String productName, Double productPrice, String productImageUrl,int type) {
         Dialog dialog = new Dialog(OrderActivity.this);
         dialog.setContentView(R.layout.dialog_order);
         dialog.getWindow().setBackgroundDrawable(getApplicationContext().getDrawable(R.drawable.bg_dialog));
@@ -185,21 +207,43 @@ public class OrderActivity extends AppCompatActivity {
             imgOrder.setImageResource(R.drawable.baseline_shopping_cart_24);
             Toast.makeText(OrderActivity.this, "Không tìm thấy hình ảnh sản phẩm", Toast.LENGTH_SHORT).show();
         }
-        btnBuy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                bundle.putString("Size", sizeAdapter.getSelectedSize());
-                ArrayList<Integer> selectedColors = new ArrayList<>(selectedColorAdapter.getSelectedColorList());
-                bundle.putIntegerArrayList("Color", selectedColors);
-                bundle.putInt("Quantity", num);
 
-                Intent intent = new Intent(OrderActivity.this, orderDetailsActivity.class);
-                intent.putExtra("productData", bundle);
-                intent.putExtra("idPro", idProduct);
-                startActivity(intent);
-            }
-        });
+        if (type==0){
+            btnBuy.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("Size", sizeAdapter.getSelectedSize());
+                    ArrayList<Integer> selectedColors = new ArrayList<>(selectedColorAdapter.getSelectedColorList());
+                    bundle.putIntegerArrayList("Color", selectedColors);
+                    bundle.putInt("Quantity", num);
+
+                    Intent intent = new Intent(OrderActivity.this, orderDetailsActivity.class);
+                    intent.putExtra("productData", bundle);
+                    intent.putExtra("idPro", idProduct);
+                    startActivity(intent);
+                }
+            });
+        }else {
+            btnBuy.setText("Thêm vào giỏ hàng");
+            String id_user = firebaseUser.getUid();
+            btnBuy.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String selectedColor = selectedColorAdapter.getSelectedColor();
+                   if (selectedColor==null||sizeAdapter.getSelectedSize()==null){
+                       Toast.makeText(OrderActivity.this, "Vui lòng chọn đủ màu và kích cỡ", Toast.LENGTH_SHORT).show();
+                   }else {
+                       mReference = FirebaseDatabase.getInstance().getReference().child("cart");
+                       String newKey = mReference.push().getKey();
+                       AddProductToCart product1 = new AddProductToCart(newKey, id_user, idProduct, productName,Integer.parseInt(selectedColor), sizeAdapter.getSelectedSize(), productImageUrl, num, productPrice);
+                       mReference.child(id_user).child(newKey).setValue(product1);
+                       Toast.makeText(OrderActivity.this, "Thêm vào giỏ hàng thành công", Toast.LENGTH_SHORT).show();
+                       dialog.dismiss();
+                   }
+                }
+            });
+        }
         dialog.show();
     }
 }
