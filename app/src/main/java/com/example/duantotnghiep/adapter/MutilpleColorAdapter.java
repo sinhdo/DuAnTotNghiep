@@ -25,11 +25,15 @@ public class MutilpleColorAdapter extends RecyclerView.Adapter<MutilpleColorAdap
     public MutilpleColorAdapter() {
         this.colorList = new ArrayList<>();
     }
+    public MutilpleColorAdapter(List<Integer> colorList) {
+        this.colorList = colorList;
+    }
 
     public void setColorList(List<Integer> colorList) {
         this.colorList = colorList;
         notifyDataSetChanged();
     }
+
     @NonNull
     @Override
 
@@ -38,6 +42,19 @@ public class MutilpleColorAdapter extends RecyclerView.Adapter<MutilpleColorAdap
         CircleColorBinding binding = CircleColorBinding.inflate(LayoutInflater.from(context), parent, false);
         return new ViewHolder(binding, context);
     }
+    public void updateColor(int color) {
+        if (colorList.contains(color)) {
+
+            colorList.remove(Integer.valueOf(color));
+        } else {
+
+            colorList.add(color);
+        }
+        notifyDataSetChanged();
+    }
+
+
+
 
 
     @Override
@@ -64,8 +81,9 @@ public class MutilpleColorAdapter extends RecyclerView.Adapter<MutilpleColorAdap
             super(binding.getRoot());
             this.binding = binding;
             this.context = context;
-            colorImageView = binding.colorImageView;
+            colorImageView = binding.colorImageView1;
         }
+
 
         public void bind(Integer color) {
 
@@ -89,6 +107,10 @@ public class MutilpleColorAdapter extends RecyclerView.Adapter<MutilpleColorAdap
             colorList.clear();
         }
         notifyDataSetChanged();
+    }
+    public List<Integer> getSelectedColors() {
+        return colorList;
+
     }
 
 

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,10 +30,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.Activity.ManagerProductActivity;
+
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.ColorAdapter;
 import com.example.duantotnghiep.adapter.MutilpleColorAdapter;
 import com.example.duantotnghiep.adapter.MutilpleImgAdapter;
+import com.example.duantotnghiep.model.Discount;
 import com.example.duantotnghiep.model.Product;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -45,7 +49,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AddProductFragment extends Fragment {
+public class AddProductFragment extends Fragment  {
     ImageView btnColor;
     private FirebaseAuth firebaseAuth;
 
@@ -132,6 +136,7 @@ public class AddProductFragment extends Fragment {
         sizeAdapter.add("FOOTWEAR");
 
 
+
         sizeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
@@ -191,6 +196,11 @@ public class AddProductFragment extends Fragment {
     }
 
 
+    public void callOnActivityResult(int requestCode, int resultCode, Intent data) {
+        onActivityResult(requestCode, resultCode, data);
+    }
+
+
     private void showDialogColor() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         LayoutInflater layoutInflater = LayoutInflater.from(requireContext());
@@ -202,7 +212,7 @@ public class AddProductFragment extends Fragment {
         alertDialog.show();
 
         GridLayout gridLayout = view.findViewById(R.id.grid);
-        final List<Integer> selectedColors = new ArrayList<>();
+
 
         for (int i = 0; i < gridLayout.getChildCount(); i++) {
             final ImageButton button = (ImageButton) gridLayout.getChildAt(i);
@@ -271,12 +281,14 @@ public class AddProductFragment extends Fragment {
                         DatabaseReference userProductsRef = database.getReference("user").child(userId);
 
                         userProductsRef.child(productId).setValue(product);
-
+                        Discount discount = new Discount();
+                        discount.setAmount(10.0);
 
                         product = new Product(
                                 productId, userId, Title, productType,
-                                "categoryID", Brand, Des, imageUrls, selectedColors, 1000, "ngon", Quantity, Price, selectedSize
+                                "categoryID", Brand, Des, imageUrls, selectedColors, 1000, "ngon", Quantity, Price, selectedSize,discount
                         );
+
 
 
                         productsRef.child(productId).setValue(product);
