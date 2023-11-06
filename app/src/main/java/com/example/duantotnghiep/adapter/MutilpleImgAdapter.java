@@ -28,6 +28,11 @@ public class MutilpleImgAdapter extends RecyclerView.Adapter<MutilpleImgAdapter.
         this.imageList = imageList;
         notifyDataSetChanged();
     }
+    public void setImageListEdit(List<Uri> newImageList) {
+        // Thêm danh sách Uri mới vào danh sách hiện có
+        imageList.addAll(newImageList);
+        notifyDataSetChanged(); // Cập nhật giao diện RecyclerView
+    }
 
     @NonNull
     @Override
