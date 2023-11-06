@@ -31,13 +31,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.duantotnghiep.Activity.ListUserActivity;
-import com.example.duantotnghiep.Activity.LocationActivity;
-import com.example.duantotnghiep.Activity.ManagerProductActivity;
-import com.example.duantotnghiep.ManHinhChoActivity;
+import com.example.duantotnghiep.activity.ListUserActivity;
+import com.example.duantotnghiep.activity.LocationActivity;
+import com.example.duantotnghiep.activity.ManagerProductActivity;
+import com.example.duantotnghiep.activity.ManHinhChoActivity;
 
-import com.example.duantotnghiep.Activity.ChangePassword_Activity;
+import com.example.duantotnghiep.activity.ChangePassword_Activity;
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.activity.OrderOfShopActivity;
+import com.example.duantotnghiep.activity.TopUpCardActivity;
 import com.example.duantotnghiep.database.FireBaseType;
 import com.example.duantotnghiep.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -92,7 +94,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
 
         cvOut = view.findViewById(R.id.cvOut);
-        cvOder = view.findViewById(R.id.cvOder);
+        cvOder = view.findViewById(R.id.cvOderForShop);
         cvPayment = view.findViewById(R.id.cvPayment);
         cvReview = view.findViewById(R.id.cvReView);
         cvTK = view.findViewById(R.id.cvTK);
@@ -137,7 +139,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         cvOder.setOnClickListener(this);
         cvOut.setOnClickListener(this);
         cvPromotion.setOnClickListener(this);
-        cvPayment.setOnClickListener(this);
+        cvPayment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), TopUpCardActivity.class);
+                startActivity(intent);
+            }
+        });
         cvChangePass.setOnClickListener(this);
         cvQLProduct.setOnClickListener(this);
         cvReview.setOnClickListener(this);
@@ -366,8 +374,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             if (view.getId()==R.id.cvOut){
                 showDialogOut();
                 firebaseAuth.signOut();
-            }else if (view.getId()==R.id.cvOder){
-
+            }else if (view.getId()==R.id.cvOderForShop){
+                startActivity(new Intent(getContext(), OrderOfShopActivity.class));
             }else if (view.getId()==R.id.cvPayment){
 
             }else if (view.getId()==R.id.cvPromotion){

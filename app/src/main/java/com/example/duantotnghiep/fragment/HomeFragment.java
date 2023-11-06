@@ -1,5 +1,6 @@
 package com.example.duantotnghiep.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -7,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
@@ -21,6 +23,7 @@ import android.widget.TextView;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.ProductAdapter;
 import com.example.duantotnghiep.adapter.ProductHomeAdapter;
+import com.example.duantotnghiep.adapter.SlideImageAdapter;
 import com.example.duantotnghiep.adapter.SliderImageAdapter;
 import com.example.duantotnghiep.model.Product;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,7 +36,15 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import me.relex.circleindicator.CircleIndicator;
+
 public class HomeFragment extends Fragment {
+    private Timer timer;
+    private ViewPager slideImage;
+    private CircleIndicator circleIndicator;
     private TextView textViewName;
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
@@ -60,6 +71,7 @@ public class HomeFragment extends Fragment {
         loadDataFromFirebase();
     }
 
+    @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -67,12 +79,41 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         textViewName = view.findViewById(R.id.txtName);
+        slideImage = view.findViewById(R.id.silde_image);
+        circleIndicator = view.findViewById(R.id.circle_indicator);
         RecyclerView recyclerView = view.findViewById(R.id.view1);
         RecyclerView recyclerView2 = view.findViewById(R.id.view2);
 
          productHomeAdapter = new ProductHomeAdapter(getContext(), productList);
         recyclerView.setAdapter(productHomeAdapter);
         recyclerView2.setAdapter(productHomeAdapter);
+        List<Integer> listImageSlide =new ArrayList<>();
+        listImageSlide.add(R.drawable.img);
+        listImageSlide.add(R.drawable.img1);
+        listImageSlide.add(R.drawable.img2);
+        listImageSlide.add(R.drawable.img3);
+        listImageSlide.add(R.drawable.img4);
+        SlideImageAdapter slideImageAdapter = new SlideImageAdapter(getContext(),listImageSlide);
+        slideImage.setAdapter(slideImageAdapter);
+        circleIndicator.setViewPager(slideImage);
+        slideImageAdapter.registerDataSetObserver(circleIndicator.getDataSetObserver());
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (isAdded() && getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            int currentItem = slideImage.getCurrentItem();
+                            int totalItems = slideImage.getAdapter().getCount();
+                            int nextItem = (currentItem + 1) % totalItems;
+                            slideImage.setCurrentItem(nextItem);
+                        }
+                    });
+                }
+            }
+        },2000,2000);
         LinearLayoutManager layoutManager2 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         ViewPager2 viewPager2 = view.findViewById(R.id.viewPaperSlider);

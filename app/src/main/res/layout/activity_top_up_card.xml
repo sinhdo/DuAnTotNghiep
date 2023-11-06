@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.TopUpCardActivity">
+
+    <EditText
+        android:id="@+id/etCardSerial"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:hint="Seri thẻ" />
+
+    <EditText
+        android:id="@+id/etCardPin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etCardSerial"
+        android:layout_margin="16dp"
+        android:hint="Mã thẻ" />
+
+    <Spinner
+        android:id="@+id/spinnerCardProvider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etCardPin"
+        android:layout_margin="16dp" />
+
+    <Spinner
+        android:id="@+id/spinnerCardValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/spinnerCardProvider"
+        android:layout_margin="16dp" />
+
+    <Button
+        android:id="@+id/btnAddCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/spinnerCardValue"
+        android:layout_margin="16dp"
+        android:text="Thêm thẻ" />
+
+    <ListView
+        android:id="@+id/lvCardList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnAddCard"
+        android:layout_margin="16dp" />
+
+</RelativeLayout>

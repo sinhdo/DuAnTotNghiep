@@ -19,20 +19,28 @@
         android:theme="@style/Theme.DuAnTotNghiep"
         tools:targetApi="31">
         <activity
-            android:name=".Activity.OrderActivity"
-            android:name=".Activity.LocationActivity"
+            android:name=".activity.AddLocationActivity"
             android:exported="false" />
         <activity
-            android:name=".Activity.OderActivity"
+            android:name=".activity.TopUpCardActivity"
             android:exported="false" />
         <activity
-            android:name=".Activity.ListUserActivity"
+            android:name=".activity.OrderOfShopActivity"
             android:exported="false" />
         <activity
-            android:name=".Activity.ChangePassword_Activity"
+            android:name=".activity.OrderActivity"
             android:exported="false" />
         <activity
-            android:name=".ManHinhChoActivity"
+            android:name=".activity.LocationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ListUserActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ChangePassword_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ManHinhChoActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,19 +49,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activity.ManagerProductActivity"
+            android:name=".activity.ManagerProductActivity"
             android:exported="true" />
         <activity
-            android:name=".Activity.TrackOrderActivity"
+            android:name=".activity.TrackOrderActivity"
             android:exported="false" />
         <activity
-            android:name=".Activity.DetailProductActivity"
+            android:name=".activity.DetailProductActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activity.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".Activity.orderDetailsActivity"
+            android:name=".activity.orderDetailsActivity"
             android:exported="true" />
         <activity
             android:name=".MainActivity"
