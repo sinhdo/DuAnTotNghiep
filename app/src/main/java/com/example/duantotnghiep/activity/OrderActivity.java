@@ -207,6 +207,7 @@ public class OrderActivity extends AppCompatActivity {
             imgOrder.setImageResource(R.drawable.baseline_shopping_cart_24);
             Toast.makeText(OrderActivity.this, "Không tìm thấy hình ảnh sản phẩm", Toast.LENGTH_SHORT).show();
         }
+
         if (type==0){
             btnBuy.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -243,7 +244,6 @@ public class OrderActivity extends AppCompatActivity {
                 }
             });
         }
-
         dialog.show();
     }
 }
