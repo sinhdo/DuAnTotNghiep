@@ -17,7 +17,7 @@ public class Product {
     private int quantity;
     private double price;
     private List<String> size;
-    private boolean paid;
+
     private Discount discount;
 
     public enum ProductType {
@@ -30,13 +30,6 @@ public class Product {
     }
 
 
-    public boolean isPaid() {
-        return paid;
-    }
-
-    public void setPaid(boolean paid) {
-        this.paid = paid;
-    }
 
     public Discount getDiscount() {
         return discount;
@@ -46,7 +39,7 @@ public class Product {
         this.discount = discount;
     }
 
-    public Product(String id, String sellerId, String name, ProductType productType, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int sold, String reviewId, int quantity, double price, List<String> size, boolean paid, Discount discount) {
+    public Product(String id, String sellerId, String name, ProductType productType, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int sold, String reviewId, int quantity, double price, List<String> size, Discount discount) {
         this.id = id;
         this.sellerId = sellerId;
         this.name = name;
@@ -61,7 +54,6 @@ public class Product {
         this.quantity = quantity;
         this.price = price;
         this.size = size;
-        this.paid = paid;
         this.discount = discount;
     }
 
