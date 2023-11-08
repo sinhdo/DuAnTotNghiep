@@ -50,6 +50,7 @@ public class CardAdapter extends BaseAdapter {
         TextView tvCardValue = view.findViewById(R.id.tvCardValue);
         TextView tvTime = view.findViewById(R.id.tvTime);
         TextView tvUsername = view.findViewById(R.id.tvUsername);
+        TextView tvStatus = view.findViewById(R.id.tvStatus);
 
         Card card = cardList.get(position);
 
@@ -59,6 +60,7 @@ public class CardAdapter extends BaseAdapter {
         tvCardValue.setText("Mệnh giá: " + card.getCardValue());
         tvTime.setText("Thời gian: " + card.getTime());
         tvUsername.setText("Người dùng: " + card.getUsername());
+        tvStatus.setText("Trạng thái: " + card.getStatus());
 
         return view;
     }
