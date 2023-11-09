@@ -208,20 +208,28 @@ public class OrderActivity extends AppCompatActivity {
             Toast.makeText(OrderActivity.this, "Không tìm thấy hình ảnh sản phẩm", Toast.LENGTH_SHORT).show();
         }
 
-        if (type==0){
+        if (type == 0) {
             btnBuy.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("Size", sizeAdapter.getSelectedSize());
+                    String selectedSize = sizeAdapter.getSelectedSize();
                     ArrayList<Integer> selectedColors = new ArrayList<>(selectedColorAdapter.getSelectedColorList());
-                    bundle.putIntegerArrayList("Color", selectedColors);
-                    bundle.putInt("Quantity", num);
 
-                    Intent intent = new Intent(OrderActivity.this, orderDetailsActivity.class);
-                    intent.putExtra("productData", bundle);
-                    intent.putExtra("idPro", idProduct);
-                    startActivity(intent);
+                    if (selectedColors.isEmpty()) {
+                        Toast.makeText(OrderActivity.this, "Vui lòng chọn ít nhất một màu sắc", Toast.LENGTH_SHORT).show();
+                    } else if (selectedSize == null ) {
+                        Toast.makeText(OrderActivity.this, "Vui lòng chọn kích cỡ", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("Size", selectedSize);
+                        bundle.putIntegerArrayList("Color", selectedColors);
+                        bundle.putInt("Quantity", num);
+
+                        Intent intent = new Intent(OrderActivity.this, orderDetailsActivity.class);
+                        intent.putExtra("productData", bundle);
+                        intent.putExtra("idPro", idProduct);
+                        startActivity(intent);
+                    }
                 }
             });
         }else {

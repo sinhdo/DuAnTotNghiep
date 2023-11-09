@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.LocationAdapter;
+
 import com.example.duantotnghiep.databinding.ActivityLocationBinding;
 import com.example.duantotnghiep.model.Location;
 import com.google.android.gms.tasks.OnCompleteListener;
