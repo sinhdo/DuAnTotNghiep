@@ -28,17 +28,14 @@ public class Product {
     public Product() {
 
     }
-
-
-
-    public Discount getDiscount() {
-        return discount;
+    public Product(String name, double price, List<String> imgProduct, List<String> size, List<Integer> color, int quantity) {
+        this.name = name;
+        this.price = price;
+        this.imgProduct = imgProduct;
+        this.size = size;
+        this.color = color;
+        this.quantity = quantity;
     }
-
-    public void setDiscount(Discount discount) {
-        this.discount = discount;
-    }
-
     public Product(String id, String sellerId, String name, ProductType productType, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int sold, String reviewId, int quantity, double price, List<String> size, Discount discount) {
         this.id = id;
         this.sellerId = sellerId;
@@ -54,6 +51,13 @@ public class Product {
         this.quantity = quantity;
         this.price = price;
         this.size = size;
+        this.discount = discount;
+    }
+    public Discount getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Discount discount) {
         this.discount = discount;
     }
 

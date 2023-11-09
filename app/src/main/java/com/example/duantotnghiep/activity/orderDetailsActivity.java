@@ -92,7 +92,7 @@ public class orderDetailsActivity extends AppCompatActivity {
 
                         // Tạo một đối tượng Product từ dữ liệu nhận được
 
-                        Product product = new Product();
+                        Product product = new Product(name, price, imgProduct, Collections.singletonList(size), colorList, quantity);
 
                         productList = new ArrayList<>();
                         productList.add(product);

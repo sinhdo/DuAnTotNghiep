@@ -7,12 +7,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.databinding.ActivityAddLocationBinding;
 import com.example.duantotnghiep.model.Location;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.example.duantotnghiep.databinding.ActivityAddLocationBinding;
 
 public class AddLocationActivity extends AppCompatActivity implements View.OnClickListener {
     private ActivityAddLocationBinding binding;
