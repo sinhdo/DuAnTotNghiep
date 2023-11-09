@@ -7,8 +7,12 @@ public class Card {
     private String cardValue;
     private String time;
     private String username;
-    private String userId; // Thêm trường userId
+    private String userId;
+    private String status; // Trường trạng thái
 
+    public Card() {
+        // Constructor mặc định không có đối số để đáp ứng yêu cầu của Firebase
+    }
     public Card(String cardSerial, String cardPin, String cardProvider, String cardValue, String time, String username, String userId) {
         this.cardSerial = cardSerial;
         this.cardPin = cardPin;
@@ -16,11 +20,11 @@ public class Card {
         this.cardValue = cardValue;
         this.time = time;
         this.username = username;
-        this.userId = userId; // Gán ID người dùng
+        this.userId = userId;
+        this.status = "Đang xử lý"; // Giá trị mặc định
     }
 
     // Các getter và setter
-
 
     public String getCardSerial() {
         return cardSerial;
@@ -76,6 +80,14 @@ public class Card {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
 

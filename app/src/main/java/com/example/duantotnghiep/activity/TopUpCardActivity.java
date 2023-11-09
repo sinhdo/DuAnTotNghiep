@@ -28,16 +28,20 @@ import android.widget.ArrayAdapter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class TopUpCardActivity extends AppCompatActivity {
-
     private EditText etCardSerial, etCardPin;
     private Spinner spinnerCardProvider, spinnerCardValue;
     private Button btnAddCard;
     private ListView lvCardList;
     private List<Card> cardList;
-    private CardAdapter cardAdapter; // Sử dụng CardAdapter thay vì ArrayAdapter
+    private CardAdapter cardAdapter;
+    private String currentUserId; // Thêm biến để lưu ID người dùng hiện tại
+    private FirebaseAuth mAuth; // Đối tượng Firebase Authentication
+    private DatabaseReference userRef; // Tham chiếu đến bảng dữ liệu người dùng
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,12 +55,10 @@ public class TopUpCardActivity extends AppCompatActivity {
         btnAddCard = findViewById(R.id.btnAddCard);
         lvCardList = findViewById(R.id.lvCardList);
 
-        // Khởi tạo danh sách thẻ đã thêm và adapter
         cardList = new ArrayList<>();
-        cardAdapter = new CardAdapter(this, cardList); // Sử dụng CardAdapter
-        lvCardList.setAdapter(cardAdapter); // Sử dụng CardAdapter
+        cardAdapter = new CardAdapter(this, cardList);
+        lvCardList.setAdapter(cardAdapter);
 
-        // Khởi tạo danh sách lựa chọn cho hãng thẻ và mệnh giá
         String[] cardProviders = {"Viettel", "Mobifone", "Vinaphone"};
         String[] cardValues = {"10000", "20000", "50000", "100000"};
 
@@ -68,92 +70,92 @@ public class TopUpCardActivity extends AppCompatActivity {
 
         spinnerCardProvider.setAdapter(cardProviderAdapter);
         spinnerCardValue.setAdapter(cardValueAdapter);
+        // Khởi tạo Firebase Authentication
+        mAuth = FirebaseAuth.getInstance();
 
-        // Lấy UID của người dùng đang đăng nhập hiện tại
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        String userId = currentUser.getUid();
+        // Khởi tạo tham chiếu đến bảng dữ liệu người dùng
+        userRef = FirebaseDatabase.getInstance().getReference("user");
 
-        // Đường dẫn thẻ của người dùng hiện tại trong Realtime Database
-        DatabaseReference userCardsRef = FirebaseDatabase.getInstance().getReference("user_cards").child(userId);
+        // Các dòng mã khác ở onCreate không thay đổi
 
-        // Mã lắng nghe sự thay đổi dữ liệu thẻ
-        userCardsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                cardList.clear(); // Xóa danh sách thẻ hiện tại
-
-                for (DataSnapshot cardSnapshot : dataSnapshot.getChildren()) {
-                    // Lấy thông tin thẻ và thêm vào danh sách
-                    Card card = cardSnapshot.getValue(Card.class);
-                    cardList.add(card);
-                }
-
-                cardAdapter.notifyDataSetChanged(); // Cập nhật giao diện ListView
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Xử lý lỗi nếu có
-            }
-        });
+        // Tải dữ liệu thẻ từ Firebase và thêm vào danh sách cardList
+        loadCardDataFromFirebase();
 
         btnAddCard.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                String cardSerial = etCardSerial.getText().toString();
-                String cardPin = etCardPin.getText().toString();
+            public void onClick(View v) {
+                // Lấy dữ liệu từ giao diện
+                String cardSerial = etCardSerial.getText().toString().trim();
+                String cardPin = etCardPin.getText().toString().trim();
                 String cardProvider = spinnerCardProvider.getSelectedItem().toString();
                 String cardValue = spinnerCardValue.getSelectedItem().toString();
+                String time = getCurrentTime(); // Lấy thời gian hiện tại
+                String userId = mAuth.getUid(); // Lấy ID người dùng hiện tại từ Firebase Authentication
 
-                // Lấy thời gian hiện tại
-                Calendar calendar = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-                String currentTime = sdf.format(calendar.getTime());
-
-                // Lấy tên người dùng và ID người dùng đang đăng nhập hiện tại
-                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                String userId = currentUser.getUid(); // Lấy ID của người dùng hiện tại
-                DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("user").child(userId);
-
-                usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                // Lấy thông tin người dùng từ Realtime Database
+                userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
                             String username = dataSnapshot.child("username").getValue(String.class);
-                            int currentWallet = dataSnapshot.child("wallet").getValue(Integer.class); // Lấy số tiền hiện tại trong ví
 
-                            // Tính toán số tiền mới sau khi nạp thẻ
-                            int cardValueInt = Integer.parseInt(cardValue); // Đổi giá trị thẻ thành kiểu int
-                            int newWallet = currentWallet + cardValueInt;
+                            // Tạo đối tượng Card
+                            Card card = new Card(cardSerial, cardPin, cardProvider, cardValue, time, username, userId);
 
-                            // Cập nhật số tiền trong ví của người dùng
-                            usersRef.child("wallet").setValue(newWallet);
+                            // Thêm đối tượng Card vào Realtime Database
+                            DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference("cards");
+                            String cardId = cardRef.push().getKey(); // Tạo ID mới cho thẻ
+                            cardRef.child(cardId).setValue(card);
 
-                            // Tạo đối tượng Card từ thông tin thẻ, thời gian, tên người dùng và ID người dùng
-                            Card card = new Card(cardSerial, cardPin, cardProvider, cardValue, currentTime, username, userId);
+                            // Xóa thông tin trên giao diện
+                            etCardSerial.setText("");
+                            etCardPin.setText("");
 
-                            // Thêm thẻ vào Realtime Database
-                            DatabaseReference cardsRef = FirebaseDatabase.getInstance().getReference("cards");
-                            String cardKey = cardsRef.push().getKey(); // Tạo một khóa duy nhất cho thẻ
-                            cardsRef.child(cardKey).setValue(card);
-
-                            // Thêm thẻ vào danh sách và cập nhật ListView
+                            // Cập nhật lại danh sách thẻ (nếu cần)
                             cardList.add(card);
                             cardAdapter.notifyDataSetChanged();
-                        } else {
-                            // Handle error: User data doesn't exist
                         }
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        // Handle error: Read operation cancelled
+                        // Xử lý lỗi nếu cần
                     }
                 });
             }
         });
-    }
 
+    }
+    // Hàm lấy thời gian hiện tại dưới dạng chuỗi
+    private String getCurrentTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+        Date currentDate = new Date();
+        return sdf.format(currentDate);
+    }
+    private void loadCardDataFromFirebase() {
+        // Lấy tham chiếu đến bảng dữ liệu thẻ từ Firebase
+        DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference("cards");
+
+        cardRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                cardList.clear();
+
+                for (DataSnapshot cardSnapshot : dataSnapshot.getChildren()) {
+                    Card card = cardSnapshot.getValue(Card.class);
+                    cardList.add(card);
+                }
+
+                // Cập nhật danh sách thẻ trên giao diện
+                cardAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Xử lý lỗi nếu cần
+            }
+        });
+    }
 }
 
 
