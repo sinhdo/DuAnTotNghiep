@@ -14,6 +14,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import android.os.Bundle;
@@ -136,7 +137,13 @@ public class TopUpCardActivity extends AppCompatActivity {
         // Lấy tham chiếu đến bảng dữ liệu thẻ từ Firebase
         DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference("cards");
 
-        cardRef.addValueEventListener(new ValueEventListener() {
+        // Lấy ID người dùng hiện tại
+        String currentUserId = mAuth.getUid();
+
+        // Tạo truy vấn để chỉ lấy dữ liệu thẻ của người dùng hiện tại
+        Query query = cardRef.orderByChild("userId").equalTo(currentUserId);
+
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 cardList.clear();
@@ -156,6 +163,7 @@ public class TopUpCardActivity extends AppCompatActivity {
             }
         });
     }
+
 }
 
 
