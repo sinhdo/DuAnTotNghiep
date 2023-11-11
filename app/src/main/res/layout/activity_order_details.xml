@@ -150,6 +150,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/white"
                 android:padding="8dp"
+                android:visibility="gone"
                 android:layout_height="match_parent">
                 <TextView
                     android:layout_width="wrap_content"
@@ -197,10 +198,11 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:background="@color/white"
                 android:padding="8dp"
+                android:orientation="vertical"
                 android:layout_height="match_parent">
                 <TextView
                     android:layout_width="wrap_content"
@@ -209,42 +211,72 @@
                     android:text="Your Address"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"/>
-                <ImageView
+                <LinearLayout
+                    android:id="@+id/lrlAddress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/imv1"
-                    android:src="@drawable/baseline_location_on_24"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="@id/txtA"
-                    app:layout_constraintTop_toBottomOf="@id/txtA"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/txtAddress"
-                    android:layout_marginStart="8dp"
-                    android:text="Ha NOI, HCM"
-                    style="@style/textStyleBold"
-                    app:layout_constraintBottom_toBottomOf="@id/imv1"
-                    app:layout_constraintStart_toEndOf="@id/imv1"
-                    app:layout_constraintTop_toTopOf="@id/imv1"/>
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/imgChooseAddress"
-                    app:layout_constraintBottom_toBottomOf="@id/txtAddress"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/txtA"
-                    android:src="@drawable/baseline_navigate_next_24"/>
-                <View
-                    android:layout_width="wrap_content"
-                    android:layout_height="1dp"
-                    android:id="@+id/view2"
-                    android:layout_marginTop="8dp"
-                    android:background="#D3C0C0"
-                    android:layout_marginBottom="8dp"
-                    app:layout_constraintEnd_toEndOf="@id/imgChooseAddress"
-                    app:layout_constraintStart_toStartOf="@id/imv1"
-                    app:layout_constraintTop_toBottomOf="@id/txtAddress"/>
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/imv1"
+                        android:src="@drawable/baseline_location_on_24"
+                        android:layout_marginTop="8dp"
+                       />
+                    <LinearLayout
+                        android:visibility="gone"
+                        android:id="@+id/idlr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_marginTop="8dp"
+                            android:textStyle="italic"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Address: "/>
+                        <TextView
+                            android:layout_marginTop="8dp"
+                            android:textStyle="italic"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Phone: "/>
+                    </LinearLayout>
+                   <LinearLayout
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:orientation="vertical">
+
+                       <TextView
+                           android:layout_marginTop="8dp"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:id="@+id/txtAddress"
+                           android:layout_marginStart="8dp"
+                           android:text="Enter your address"
+                           style="@style/textStyleBold"
+                          />
+                       <TextView
+                           android:layout_marginTop="8dp"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:id="@+id/txtPhone"
+                           android:layout_marginStart="8dp"
+                          android:visibility="gone"
+                           style="@style/textStyleBold"
+                          />
+                   </LinearLayout>
+                    <ImageView
+                        android:layout_marginTop="8dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:id="@+id/imgChooseAddress"
+                        app:layout_constraintBottom_toBottomOf="@id/txtAddress"
+                        android:layout_marginLeft="110dp"
+                        android:src="@drawable/baseline_navigate_next_24"/>
+                </LinearLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -253,33 +285,37 @@
                     android:layout_marginTop="8dp"
                     app:layout_constraintStart_toStartOf="@id/view2"
                     app:layout_constraintTop_toBottomOf="@id/view2"/>
-                <ImageView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/imgPayment"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="@id/txtB"
-                    app:layout_constraintTop_toBottomOf="@id/txtB"
-                    android:src="@drawable/baseline_payment_24"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/txtPayment"
-                    android:layout_marginStart="8dp"
-                    android:text="Cash"
-                    style="@style/textStyleBold"
-                    app:layout_constraintBottom_toBottomOf="@id/imgPayment"
-                    app:layout_constraintStart_toEndOf="@id/imgPayment"
-                    app:layout_constraintTop_toTopOf="@id/imgPayment"/>
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/imgChoosePayment"
-                    app:layout_constraintBottom_toBottomOf="@id/txtPayment"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/txtB"
-                    android:src="@drawable/baseline_navigate_next_24"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/imgPayment"
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintStart_toStartOf="@id/txtB"
+                        app:layout_constraintTop_toBottomOf="@id/txtB"
+                        android:src="@drawable/baseline_payment_24"/>
+                    <TextView
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtPayment"
+                        android:layout_marginStart="8dp"
+                        android:text="Payment methods"
+                        style="@style/textStyleBold"
+                        app:layout_constraintBottom_toBottomOf="@id/imgPayment"
+                        app:layout_constraintStart_toEndOf="@id/imgPayment"
+                        app:layout_constraintTop_toTopOf="@id/imgPayment"/>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/imgChoosePayment"
+                        android:layout_marginLeft="210dp"
+                        android:src="@drawable/baseline_navigate_next_24"/>
+                </LinearLayout>
+            </LinearLayout>
             <EditText
                 android:id="@+id/editTextMessageToSeller"
                 android:layout_width="match_parent"

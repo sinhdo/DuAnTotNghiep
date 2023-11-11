@@ -1,19 +1,49 @@
 package com.example.duantotnghiep.fragment;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.activity.InforOrderActivity;
+import com.example.duantotnghiep.adapter.OrderAdapter;
+import com.example.duantotnghiep.model.Order;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 
-public class WaitForShopFragment extends Fragment {
+public class WaitForShopFragment extends Fragment implements OrderAdapter.Callback{
+    private RecyclerView recyclerView;
+    private OrderAdapter oderAdapter;
+    private ArrayList<Order> list = new ArrayList<>();
+    private FirebaseUser firebaseUser;
+    private TextView noResultsTextView;
+
 
 
     public WaitForShopFragment() {
@@ -40,5 +70,118 @@ public class WaitForShopFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        recyclerView = view.findViewById(R.id.rec_waitforshop);
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        oderAdapter = new OrderAdapter(getContext(), list, this);
+        noResultsTextView = view.findViewById(R.id.noResultsTextView);
+        recyclerView.setAdapter(oderAdapter);
+        GetDataWaitListForShop();
+    }
+    private void GetDataWaitListForShop() {
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        String id_user = firebaseUser.getUid();
+        DatabaseReference myReference = firebaseDatabase.getReference("list_order");
+
+        myReference.orderByChild("status").equalTo("waiting").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (list != null) {
+                    list.clear();
+                }
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Order order = dataSnapshot.getValue(Order.class);
+                    if (order.getIdSeller().equals(id_user)) {
+                        list.add(order);
+                    }
+                }
+                if (list.isEmpty()){
+                    recyclerView.setVisibility(View.GONE);
+                    noResultsTextView.setVisibility(View.VISIBLE);
+
+                }else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    noResultsTextView.setVisibility(View.GONE);
+                }
+                oderAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Get list order failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void dialogForShop(Order order) {
+        Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.dialog_menu_order);
+        dialog.getWindow().setBackgroundDrawable(getActivity().getDrawable(R.drawable.bg_dialog_order));
+        Window window = dialog.getWindow();
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+        window.setAttributes(windowAttributes);
+        windowAttributes.gravity = Gravity.BOTTOM;
+        Button btnCancel = dialog.findViewById(R.id.btn1);
+        Button btnExit = dialog.findViewById(R.id.btn2);
+        btnExit.setText("Xác nhận đơn hàng");
+        btnExit.setOnClickListener(view -> {
+            order.setStatus("confirmed");
+            UpdateStatus(order);
+            dialog.dismiss();
+        });
+        btnCancel.setOnClickListener(view -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle("Confirm Cancellation");
+            builder.setMessage("Are you sure you want to cancel this order?");
+            builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    order.setStatus("canceledbyshop");
+                    UpdateStatus(order);
+                    dialog.dismiss();
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+            AlertDialog dialog1 = builder.create();
+            dialog1.show();
+
+        });
+        Button tt = dialog.findViewById(R.id.btn_propety);
+        tt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), InforOrderActivity.class);
+                intent.putExtra("idOrder",order.getId());
+                startActivity(intent);
+            }
+        });
+
+        dialog.show();
+    }
+    private void UpdateStatus(Order order) {
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = firebaseDatabase.getReference("list_order");
+        String id = order.getId();
+        myRef.child(id).setValue(order, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if (error == null) {
+                    Toast.makeText(getContext(), "Update status", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Update fall", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void logic(Order order) {
+        dialogForShop(order);
     }
 }
