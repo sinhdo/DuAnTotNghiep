@@ -3,7 +3,8 @@ package com.example.duantotnghiep.model;
 import java.util.List;
 
 public class User {
-    private String id,username,password,email,address,phone,wallet;
+    private String id,username,password,email,address,phone;
+    private Double wallet;
     private String img;
     private Boolean user_type;
     private List<Location> location;
@@ -72,12 +73,11 @@ public class User {
     }
 
 
-
-    public String getWallet() {
+    public Double getWallet() {
         return wallet;
     }
 
-    public void setWallet(String wallet) {
+    public void setWallet(Double wallet) {
         this.wallet = wallet;
     }
 
@@ -92,7 +92,7 @@ public class User {
         this.location = location;
     }
 
-    public User(String id, String username, String password, String email, String address, String phone, String wallet, String img, Boolean user_type, List<Location> location) {
+    public User(String id, String username, String password, String email, String address, String phone, Double wallet, String img, Boolean user_type, List<Location> location) {
         this.id = id;
         this.username = username;
         this.password = password;

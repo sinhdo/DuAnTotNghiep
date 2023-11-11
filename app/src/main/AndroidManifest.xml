@@ -23,6 +23,12 @@
         android:theme="@style/Theme.DuAnTotNghiep"
         tools:targetApi="31">
         <activity
+            android:name=".activity.InforOrderActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ShowListLocationActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.CartActivity"
             android:exported="false" />
         <activity

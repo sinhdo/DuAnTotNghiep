@@ -17,6 +17,7 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.model.Discount;
 import com.example.duantotnghiep.model.Product;
 import com.squareup.picasso.Picasso;
 
@@ -54,6 +55,12 @@ public class OrderDetailsAdapter extends RecyclerView.Adapter<OrderDetailsAdapte
     public int getItemCount() {
         return productList != null ? productList.size() : 0;
     }
+    public Product getProduct(int position) {
+        if (position >= 0 && position < productList.size()) {
+            return productList.get(position);
+        }
+        return null;
+    }
 
     public void setProductList(List<Product> productList) {
         this.productList = productList;
@@ -62,7 +69,7 @@ public class OrderDetailsAdapter extends RecyclerView.Adapter<OrderDetailsAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView imgProduct;
-        private TextView tvProductName, tvSize, tvPrice, tvCum, tvColor;
+        private TextView tvProductName, tvSize, tvPrice, tvCum, tvColor,tv_km_dt,idPR,idSl;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -72,10 +79,16 @@ public class OrderDetailsAdapter extends RecyclerView.Adapter<OrderDetailsAdapte
             tvColor = itemView.findViewById(R.id.tvColor_dt);
             tvPrice = itemView.findViewById(R.id.priceOrder_dt);
             tvCum = itemView.findViewById(R.id.tvCum_dt);
+            tv_km_dt = itemView.findViewById(R.id.tv_km_dt);
+            idPR = itemView.findViewById(R.id.idPR);
+            idSl = itemView.findViewById(R.id.idSL);
         }
 
         public void bind(Product product, List<Integer> colorList, int position) {
+
             tvProductName.setText(product.getName());
+            idPR.setText(product.getId());
+            idSl.setText(product.getSellerId());
 
             tvSize.setText(String.format("Cỡ %s", TextUtils.join(", ", product.getSize())));
 
@@ -87,6 +100,14 @@ public class OrderDetailsAdapter extends RecyclerView.Adapter<OrderDetailsAdapte
             tvPrice.setText("$ " + product.getPrice());
 
             tvCum.setText(String.format("Số lượng %s", product.getQuantity()));
+            Discount discount = product.getDiscount();
+
+            if (discount != null) {
+                double discountAmount = discount.getAmount();
+                tv_km_dt.setText("Discount: " + discountAmount + "%");
+            } else {
+                tv_km_dt.setText("No Discount");
+            }
 
             if (product.getImgProduct() != null && !product.getImgProduct().isEmpty()) {
                 Picasso.get().load(product.getImgProduct().get(0)).into(imgProduct);
