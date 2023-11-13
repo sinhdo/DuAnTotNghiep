@@ -101,11 +101,11 @@ public class TopUpCardActivity extends AppCompatActivity {
                             String username = dataSnapshot.child("username").getValue(String.class);
 
                             // Tạo đối tượng Card
-                            Card card = new Card(cardSerial, cardPin, cardProvider, cardValue, time, username, userId);
-
-                            // Thêm đối tượng Card vào Realtime Database
                             DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference("cards");
                             String cardId = cardRef.push().getKey(); // Tạo ID mới cho thẻ
+
+                            // Thêm đối tượng Card vào Realtime Database
+                            Card card = new Card(cardId, cardSerial, cardPin, cardProvider, cardValue, time, username, userId, "pending", false);
                             cardRef.child(cardId).setValue(card);
 
                             // Xóa thông tin trên giao diện

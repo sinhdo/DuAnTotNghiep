@@ -1,12 +1,13 @@
 package com.example.duantotnghiep.model;
 
 import java.util.List;
+import java.util.Map;
 
 public class User {
     private String id,username,password,email,address,phone,wallet;
     private String img;
     private Boolean user_type;
-    private List<Location> location;
+    private Map<String, Location> location;  // Thay vì List<Location>
     public Boolean getUser_type() {
         return user_type;
     }
@@ -84,15 +85,15 @@ public class User {
     public User() {
     }
 
-    public List<Location> getLocation() {
+    public Map<String, Location> getLocation() {
         return location;
     }
 
-    public void setLocation(List<Location> location) {
+    public void setLocation(Map<String, Location> location) {
         this.location = location;
     }
 
-    public User(String id, String username, String password, String email, String address, String phone, String wallet, String img, Boolean user_type, List<Location> location) {
+    public User(String id, String username, String password, String email, String address, String phone, String wallet, String img, Boolean user_type,Map<String, Location> location) {
         this.id = id;
         this.username = username;
         this.password = password;
