@@ -40,9 +40,9 @@ import java.util.List;
 
 public class OrderActivity extends AppCompatActivity {
     private ImageView imgProduct;
-    private TextView tvNameProduct,tvPriceProduct,tvDescriptionPro;
+    private TextView tvNameProduct,tvPriceProduct,tvDescriptionPro, tvQuantity;
     private Button btnAddToCart,btnBuyProduct;
-
+    private int productQuantity; // Biến thành viên lưu trữ số lượng sản phẩm từ Firebase
     private ColorAdapter selectedColorAdapter;
     private int num;
 
@@ -66,6 +66,7 @@ public class OrderActivity extends AppCompatActivity {
         tvNameProduct =findViewById(R.id.tvNameProduct);
         tvPriceProduct =findViewById(R.id.tvPriceProduct);
         tvDescriptionPro =findViewById(R.id.tvDescriptionPro);
+        tvQuantity =findViewById(R.id.tvQuantity);
         btnAddToCart =findViewById(R.id.btnAddToCart);
         btnBuyProduct =findViewById(R.id.btnBuyProduct);
         idProduct = getIntent().getStringExtra("idPro");
@@ -103,17 +104,26 @@ public class OrderActivity extends AppCompatActivity {
     private void loadDataFromFirebase() {
         idProduct = getIntent().getStringExtra("idPro");
         DatabaseReference productRef = FirebaseDatabase.getInstance().getReference().child("products").child(idProduct);
-        productRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        productRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // Xử lý dữ liệu khi có sự thay đổi trên Firebase
                 String name = snapshot.child("name").getValue(String.class);
                 Double price = snapshot.child("price").getValue(Double.class);
                 String description = snapshot.child("description").getValue(String.class);
+                Integer quantity = snapshot.child("quantity").getValue(Integer.class);
+                if (quantity != null) {
+                    productQuantity = quantity;
+                }
+
                 ArrayList<String> imgProductUrls = snapshot.child("imgProduct").getValue(new GenericTypeIndicator<ArrayList<String>>() {});
 
                 tvNameProduct.setText(name);
                 tvPriceProduct.setText("$ " + price);
                 tvDescriptionPro.setText(description);
+                if (quantity != null) {
+                    tvQuantity.setText("Số lượng còn: " + quantity);
+                }
 
                 if (imgProductUrls != null && !imgProductUrls.isEmpty()) {
                     String imgUrl = imgProductUrls.get(0);
@@ -129,6 +139,7 @@ public class OrderActivity extends AppCompatActivity {
                         colors.add(color);
                     }
                 }
+
                 DataSnapshot sizeSnapshot = snapshot.child("size");
                 sizeList = new ArrayList<>();
                 for (DataSnapshot sizeItemSnapshot : sizeSnapshot.getChildren()) {
@@ -136,15 +147,6 @@ public class OrderActivity extends AppCompatActivity {
                     if (size != null) {
                         sizeList.add(size);
                     }
-                }
-                tvNameProduct.setText(name);
-                tvPriceProduct.setText("$ " + price);
-                tvDescriptionPro.setText(description);
-
-                if (imgProductUrls != null && !imgProductUrls.isEmpty()) {
-                    String imgUrl = imgProductUrls.get(0);
-                    picasso.load(imgUrl).into(imgProduct);
-                    imgProduct.setTag(imgUrl);
                 }
             }
 
@@ -193,10 +195,11 @@ public class OrderActivity extends AppCompatActivity {
             }
         });
         imgPlus.setOnClickListener(view -> {
-            if (num < 10){
+            if (num < productQuantity){
                 num++;
                 tvNum.setText(num+"");
-
+            }else {
+                Toast.makeText(OrderActivity.this, "Sản phẩm chỉ có " + productQuantity + " cái", Toast.LENGTH_SHORT).show();
             }
         });
         nameProduct.setText(productName);

@@ -19,8 +19,6 @@ public class ManagerProductActivity extends AppCompatActivity {
     ActivityManagerProductBinding binding;
     private boolean isInAddProductFragment = false;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +55,6 @@ public class ManagerProductActivity extends AppCompatActivity {
         binding.viewPaperSeller.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(binding.tabLayoutSeller));
         binding.viewPaperSeller.setAdapter(new ManagerSellerAdapter(getSupportFragmentManager(), this, binding.tabLayoutSeller.getTabCount()));
 
-
         binding.floatAddProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,9 +68,6 @@ public class ManagerProductActivity extends AppCompatActivity {
                 transaction.commit();
             }
         });
-
-
-
     }
 
     public void hideFloatingActionButton() {
@@ -106,7 +100,4 @@ public class ManagerProductActivity extends AppCompatActivity {
             showFloatingActionButton();
         }
     }
-
-
-
 }

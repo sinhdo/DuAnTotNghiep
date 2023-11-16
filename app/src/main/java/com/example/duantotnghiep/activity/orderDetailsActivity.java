@@ -59,7 +59,7 @@ public class orderDetailsActivity extends AppCompatActivity {
     private Button btnOrder;
     private RecyclerView rcvOrderDetail;
 
-    private TextView txtSubtotal, txtDelivery, txtTax, txtTotal, txtAddress, txtPayment, txtPhone;
+    private TextView txtSubtotal, txtDelivery, txtTax, txtTotal, txtAddress, txtPayment, txtPhone, txtMoney;
 
     private LinearLayout linearLayouAddress, idlr;
     private EditText notes;
@@ -88,6 +88,7 @@ public class orderDetailsActivity extends AppCompatActivity {
         txtAddress = findViewById(R.id.txtAddress);
         txtPhone = findViewById(R.id.txtPhone);
         txtPayment = findViewById(R.id.txtPayment);
+        txtMoney = findViewById(R.id.txtMoney);
         notes = findViewById(R.id.editTextMessageToSeller);
         linearLayouAddress = findViewById(R.id.lrlAddress);
         idlr = findViewById(R.id.idlr);
@@ -97,7 +98,22 @@ public class orderDetailsActivity extends AppCompatActivity {
         Intent intent = getIntent();
         idProduct = intent.getStringExtra("idPro");
         productRef = FirebaseDatabase.getInstance().getReference().child("products").child(idProduct);
+        String buyerID = firebaseUser.getUid();
+        DatabaseReference buyerRef = userRef.child("user").child(buyerID).child("wallet");
+        buyerRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    double walletAmount = dataSnapshot.getValue(Double.class);
+                    txtMoney.setText(String.format(walletAmount + " VND"));
+                }
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Xử lý khi có lỗi xảy ra
+            }
+        });
         productRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -111,6 +127,7 @@ public class orderDetailsActivity extends AppCompatActivity {
                     String reviewId = dataSnapshot.child("reviewId").getValue(String.class);
                     int sold = dataSnapshot.child("sold").getValue(Integer.class);
                     double price = dataSnapshot.child("price").getValue(Double.class);
+                    int currentQuantity = dataSnapshot.child("quantity").getValue(Integer.class);
                     List<String> imgProduct = dataSnapshot.child("imgProduct").getValue(new GenericTypeIndicator<List<String>>() {
                     });
 
@@ -128,6 +145,7 @@ public class orderDetailsActivity extends AppCompatActivity {
                         Product product = new Product(idProduct, idseller, name, null, categoryID, brand,
                                 description, imgProduct, colorList, sold, reviewId, quantity, price, Collections.singletonList(size), null);
 
+                        product.setSelectedQuantity(quantity);
                         productList = new ArrayList<>();
                         productList.add(product);
 
@@ -171,9 +189,8 @@ public class orderDetailsActivity extends AppCompatActivity {
         btnOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-                DatabaseReference myRef = firebaseDatabase.getReference("list_order");
-                String newKey = myRef.push().getKey();
+                DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference("list_order");
+                String newKey = orderRef.push().getKey();
                 String idBuyer = firebaseUser.getUid();
                 String date = getCurrentTime();
 
@@ -182,22 +199,60 @@ public class orderDetailsActivity extends AppCompatActivity {
                 } else if (txtPayment.getText().toString().equalsIgnoreCase("Payment methods")) {
                     Toast.makeText(orderDetailsActivity.this, "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
                 } else {
+                    boolean paid = false;
                     if (txtPayment.getText().toString().equalsIgnoreCase("Payment on delivery")) {
                         paid = false;
                     } else if (txtPayment.getText().toString().equalsIgnoreCase("Pay with wallet")) {
                         paid = true;
                     }
 
+                    if (paid) {
+                        double totalAmount = Double.parseDouble(txtTotal.getText().toString());
+                        String buyerID = firebaseUser.getUid();
+                        deductAmountFromBuyerWallet(buyerID, totalAmount);
+                    }
+
+                    DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference("products");
                     for (int i = 0; i < adapter.getItemCount(); i++) {
                         Product product = adapter.getProduct(i);
                         if (product != null) {
                             List<Integer> listColor = product.getColor();
                             int color = listColor.get(i);
-                            Order order = new Order(newKey, idBuyer, product.getSellerId(), product.getId(), product.getName()
-                                    , product.getImgProduct().get(0),color, Double.parseDouble(txtTotal.getText().toString()), date, txtAddress.getText().toString()
-                                    , txtPhone.getText().toString(), product.getQuantity(), notes.getText().toString(), paid, "waiting");
-                            On_Create_Bill(order);
-                            Log.d("=====", "onClick: sl" + product.getSellerId() + " pr " + product.getId());
+
+                            Bundle bundle = getIntent().getBundleExtra("productData");
+                            if (bundle != null) {
+                                int receivedQuantity = bundle.getInt("Quantity");
+
+                                boolean finalPaid = paid;
+                                productsRef.child(product.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        int currentQuantity = dataSnapshot.child("quantity").getValue(Integer.class);
+                                        int remainingQuantity = currentQuantity - receivedQuantity;
+
+                                        if (remainingQuantity >= 0) {
+                                            // Cập nhật số lượng còn lại (remainingQuantity) trong Firebase
+                                            productsRef.child(product.getId()).child("quantity").setValue(remainingQuantity);
+
+                                            Order order = new Order(newKey, idBuyer, product.getSellerId(), product.getId(), product.getName(),
+                                                    product.getImgProduct().get(0), color, Double.parseDouble(txtTotal.getText().toString()),
+                                                    date, txtAddress.getText().toString(), txtPhone.getText().toString(),
+                                                    receivedQuantity, notes.getText().toString(), finalPaid, "waiting");
+
+                                            On_Create_Bill(order);
+                                            Log.d("=====", "onClick: sl" + product.getSellerId() + " pr " + product.getId());
+                                        } else {
+                                            // Số lượng yêu cầu vượt quá số lượng hiện có
+                                            Toast.makeText(orderDetailsActivity.this, "Số lượng sản phẩm không đủ", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
+                                    }
+                                });
+                            }
                         }
                     }
                 }

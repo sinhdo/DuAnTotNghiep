@@ -1,5 +1,6 @@
 package com.example.duantotnghiep.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import com.example.duantotnghiep.model.Card;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -76,10 +78,11 @@ public class TopUpCardActivity extends AppCompatActivity {
         spinnerCardValue.setAdapter(cardValueAdapter);
 
         mAuth = FirebaseAuth.getInstance();
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        currentUserId = firebaseUser.getUid();
 
 
         userRef = FirebaseDatabase.getInstance().getReference("user");
-        currentUserId = mAuth.getUid();
 
         loadCardDataFromFirebase();
 
@@ -92,30 +95,47 @@ public class TopUpCardActivity extends AppCompatActivity {
                 String cardProvider = spinnerCardProvider.getSelectedItem().toString();
                 String cardValue = spinnerCardValue.getSelectedItem().toString();
                 String time = getCurrentTime();
-                String userId = mAuth.getUid();
+                String buyerID  = mAuth.getUid();
+                DatabaseReference buyerRef = userRef.child("user").child(buyerID).child("wallet");
+                buyerRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            Number walletValue = dataSnapshot.getValue(Number.class);
+                            if (walletValue != null) {
+                                double walletValueString = dataSnapshot.getValue(Double.class);
+                                moneyTextView.setText(String.format(walletValueString + " VND"));
+                            }
+                        }
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        // Xử lý khi có lỗi xảy ra
+                    }
+                });
                 userRef.child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
                             String username = dataSnapshot.child("username").getValue(String.class);
-                            Number walletValue = dataSnapshot.child("wallet").getValue(Number.class);
-                            if (walletValue != null) {
-                                String walletValueString = String.valueOf(walletValue);
-                                moneyTextView.setText(walletValueString);
 
-                                Card card = new Card(cardSerial, cardPin, cardProvider, cardValue, time, username, currentUserId);
+                            // Tạo đối tượng Card
+                            Card card = new Card(cardSerial, cardPin, cardProvider, cardValue, time, username, buyerID);
 
-                                DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference("cards");
-                                String cardId = cardRef.push().getKey();
-                                cardRef.child(cardId).setValue(card);
+                            // Thêm đối tượng Card vào Realtime Database
+                            DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference("cards");
+                            String cardId = cardRef.push().getKey(); // Tạo ID mới cho thẻ
+                            cardRef.child(cardId).setValue(card);
 
-                                etCardSerial.setText("");
-                                etCardPin.setText("");
+                            // Xóa thông tin trên giao diện
+                            etCardSerial.setText("");
+                            etCardPin.setText("");
 
-                                cardList.add(card);
-                                cardAdapter.notifyDataSetChanged();
-                            }
+                            // Cập nhật lại danh sách thẻ (nếu cần)
+                            cardList.add(card);
+                            cardAdapter.notifyDataSetChanged();
+
                         }
                     }
 
