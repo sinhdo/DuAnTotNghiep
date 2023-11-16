@@ -38,6 +38,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -172,27 +173,32 @@ public class HomeFragment extends Fragment {
     private void loadDataFromFirebase() {
         databaseReference = FirebaseDatabase.getInstance().getReference("products");
 
-       
-       databaseReference.addValueEventListener(new ValueEventListener() {
-           @Override
-           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-               productList.clear(); 
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                productList.clear();
 
-               for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                   Product product = snapshot.getValue(Product.class);
-                   productList.add(product);
-               }
+                String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-             
-               productHomeAdapter.updateProductList(productList);
-           }
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Product product = snapshot.getValue(Product.class);
+                    if (product.getQuantity() > 0) {
+                        if (product.getSellerId().equals(currentUserId)) {
+                            continue;
+                        }
+                        productList.add(product);
+                    }
+                }
 
-           @Override
-           public void onCancelled(@NonNull DatabaseError databaseError) {
-              
-           }
-       });
-   }
+                productHomeAdapter.setData(productList);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
     private void setInfoProfile() {
         String id = firebaseUser.getUid();
         DatabaseReference userRef = mReference.child("user").child(id);

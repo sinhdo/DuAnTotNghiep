@@ -20,6 +20,11 @@ public class Product {
 
     private Discount discount;
 
+    private boolean isUserProduct;
+
+    private int selectedQuantity;
+
+
     public enum ProductType {
         CLOTHING,
         FOOTWEAR
@@ -45,14 +50,20 @@ public class Product {
         this.size = size;
         this.discount = discount;
     }
-    //    public Product(String name, double price, List<String> imgProduct, List<String> size, List<Integer> color, int quantity) {
-    //        this.name = name;
-    //        this.price = price;
-    //        this.imgProduct = imgProduct;
-    //        this.size = size;
-    //        this.color = color;
-    //        this.quantity = quantity;
-    //    }
+    public int getSelectedQuantity() {
+        return selectedQuantity;
+    }
+
+    public void setSelectedQuantity(int selectedQuantity) {
+        this.selectedQuantity = selectedQuantity;
+    }
+    public boolean isUserProduct() {
+        return isUserProduct;
+    }
+
+    public void setUserProduct(boolean userProduct) {
+        isUserProduct = userProduct;
+    }
 
     public Discount getDiscount() {
         return discount;

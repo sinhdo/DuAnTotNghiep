@@ -52,26 +52,20 @@ import java.util.List;
 public class AddProductFragment extends Fragment  {
     ImageView btnColor;
     private FirebaseAuth firebaseAuth;
-
     private List<Uri> selectedImageUris = new ArrayList<>();
-
     private List<Integer> selectedColors = new ArrayList<>();
     private MutilpleColorAdapter mAdapter = new MutilpleColorAdapter();
     private ImageView chooseImg;
-
     List<String> selectedSize;
     MutilpleImgAdapter adapter;
     private boolean isAddingProduct = false;
-
     private RecyclerView multipleImg;
     private static final int REQUEST_CODE_SELECT_IMAGES = 1;
-
     EditText edtTitle, edtPrice, edtQuantity, edtBrand, edtDes;
     Button addProduct;
     private Spinner sizeSpinner;
     Product product;
     private StorageReference storageReference;
-
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.add_product_fragment, container, false);
         firebaseAuth = FirebaseAuth.getInstance();
@@ -89,16 +83,13 @@ public class AddProductFragment extends Fragment  {
         RecyclerView rvMutilpeColor = root.findViewById(R.id.rvMutilpeColor);
         rvMutilpeColor.setAdapter(mAdapter);
 
-
         btnColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDialogColor();
             }
         });
-
         ((ManagerProductActivity) requireActivity()).hideFloatingActionButton();
-
         chooseImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -131,48 +122,34 @@ public class AddProductFragment extends Fragment  {
         sizeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sizeSpinner.setAdapter(sizeAdapter);
 
-
         sizeAdapter.add("CLOTHING");
         sizeAdapter.add("FOOTWEAR");
-
-
 
         sizeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String selectedProductType = (String) sizeSpinner.getSelectedItem();
                 selectedSize = new ArrayList<>();
-
                 if ("CLOTHING".equals(selectedProductType)) {
-
                     selectedSize.addAll(Arrays.asList("XS", "S", "M", "L", "XL", "XXL"));
                 } else if ("FOOTWEAR".equals(selectedProductType)) {
-
                     selectedSize.addAll(Arrays.asList("36", "37", "38", "39", "40", "41", "42", "43", "44"));
                 }
-
-
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
 
             }
         });
-
         return root;
     }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == REQUEST_CODE_SELECT_IMAGES && resultCode == Activity.RESULT_OK) {
             if (data != null) {
                 ClipData clipData = data.getClipData();
-
                 if (clipData != null) {
-
                     for (int i = 0; i < clipData.getItemCount(); i++) {
                         Uri imageUri = clipData.getItemAt(i).getUri();
                         if (imageUri != null) {
@@ -180,14 +157,11 @@ public class AddProductFragment extends Fragment  {
                         }
                     }
                 } else {
-
                     Uri imageUri = data.getData();
                     if (imageUri != null) {
                         selectedImageUris.add(imageUri);
                     }
                 }
-
-
                 if (adapter != null) {
                     adapter.setImageList(selectedImageUris);
                 }
@@ -195,11 +169,9 @@ public class AddProductFragment extends Fragment  {
         }
     }
 
-
     public void callOnActivityResult(int requestCode, int resultCode, Intent data) {
         onActivityResult(requestCode, resultCode, data);
     }
-
 
     private void showDialogColor() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -244,7 +216,6 @@ public class AddProductFragment extends Fragment  {
         recyclerView.setAdapter(colorAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
     }
-
     private void saveProductToRealtimeDatabase() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference productsRef = database.getReference("products");
@@ -263,33 +234,29 @@ public class AddProductFragment extends Fragment  {
         Product.ProductType productType = Product.ProductType.valueOf(selectedProductType);
         List<String> imageUrls = new ArrayList<>();
         List<String> imageUriStrings = new ArrayList<>();
+
         for (Uri imageUri : selectedImageUris) {
             String imageName = "product_images/" + productId + "/" + imageUri.getLastPathSegment();
             StorageReference imageRef = storageReference.child(imageName);
             UploadTask uploadTask = imageRef.putFile(imageUri);
             imageUriStrings.add(imageUri.toString());
-            uploadTask.addOnSuccessListener(taskSnapshot -> {
 
+            uploadTask.addOnSuccessListener(taskSnapshot -> {
                 imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     String imageUrl = uri.toString();
                     imageUrls.add(imageUrl);
 
-
                     if (imageUrls.size() == selectedImageUris.size()) {
-
                         String userId = firebaseAuth.getCurrentUser().getUid();
-                        DatabaseReference userProductsRef = database.getReference("user").child(userId);
 
-                        userProductsRef.child(productId).setValue(product);
                         Discount discount = new Discount();
                         discount.setAmount(10.0);
-
-                        product = new Product(
+                        // Tạo đối tượng Product và đánh dấu là sản phẩm do người dùng đăng
+                        Product product = new Product(
                                 productId, userId, Title, productType,
-                                "categoryID", Brand, Des, imageUrls, selectedColors, 1000, "ngon", Quantity, Price, selectedSize,discount
+                                "categoryID", Brand, Des, imageUrls, selectedColors, 1000, "ngon", Quantity, Price, selectedSize, discount
                         );
-
-
+                        product.setUserProduct(true);
 
                         productsRef.child(productId).setValue(product);
                         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
@@ -300,11 +267,6 @@ public class AddProductFragment extends Fragment  {
                     }
                 });
             });
-
         }
-
-
     }
-
-
 }

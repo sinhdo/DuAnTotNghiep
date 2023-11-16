@@ -58,17 +58,43 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/txt1"
-                    android:text="Subtotal"
+                    android:id="@+id/txt0"
+                    android:text="Your amount"
                     style="@style/textStyle"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/txtSubtotal"
+                    android:id="@+id/txtMoney"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/txt1"
+                    app:layout_constraintTop_toTopOf="@id/txt0"
+                    style="@style/textStyle"
+                    android:text="VND"/>
+                <View
+                    android:layout_width="wrap_content"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#D3C0C0"
+                    android:id="@+id/View1"
+                    app:layout_constraintTop_toBottomOf="@id/txt0"
+                    app:layout_constraintEnd_toEndOf="@id/txtMoney"
+                    app:layout_constraintStart_toStartOf="@id/txt0"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txt1"
+                    android:text="Subtotal"
+                    style="@style/textStyle"
+                    app:layout_constraintStart_toStartOf="@+id/txt0"
+                    app:layout_constraintTop_toBottomOf="@id/View1"/>/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txtSubtotal"
+                    app:layout_constraintEnd_toEndOf="@id/txtMoney"
+                    app:layout_constraintTop_toTopOf="@id/View1"
                     style="@style/textStyle"
                     android:text="10$"/>
                 <TextView
