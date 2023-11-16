@@ -206,11 +206,12 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                                             User user = new User();
                                             user.setId(id);
                                             user.setUsername(name);
-                                            user.setImg("");
+                                            user.setImg("https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=");
                                             user.setEmail(email);
                                             user.setPhone(phone);
                                             user.setPassword(password);
                                             user.setAddress(address);
+                                            user.setWallet(0.0);
                                             if (role == "ADMIN") {
                                                 user.setUser_type(true);
                                             } else {

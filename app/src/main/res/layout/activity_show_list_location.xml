@@ -32,6 +32,14 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="25dp"
+        android:visibility="gone"
         android:layout_marginEnd="25dp"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Thêm địa chỉ"
+        android:layout_marginVertical="250dp"
+        android:id="@+id/addLocation"/>
 
 </LinearLayout>

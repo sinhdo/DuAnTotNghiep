@@ -39,6 +39,7 @@ import com.example.duantotnghiep.activity.ManHinhChoActivity;
 import com.example.duantotnghiep.activity.ChangePassword_Activity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.activity.OrderOfShopActivity;
+import com.example.duantotnghiep.activity.StatisticalActivity;
 import com.example.duantotnghiep.activity.TopUpCardActivity;
 import com.example.duantotnghiep.database.FireBaseType;
 import com.example.duantotnghiep.model.User;
@@ -352,9 +353,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 if (isAdmin) {
                     cvQLUser.setVisibility(View.VISIBLE);
                     cvQLProduct.setVisibility(View.GONE);
+                    cvTK.setVisibility(View.GONE);
+
                 } else {
                     cvQLUser.setVisibility(View.GONE);
                     cvQLProduct.setVisibility(View.VISIBLE);
+                    cvTK.setVisibility(View.VISIBLE);
                 }
             }
             @Override
@@ -381,7 +385,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }else if (view.getId()==R.id.cvPromotion){
 
             }else if (view.getId()==R.id.cvTK){
-
+                    startActivity(new Intent(getContext(), StatisticalActivity.class));
             }else if (view.getId()==R.id.cvQLUser){
                 startActivity(new Intent(getContext(), ListUserActivity.class));
             }else if (view.getId()==R.id.cvQLProduct){
