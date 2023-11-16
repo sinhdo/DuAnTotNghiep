@@ -4,6 +4,7 @@ package com.example.duantotnghiep.adapter;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -98,7 +99,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
 
     @Override
-    public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ProductViewHolder holder, @SuppressLint("RecyclerView") int position) {
         product = productList.get(position);
         holder.binding.tvProduct.setText(product.getName());
         holder.binding.priceProduct.setText(String.valueOf(product.getPrice()));
@@ -237,7 +238,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                         String updatedTitle = editTitle.getText().toString();
                         String updatedDescription = editDes.getText().toString();
                         String updatedBrand = editBrand.getText().toString();
-                        int updatedPrice = Integer.parseInt(editPrice.getText().toString());
+                        double updatedPrice = Double.parseDouble(editPrice.getText().toString());
                         int updatedQuantity = Integer.parseInt(editQuantity.getText().toString());
                         List<Integer> updatedColors = mAdapter.getSelectedColors();
                         String selectedSize = (String) sizeSpinnerEdit.getSelectedItem();

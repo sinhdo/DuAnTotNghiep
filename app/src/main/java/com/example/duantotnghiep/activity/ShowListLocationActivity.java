@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.example.duantotnghiep.MainActivity;
 import com.example.duantotnghiep.R;
@@ -36,6 +37,13 @@ public class ShowListLocationActivity extends AppCompatActivity implements ShowL
         setContentView(binding.getRoot());
 
         binding.rcvShowListLocation.setLayoutManager(new LinearLayoutManager(this));
+        binding.addLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), AddLocationActivity.class);
+                startActivity(intent);
+            }
+        });
         showList();
         binding.imgBack.setOnClickListener(view -> {
             finish();
@@ -61,6 +69,13 @@ public class ShowListLocationActivity extends AppCompatActivity implements ShowL
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Location location = dataSnapshot.getValue(Location.class);
                     list.add(location);
+                }
+                if (list.isEmpty()){
+                    binding.addLocation.setVisibility(View.VISIBLE);
+                    binding.rcvShowListLocation.setVisibility(View.GONE);
+                }else {
+                    binding.addLocation.setVisibility(View.GONE);
+                    binding.rcvShowListLocation.setVisibility(View.VISIBLE);
                 }
                 adapter.notifyDataSetChanged();
             }
