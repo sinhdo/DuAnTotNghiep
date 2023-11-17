@@ -31,6 +31,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.duantotnghiep.MainActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.OrderDetailsAdapter;
 import com.example.duantotnghiep.fragment.CartFragment;
@@ -253,7 +254,8 @@ public class orderDetailsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (alertDialog.isShowing()) {
-                    alertDialog.dismiss();
+                   Intent intent = new Intent(orderDetailsActivity.this, MainActivity.class);
+                   startActivity(intent);
                    finish();
                 }
             }
