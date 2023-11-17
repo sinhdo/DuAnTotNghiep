@@ -67,7 +67,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private FirebaseUser firebaseUser;
     private ImageView imgUser;
     private CardView cvOut, cvOder, cvPayment, cvReview, cvTK, cvPromotion, cvQLUser, cvQLProduct, cvChangePass, cvAdddiachi;
-    private TextView textViewName, textSDT, textViewEmail, textFixInfor;
+    private TextView textViewName, textSDT, textViewEmail, textFixInfor,textWallet;
     private ImageView dialog_AVT;
     private TextInputEditText edImg;
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -114,6 +114,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         textViewName = view.findViewById(R.id.textViewName);
         textSDT = view.findViewById(R.id.textSDT);
         textViewEmail = view.findViewById(R.id.textViewEmail);
+        textWallet = view.findViewById(R.id.textWallet);
         textFixInfor = view.findViewById(R.id.textFixInfor);
 
         firebaseAuth = FirebaseAuth.getInstance();
@@ -123,6 +124,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         String name = sharedPreferences.getString("username", "");
         String phone = sharedPreferences.getString("phone", "");
         String email = sharedPreferences.getString("email", "");
+        float walletFloat = sharedPreferences.getFloat("wallet", 0);
+        double wallet = (double) walletFloat;
         String img = sharedPreferences.getString("img", "");
 
 
@@ -132,6 +135,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             textViewName.setText(name);
             textSDT.setText(phone);
             textViewEmail.setText(email);
+            textWallet.setText("Ví : "+wallet+" VNĐ");
             if (img.equals("")) {
                 imgUser.setImageResource(R.drawable.baseline_person_24);
             } else {
@@ -176,9 +180,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 String name = snapshot.child("username").getValue(String.class);
                 String phone = snapshot.child("phone").getValue(String.class);
                 String email = snapshot.child("email").getValue(String.class);
+                double wallet = snapshot.child("wallet").getValue(Double.class);
+                float walletFloat = (float) wallet;
                 String img = snapshot.child("img").getValue(String.class);
                 textViewName.setText(name);
                 textViewEmail.setText(email);
+                textWallet.setText("Ví : "+wallet+" VNĐ");
 
                 if (img.equals("") || img.isEmpty()) {
                     imgUser.setImageResource(R.drawable.baseline_person_24);
@@ -191,6 +198,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     editor.putString("username", name);
                     editor.putString("phone", phone);
                     editor.putString("email", email);
+                    editor.putFloat("wallet", walletFloat);
                     editor.putString("img", img);
                     editor.apply();
                 }
@@ -365,10 +373,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 if (isAdmin) {
                     cvQLUser.setVisibility(View.VISIBLE);
                     cvQLProduct.setVisibility(View.GONE);
+                    cvOder.setVisibility(View.GONE);
+                    cvReview.setVisibility(View.GONE);
                     cvTK.setVisibility(View.GONE);
 
                 } else {
                     cvQLUser.setVisibility(View.GONE);
+                    cvOder.setVisibility(View.VISIBLE);
+                    cvReview.setVisibility(View.VISIBLE);
                     cvQLProduct.setVisibility(View.VISIBLE);
                     cvTK.setVisibility(View.VISIBLE);
                 }

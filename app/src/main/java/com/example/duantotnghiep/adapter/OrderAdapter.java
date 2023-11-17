@@ -62,6 +62,14 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         } else {
             holder.tvnote.setText("Note : " + oder.getNotes());
         }
+        if (oder.getStatus().equals("deliver")||oder.getStatus().equals("done")){
+            holder.tv_paid.setVisibility(View.VISIBLE);
+            if (oder.getPaid()==true){
+                holder.tv_paid.setText("Đã thanh toán bằng ví");
+            }else {
+                holder.tv_paid.setText("Thanh toán khi nhận hàng");
+            }
+        }
         holder.imgMenu.setOnClickListener(view -> {
             callback.logic(oder);
         });
@@ -82,6 +90,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         private TextView tvQuantity;
         private TextView tvTotal;
         private TextView tvnote;
+        private TextView tv_paid;
         private ImageView imgMenu;
 
         public OrderViewHolder(@NonNull View itemView) {
@@ -93,6 +102,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             tvTotal = (TextView) itemView.findViewById(R.id.tv_total);
             imgMenu = (ImageView) itemView.findViewById(R.id.img_menu);
             tvnote = (TextView) itemView.findViewById(R.id.tvNoteOrder);
+            tv_paid = (TextView) itemView.findViewById(R.id.tv_paid);
         }
     }
 
