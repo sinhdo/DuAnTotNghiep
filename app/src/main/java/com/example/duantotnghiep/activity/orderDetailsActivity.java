@@ -196,65 +196,25 @@ public class orderDetailsActivity extends AppCompatActivity {
 
                 if (txtAddress.getText().toString().equalsIgnoreCase("Enter your address")) {
                     Toast.makeText(orderDetailsActivity.this, "Vui lòng chọn địa chỉ", Toast.LENGTH_SHORT).show();
+                    return;
                 } else if (txtPayment.getText().toString().equalsIgnoreCase("Payment methods")) {
                     Toast.makeText(orderDetailsActivity.this, "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                boolean paid = false;
+                if (txtPayment.getText().toString().equalsIgnoreCase("Payment on delivery")) {
+                    paid = false;
+                } else if (txtPayment.getText().toString().equalsIgnoreCase("Pay with wallet")) {
+                    paid = true;
+                }
+
+                if (paid) {
+                    double totalAmount = Double.parseDouble(txtTotal.getText().toString());
+                    String buyerID = firebaseUser.getUid();
+                    deductAmountFromBuyerWallet(buyerID, totalAmount, newKey, idBuyer, date);
                 } else {
-                    boolean paid = false;
-                    if (txtPayment.getText().toString().equalsIgnoreCase("Payment on delivery")) {
-                        paid = false;
-                    } else if (txtPayment.getText().toString().equalsIgnoreCase("Pay with wallet")) {
-                        paid = true;
-                    }
-
-                    if (paid) {
-                        double totalAmount = Double.parseDouble(txtTotal.getText().toString());
-                        String buyerID = firebaseUser.getUid();
-                        deductAmountFromBuyerWallet(buyerID, totalAmount);
-                    }
-
-                    DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference("products");
-                    for (int i = 0; i < adapter.getItemCount(); i++) {
-                        Product product = adapter.getProduct(i);
-                        if (product != null) {
-                            List<Integer> listColor = product.getColor();
-                            int color = listColor.get(i);
-
-                            Bundle bundle = getIntent().getBundleExtra("productData");
-                            if (bundle != null) {
-                                int receivedQuantity = bundle.getInt("Quantity");
-
-                                boolean finalPaid = paid;
-                                productsRef.child(product.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        int currentQuantity = dataSnapshot.child("quantity").getValue(Integer.class);
-                                        int remainingQuantity = currentQuantity - receivedQuantity;
-
-                                        if (remainingQuantity >= 0) {
-                                            // Cập nhật số lượng còn lại (remainingQuantity) trong Firebase
-                                            productsRef.child(product.getId()).child("quantity").setValue(remainingQuantity);
-
-                                            Order order = new Order(newKey, idBuyer, product.getSellerId(), product.getId(), product.getName(),
-                                                    product.getImgProduct().get(0), color, Double.parseDouble(txtTotal.getText().toString()),
-                                                    date, txtAddress.getText().toString(), txtPhone.getText().toString(),
-                                                    receivedQuantity, notes.getText().toString(), finalPaid, "waiting");
-
-                                            On_Create_Bill(order);
-                                            Log.d("=====", "onClick: sl" + product.getSellerId() + " pr " + product.getId());
-                                        } else {
-                                            // Số lượng yêu cầu vượt quá số lượng hiện có
-                                            Toast.makeText(orderDetailsActivity.this, "Số lượng sản phẩm không đủ", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                                        // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
-                                    }
-                                });
-                            }
-                        }
-                    }
+                    performNextSteps(newKey, idBuyer, date);
                 }
             }
         });
@@ -265,7 +225,6 @@ public class orderDetailsActivity extends AppCompatActivity {
             }
         });
     }
-
     private void showDiaLogAddress() {
         Intent intent = new Intent(orderDetailsActivity.this, ShowListLocationActivity.class);
         Bundle bundle = new Bundle();
@@ -273,7 +232,6 @@ public class orderDetailsActivity extends AppCompatActivity {
         intent.putExtras(bundle);
         startActivityForResult(intent, Activity.RESULT_CANCELED);
     }
-
     private void showDialogOrder() {
         ConstraintLayout successDialog = findViewById(R.id.successDialog);
         View view = LayoutInflater.from(orderDetailsActivity.this).inflate(R.layout.success_dialog_order, successDialog);
@@ -287,11 +245,9 @@ public class orderDetailsActivity extends AppCompatActivity {
                 alertDialog.dismiss();
             }
         });
-
         if (alertDialog.getWindow() != null) {
             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         }
-
         alertDialog.show();
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -303,7 +259,6 @@ public class orderDetailsActivity extends AppCompatActivity {
             }
         }, 1000);
     }
-
     private void On_Create_Bill(Order order) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference myRef = firebaseDatabase.getReference("list_order");
@@ -316,7 +271,6 @@ public class orderDetailsActivity extends AppCompatActivity {
             }
         });
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -356,25 +310,70 @@ public class orderDetailsActivity extends AppCompatActivity {
             popupMenu.show();
         });
     }
-    private void deductAmountFromBuyerWallet(String buyerID, double amount) {
+    private void deductAmountFromBuyerWallet(String buyerID, double amount, String newKey, String idBuyer, String date) {
         DatabaseReference buyerRef = userRef.child("user").child(buyerID).child("wallet");
         buyerRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 double walletAmount = snapshot.getValue(Double.class);
-                if (walletAmount >= amount) {
+                boolean isWalletEnough = walletAmount >= amount;
+                if (isWalletEnough) {
                     walletAmount -= amount;
                     buyerRef.setValue(walletAmount);
+                    performNextSteps(newKey, idBuyer, date);
                 } else {
                     Toast.makeText(orderDetailsActivity.this, "Số tiền trong ví không đủ", Toast.LENGTH_SHORT).show();
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
             }
         });
     }
+    private void performNextSteps(String newKey, String idBuyer, String date) {
+        DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference("products");
+        for (int i = 0; i < adapter.getItemCount(); i++) {
+            Product product = adapter.getProduct(i);
+            if (product != null) {
+                List<Integer> listColor = product.getColor();
+                int color = listColor.get(i);
 
+                Bundle bundle = getIntent().getBundleExtra("productData");
+                if (bundle != null) {
+                    int receivedQuantity = bundle.getInt("Quantity");
+
+                    boolean finalPaid = paid;
+                    productsRef.child(product.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            int currentQuantity = dataSnapshot.child("quantity").getValue(Integer.class);
+                            int remainingQuantity = currentQuantity - receivedQuantity;
+
+                            if (remainingQuantity >= 0) {
+                                productsRef.child(product.getId()).child("quantity").setValue(remainingQuantity);
+
+                                Order order = new Order(newKey, idBuyer, product.getSellerId(), product.getId(), product.getName(),
+                                        product.getImgProduct().get(0), color, Double.parseDouble(txtTotal.getText().toString()),
+                                        date, txtAddress.getText().toString(), txtPhone.getText().toString(),
+                                        receivedQuantity, notes.getText().toString(), finalPaid, "waiting");
+
+                                On_Create_Bill(order);
+                                Log.d("=====", "onClick: sl" + product.getSellerId() + " pr " + product.getId());
+                            } else {
+                                Toast.makeText(orderDetailsActivity.this, "Số lượng sản phẩm không đủ", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
+                        }
+                    });
+                }
+            }
+        }
+    }
     private void addAmountToSellerWallet(String idSeller, double amount) {
         DatabaseReference sellerRef = userRef.child("user").child(idSeller).child("wallet");
         sellerRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -390,8 +389,6 @@ public class orderDetailsActivity extends AppCompatActivity {
             }
         });
     }
-
-
     private String getCurrentTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
         Date currentDate = new Date();

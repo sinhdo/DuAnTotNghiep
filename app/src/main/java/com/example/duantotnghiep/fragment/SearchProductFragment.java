@@ -104,7 +104,10 @@ public class SearchProductFragment extends Fragment {
     private void SearchProduct(String query) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference myRef = firebaseDatabase.getReference("products");
-        Query searchQuery = myRef.orderByChild("name").startAt(query).endAt(query + "\uf8ff");
+
+        Query searchQuery = myRef.orderByChild("name")
+                .startAt(query)
+                .endAt(query + "\uf8ff");
 
         searchQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -112,7 +115,7 @@ public class SearchProductFragment extends Fragment {
                 list.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Product product = snapshot.getValue(Product.class);
-                    if (product != null) {
+                    if (product != null && !product.getSellerId().equals(firebaseUser.getUid())) {
                         list.add(product);
                     }
                 }
