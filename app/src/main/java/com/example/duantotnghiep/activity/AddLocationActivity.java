@@ -1,10 +1,10 @@
 package com.example.duantotnghiep.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.databinding.ActivityAddLocationBinding;
@@ -34,7 +34,7 @@ public class AddLocationActivity extends AppCompatActivity implements View.OnCli
         } else if (view.getId() == R.id.btn_addLocation) {
             firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
             String id_user = firebaseUser.getUid();
-            DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("user").child(id_user).child("location");
+            DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("user").child(id_user).child("infolocation");
             String name = binding.edName.getText().toString().trim();
             String phone = binding.edPhone.getText().toString().trim();
             String location = binding.edLocation.getText().toString().trim();

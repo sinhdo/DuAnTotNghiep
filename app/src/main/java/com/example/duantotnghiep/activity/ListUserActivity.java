@@ -1,13 +1,5 @@
 package com.example.duantotnghiep.activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.SearchView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -24,6 +16,14 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.SearchView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.UserAdapter;
@@ -122,10 +122,10 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                 }
                 adapter.notifyDataSetChanged();
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ListUserActivity.this, "Get Fail !!!"+error.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d("====", "onCancelled: "+error.getMessage());
+                Toast.makeText(ListUserActivity.this, "Get Fail !!!", Toast.LENGTH_SHORT).show();
             }
         });
     }
