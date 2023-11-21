@@ -1,17 +1,16 @@
 package com.example.duantotnghiep.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.example.duantotnghiep.MainActivity;
-import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.ShowLocationAdapter;
 import com.example.duantotnghiep.databinding.ActivityShowListLocationBinding;
 import com.example.duantotnghiep.model.Location;
@@ -58,7 +57,7 @@ public class ShowListLocationActivity extends AppCompatActivity implements ShowL
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         String id_user = firebaseUser.getUid();
-        DatabaseReference myReference = firebaseDatabase.getReference("user").child(id_user).child("location");
+        DatabaseReference myReference = firebaseDatabase.getReference("user").child(id_user).child("infolocation");
         myReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

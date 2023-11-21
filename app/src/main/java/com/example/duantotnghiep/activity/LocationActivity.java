@@ -72,7 +72,7 @@ public class LocationActivity extends AppCompatActivity implements LocationAdapt
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         String id_user = firebaseUser.getUid();
-        DatabaseReference myReference = firebaseDatabase.getReference("user").child(id_user).child("location");
+        DatabaseReference myReference = firebaseDatabase.getReference("user").child(id_user).child("infolocation");
         myReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -125,7 +125,7 @@ public class LocationActivity extends AppCompatActivity implements LocationAdapt
             firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
             String id_user = firebaseUser.getUid();
             if (checkValidate(name,phone,location)){
-                DatabaseReference myRef = firebaseDatabase.getReference("user").child(id_user).child("location");
+                DatabaseReference myRef = firebaseDatabase.getReference("user").child(id_user).child("infolocation");
                 Map<String, Object> updates = new HashMap<>();
                 updates.put("name", name);
                 updates.put("phone", phone);
@@ -145,7 +145,7 @@ public class LocationActivity extends AppCompatActivity implements LocationAdapt
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         String id_user = firebaseUser.getUid();
-        DatabaseReference myRef = firebaseDatabase.getReference("user").child(id_user).child("location");
+        DatabaseReference myRef = firebaseDatabase.getReference("user").child(id_user).child("infolocation");
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Xóa sản phẩm");
         builder.setMessage("Bạn có chắc chắn muốn xóa địa chỉ này ?");
