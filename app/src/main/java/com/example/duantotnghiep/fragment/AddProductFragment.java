@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -249,8 +247,10 @@ public class AddProductFragment extends Fragment  {
                     if (imageUrls.size() == selectedImageUris.size()) {
                         String userId = firebaseAuth.getCurrentUser().getUid();
 
-                        Discount discount = new Discount();
+                        double discountAmount = 0;
+                        Discount discount = new Discount(discountAmount);
                         discount.setAmount(10.0);
+
                         // Tạo đối tượng Product và đánh dấu là sản phẩm do người dùng đăng
                         Product product = new Product(
                                 productId, userId, Title, productType,

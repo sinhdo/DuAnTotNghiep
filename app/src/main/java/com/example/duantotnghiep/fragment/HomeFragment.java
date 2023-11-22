@@ -85,6 +85,7 @@ public class HomeFragment extends Fragment {
 
         textViewName = view.findViewById(R.id.txtName);
         imgCart = view.findViewById(R.id.imageView4);
+        imgCart = view.findViewById(R.id.imageView3);
         slideImage = view.findViewById(R.id.silde_image);
         circleIndicator = view.findViewById(R.id.circle_indicator);
         RecyclerView recyclerView = view.findViewById(R.id.view1);
