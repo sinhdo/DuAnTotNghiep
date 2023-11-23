@@ -60,20 +60,23 @@ import java.util.Locale;
 public class orderDetailsActivity extends AppCompatActivity {
     private Button btnOrder;
     private RecyclerView rcvOrderDetail;
-
     private TextView txtSubtotal, txtDelivery, txtTax, txtTotal, txtAddress, txtPayment, txtPhone, txtMoney;
-
     private LinearLayout linearLayouAddress, idlr;
     private EditText notes;
-
     private List<Product> productList;
     private List<Integer> colorList;
     private OrderDetailsAdapter adapter;
     private String idProduct;
     private DatabaseReference productRef, userRef;
     private FirebaseUser firebaseUser;
+    private int quantity = 0;
+    private double delivery;
+    private double tax;
+    private double discountAmount;
+
+    private double discountedPrice;
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    boolean paid = false;
+    private boolean finalPaid;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -132,13 +135,6 @@ public class orderDetailsActivity extends AppCompatActivity {
                     int currentQuantity = dataSnapshot.child("quantity").getValue(Integer.class);
                     List<String> imgProduct = dataSnapshot.child("imgProduct").getValue(new GenericTypeIndicator<List<String>>() {
                     });
-                    DataSnapshot discountSnapshot = dataSnapshot.child("discount");
-                    double discountAmount = 0.0;
-                    if (discountSnapshot.exists()) {
-                        discountAmount = discountSnapshot.child("amount").getValue(Double.class);
-                    }
-
-                    Discount discount = new Discount(discountAmount);
 
                     Bundle bundle = getIntent().getBundleExtra("productData");
                     adapter = new OrderDetailsAdapter();
@@ -147,9 +143,26 @@ public class orderDetailsActivity extends AppCompatActivity {
 
                         colorList = bundle.getIntegerArrayList("Color");
                         String size = bundle.getString("Size");
-                        int quantity = bundle.getInt("Quantity");
+                        quantity = bundle.getInt("Quantity");
                         List<String> sizeList = new ArrayList<>();
                         sizeList.add(size);
+
+                        DataSnapshot discountSnapshot = dataSnapshot.child("discount");
+                        double discountPercentage = 0.0;
+                        if (discountSnapshot.exists()) {
+                            discountAmount = discountSnapshot.child("amount").getValue(Double.class);
+                            double originalPrice = price * quantity;
+                            discountPercentage = discountAmount / 100.0;
+                            discountedPrice = originalPrice - (originalPrice * discountPercentage);
+
+                            txtSubtotal.setText(String.format("%.0f VND", discountedPrice));
+
+                            double discountValue = originalPrice * discountPercentage;
+                            String discountMessage = String.format("Sản phẩm đã được giảm: %.0f VND", discountValue);
+                            Toast.makeText(orderDetailsActivity.this, discountMessage, Toast.LENGTH_SHORT).show();
+
+                        }
+                        Discount discount = new Discount(discountAmount);
 
                         Product product = new Product(idProduct, idseller, name, null, categoryID, brand,
                                 description, imgProduct, colorList, sold, reviewId, quantity, price, Collections.singletonList(size), discount);
@@ -164,11 +177,8 @@ public class orderDetailsActivity extends AppCompatActivity {
                         rcvOrderDetail.setLayoutManager(new LinearLayoutManager(orderDetailsActivity.this));
                         rcvOrderDetail.setAdapter(adapter);
 
-                        double subtotal = price * quantity;
-                        txtSubtotal.setText(String.format(subtotal + " VND"));
-
-                        double delivery = 0.0;
-                        double tax = 0.0;
+                        delivery = 0.0;
+                        tax = 0.0;
 
                         String deliveryText = txtDelivery.getText().toString().replace("VND", "");
                         String taxText = txtTax.getText().toString().replace("VND", "");
@@ -181,8 +191,8 @@ public class orderDetailsActivity extends AppCompatActivity {
                             tax = Double.parseDouble(taxText);
                         }
 
-                        double total = subtotal + delivery + tax;
-                        txtTotal.setText(String.valueOf(total));
+                        double total = discountedPrice + delivery + tax;
+                        txtTotal.setText(String.format(total + " VND"));
 
                     } else {
                         productList = new ArrayList<>();
@@ -195,6 +205,7 @@ public class orderDetailsActivity extends AppCompatActivity {
 
             }
         });
+
         btnOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -211,14 +222,14 @@ public class orderDetailsActivity extends AppCompatActivity {
                     return;
                 }
 
-                boolean paid = false;
+                finalPaid = false;
                 if (txtPayment.getText().toString().equalsIgnoreCase("Payment on delivery")) {
-                    paid = false;
+                    finalPaid = false;
                 } else if (txtPayment.getText().toString().equalsIgnoreCase("Pay with wallet")) {
-                    paid = true;
+                    finalPaid = true;
                 }
 
-                if (paid) {
+                if (finalPaid) {
                     double totalAmount = Double.parseDouble(txtTotal.getText().toString());
                     String buyerID = firebaseUser.getUid();
                     checkSufficientWalletAmount(buyerID, totalAmount, newKey, idBuyer, date);
@@ -303,7 +314,6 @@ public class orderDetailsActivity extends AppCompatActivity {
                 if (bundle != null) {
                     int receivedQuantity = bundle.getInt("Quantity");
 
-                    boolean finalPaid = paid;
                     productsRef.child(product.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

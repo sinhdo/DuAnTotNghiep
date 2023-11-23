@@ -52,9 +52,7 @@ public class WaitForShopFragment extends Fragment implements OrderAdapter.Callba
     private FirebaseUser firebaseUser;
     private TextView noResultsTextView;
 
-    private DatabaseReference userRef;
 
-    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
     public WaitForShopFragment() {
         // Required empty public constructor
@@ -68,7 +66,6 @@ public class WaitForShopFragment extends Fragment implements OrderAdapter.Callba
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userRef = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
@@ -137,7 +134,6 @@ public class WaitForShopFragment extends Fragment implements OrderAdapter.Callba
         btnExit.setText("Xác nhận đơn hàng");
         btnExit.setOnClickListener(view -> {
             order.setStatus("confirmed");
-            deductAmountFromBuyer();
             UpdateStatus(order);
             dialog.dismiss();
         });
@@ -176,96 +172,6 @@ public class WaitForShopFragment extends Fragment implements OrderAdapter.Callba
 
         dialog.show();
     }
-    private void deductAmountFromBuyer() {
-        DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference("list_order");
-        Query query = orderRef.orderByChild("status").equalTo("waiting");
-
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot orderSnapshot : dataSnapshot.getChildren()) {
-                    Order order = orderSnapshot.getValue(Order.class);
-                    if (order != null && order.getIdBuyer().equals(currentUser.getUid())) {
-                        deductAmountFromBuyer(order.getTotal(), order.getIdBuyer(), orderSnapshot.getKey());
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Xảy ra lỗi khi đọc dữ liệu đơn hàng từ Firebase
-                Toast.makeText(getContext(), "Failed to read order information", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-    private void deductAmountFromBuyer(final double amountToDeduct, final String buyerId, final String orderId) {
-        DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference("list_order").child("id");
-        orderRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    String idBuyer = dataSnapshot.child("idBuyer").getValue(String.class);
-                    double total = dataSnapshot.child("total").getValue(Double.class);
-
-                    DatabaseReference buyerRef = FirebaseDatabase.getInstance().getReference().child("user").child(idBuyer);
-                    buyerRef.runTransaction(new Transaction.Handler() {
-                        @NonNull
-                        @Override
-                        public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
-                            User buyer = mutableData.getValue(User.class);
-                            if (buyer != null) {
-                                double currentWallet = buyer.getWallet();
-                                double newWallet = currentWallet - total;
-                                buyer.setWallet(newWallet);
-                                mutableData.setValue(buyer);
-                                return Transaction.success(mutableData);
-                            }
-                            return Transaction.abort();
-                        }
-
-                        @Override
-                        public void onComplete(@Nullable DatabaseError databaseError, boolean committed, @Nullable DataSnapshot dataSnapshot) {
-                            if (committed) {
-                                // Tiền đã được trừ thành công, tiếp tục cập nhật trạng thái đơn hàng
-                                updateOrderStatus(orderId, "confirmed");
-                                Dialog dialog = new Dialog(requireContext());
-                                dialog.dismiss();
-                            } else {
-                                // Xảy ra lỗi khi cập nhật số dư của người mua
-                                Toast.makeText(getContext(), "Failed to deduct amount from buyer's wallet", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-                } else {
-                    // Không tìm thấy đơn hàng
-                    Toast.makeText(getContext(), "Order not found", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Xảy ra lỗi khi truy cập cơ sở dữ liệu
-                Toast.makeText(getContext(), "Database error", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-    private void updateOrderStatus(String orderId, String newStatus) {
-        DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference().child("list_order").child(orderId);
-        orderRef.child("status").setValue(newStatus)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        // Cập nhật trạng thái đơn hàng thành công
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Xảy ra lỗi khi cập nhật trạng thái đơn hàng
-                        Toast.makeText(getContext(), "Failed to update order status", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
     private void UpdateStatus(Order order) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference myRef = firebaseDatabase.getReference("list_order");
@@ -281,6 +187,7 @@ public class WaitForShopFragment extends Fragment implements OrderAdapter.Callba
             }
         });
     }
+
     @Override
     public void logic(Order order) {
         dialogForShop(order);
