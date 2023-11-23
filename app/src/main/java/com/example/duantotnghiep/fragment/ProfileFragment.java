@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.duantotnghiep.activity.DiscountActivity;
 import com.example.duantotnghiep.activity.ListUserActivity;
 import com.example.duantotnghiep.activity.LocationActivity;
 import com.example.duantotnghiep.activity.ManagerProductActivity;
@@ -410,7 +411,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         } else if (view.getId() == R.id.cvPayment) {
 
         } else if (view.getId() == R.id.cvPromotion) {
-
+            startActivity(new Intent(getContext(), DiscountActivity.class));
         } else if (view.getId() == R.id.cvTK) {
             startActivity(new Intent(getContext(), StatisticalActivity.class));
         } else if (view.getId() == R.id.cvQLUser) {

@@ -165,7 +165,7 @@ public class orderDetailsActivity extends AppCompatActivity {
                         Discount discount = new Discount(discountAmount);
 
                         Product product = new Product(idProduct, idseller, name, null, categoryID, brand,
-                                description, imgProduct, colorList, sold, reviewId, quantity, price, Collections.singletonList(size), discount);
+                                description, imgProduct, colorList, sold, reviewId, quantity, price, Collections.singletonList(size), null);
 
                         product.setSelectedQuantity(quantity);
                         productList = new ArrayList<>();
