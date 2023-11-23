@@ -100,8 +100,8 @@ public class OrderDetailsAdapter extends RecyclerView.Adapter<OrderDetailsAdapte
             tvPrice.setText("$ " + product.getPrice());
 
             tvCum.setText(String.format("Số lượng %s", product.getQuantity()));
-            Discount discount = product.getDiscount();
 
+            Discount discount = product.getDiscount();
             if (discount != null) {
                 double discountAmount = discount.getAmount();
                 tv_km_dt.setText("Discount: " + discountAmount + "%");

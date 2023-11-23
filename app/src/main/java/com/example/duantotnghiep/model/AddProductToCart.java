@@ -1,7 +1,7 @@
 package com.example.duantotnghiep.model;
 
 public class AddProductToCart {
-    private String id;
+    private String cartItemId;
     private String id_user;
     private String id_product;
     private String name_product;
@@ -11,12 +11,12 @@ public class AddProductToCart {
     private int quantity_product;
     private double pricetotal_product;
 
-    public String getId() {
-        return id;
+    public String getCartItemId() {
+        return cartItemId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setCartItemId(String cartItemId) {
+        this.cartItemId = cartItemId;
     }
 
     public String getId_user() {
@@ -86,8 +86,8 @@ public class AddProductToCart {
     public AddProductToCart() {
     }
 
-    public AddProductToCart(String id, String id_user, String id_product, String name_product, Integer color_product, String size_product, String image_product, int num_product, double pricetotal_product) {
-        this.id = id;
+    public AddProductToCart(String cartItemId, String id_user, String id_product, String name_product, Integer color_product, String size_product, String image_product, int num_product, double pricetotal_product) {
+        this.cartItemId = cartItemId;
         this.id_user = id_user;
         this.id_product = id_product;
         this.name_product = name_product;
@@ -96,5 +96,8 @@ public class AddProductToCart {
         this.image_product = image_product;
         this.quantity_product = num_product;
         this.pricetotal_product = pricetotal_product;
+    }
+    public String getId() {
+        return id_product;
     }
 }

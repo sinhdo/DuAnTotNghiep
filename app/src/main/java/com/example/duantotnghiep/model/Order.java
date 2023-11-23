@@ -2,6 +2,8 @@ package com.example.duantotnghiep.model;
 
 public class Order {
     private String id,idBuyer,idSeller,idProduct, nameProduct,imgProduct;
+
+    private double amount;
     private int color;
     private Double total;
     private String date;
@@ -37,6 +39,14 @@ public class Order {
         this.notes = notes;
         this.paid = paid;
         this.status = status;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 
     public int getColor() {

@@ -151,15 +151,56 @@ public class ConfirmForShopFragment extends Fragment implements OrderAdapter.Cal
     }
     private void UpdateStatus(Order order) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = firebaseDatabase.getReference("list_order");
+        DatabaseReference orderRef = firebaseDatabase.getReference("list_order");
+        DatabaseReference buyerRef = firebaseDatabase.getReference("user").child(order.getIdBuyer()).child("wallet");
+        DatabaseReference sellerRef = firebaseDatabase.getReference("user").child(order.getIdSeller()).child("wallet");
         String id = order.getId();
-        myRef.child(id).setValue(order, new DatabaseReference.CompletionListener() {
+        boolean checkPaid = order.getPaid();
+        order.setPaid(checkPaid);
+        orderRef.child(id).setValue(order, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
                 if (error == null) {
-                    Toast.makeText(getContext(), "Update status", Toast.LENGTH_SHORT).show();
+                    if (checkPaid) {
+                        // Trừ số tiền từ ví người mua chỉ khi checkPaid là true
+                        buyerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    double buyerBalance = snapshot.getValue(Double.class);
+                                    double newBuyerBalance = buyerBalance - order.getTotal();
+                                    buyerRef.setValue(newBuyerBalance);
+                                    Toast.makeText(getContext(), "Update status and deduct buyer's balance", Toast.LENGTH_SHORT).show();
+
+                                    sellerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if (snapshot.exists()) {
+                                                double sellerBalance = snapshot.getValue(Double.class);
+                                                double newSellerBalance = sellerBalance + order.getTotal();
+                                                sellerRef.setValue(newSellerBalance);
+                                                Toast.makeText(getContext(), "Add deducted amount to seller's balance", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                            Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getContext(), "Update status", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    Toast.makeText(getContext(), "Update fall", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show();
                 }
             }
         });
