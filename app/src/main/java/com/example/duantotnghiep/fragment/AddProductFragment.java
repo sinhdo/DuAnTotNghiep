@@ -34,12 +34,14 @@ import com.example.duantotnghiep.activity.ManagerProductActivity;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.ColorAdapter;
+import com.example.duantotnghiep.adapter.DiscountAdapter;
 import com.example.duantotnghiep.adapter.DiscountSelectionAdapter;
 import com.example.duantotnghiep.adapter.MutilpleColorAdapter;
 import com.example.duantotnghiep.adapter.MutilpleImgAdapter;
 import com.example.duantotnghiep.model.Discount;
 import com.example.duantotnghiep.model.Product;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,15 +56,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AddProductFragment extends Fragment  {
-    ImageView btnColor,btnDiscount;
+public class AddProductFragment extends Fragment {
+    ImageView btnColor, btnDiscount;
     private FirebaseAuth firebaseAuth;
     private List<Uri> selectedImageUris = new ArrayList<>();
     private List<Integer> selectedColors = new ArrayList<>();
     private MutilpleColorAdapter mAdapter = new MutilpleColorAdapter();
     private ImageView chooseImg;
     List<String> selectedSize;
-    String Title,Des,Brand;
+    String Title, Des, Brand;
     MutilpleImgAdapter adapter;
     DiscountSelectionAdapter discountSelectionAdapter;
     private boolean isAddingProduct = false;
@@ -72,9 +74,12 @@ public class AddProductFragment extends Fragment  {
     Button addProduct;
     int Price;
     List<Discount> selectedDiscounts;
+    List<Discount> allDiscounts;
+    RecyclerView rvMutilpeDiscount;
     private Spinner sizeSpinner;
     Product product;
     private StorageReference storageReference;
+
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.add_product_fragment, container, false);
         firebaseAuth = FirebaseAuth.getInstance();
@@ -87,6 +92,7 @@ public class AddProductFragment extends Fragment  {
         edtQuantity = root.findViewById(R.id.QuantityProduct);
         edtDes = root.findViewById(R.id.descriptionProduct);
         btnDiscount = root.findViewById(R.id.btnDiscount);
+        rvMutilpeDiscount = root.findViewById(R.id.rvMutilpeDiscount);
         edtBrand = root.findViewById(R.id.BrandProduct);
         chooseImg = root.findViewById(R.id.chooseImg);
         multipleImg = root.findViewById(R.id.mutilpeImg);
@@ -156,6 +162,7 @@ public class AddProductFragment extends Fragment  {
                     selectedSize.addAll(Arrays.asList("36", "37", "38", "39", "40", "41", "42", "43", "44"));
                 }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
 
@@ -171,20 +178,24 @@ public class AddProductFragment extends Fragment  {
         View view = layoutInflater.inflate(R.layout.dialog_discount_selection, null);
         builder.setView(view);
 
-
         RecyclerView recyclerView = view.findViewById(R.id.rvDiscountSelection);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-
 
         DatabaseReference discountsRef = FirebaseDatabase.getInstance().getReference("discounts");
 
         discountsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<Discount> allDiscounts = new ArrayList<>();
+                 allDiscounts = new ArrayList<>();
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Discount discount = snapshot.getValue(Discount.class);
-                    allDiscounts.add(discount);
+
+
+                    if (currentUser != null && discount != null && currentUser.getUid().equals(discount.getSellerId())) {
+                        allDiscounts.add(discount);
+                    }
                 }
 
                 List<Discount> selectedDiscountIds = new ArrayList<>();
@@ -192,37 +203,43 @@ public class AddProductFragment extends Fragment  {
                 recyclerView.setAdapter(adapter);
 
                 Log.d("DiscountActivity", "Size of allDiscounts: " + allDiscounts.size());
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
                 Toast.makeText(requireContext(), "Lỗi khi đọc dữ liệu từ Firebase", Toast.LENGTH_SHORT).show();
             }
         });
+
         builder.setPositiveButton("Xác nhận", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
                 DiscountSelectionAdapter discountSelectionAdapter1 = (DiscountSelectionAdapter) recyclerView.getAdapter();
                 selectedDiscounts = discountSelectionAdapter1.getSelectedDiscountIds();
-
-
+                showSelectedDiscounts(selectedDiscounts);
             }
         });
-
 
         builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
                 dialog.dismiss();
             }
         });
+
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
+    private void showSelectedDiscounts(List<Discount> selectedDiscountIds) {
+
+
+
+        rvMutilpeDiscount.setLayoutManager(new LinearLayoutManager(requireContext()));
+        DiscountAdapter selectedDiscountsAdapter = new DiscountAdapter(selectedDiscountIds);
+        rvMutilpeDiscount.setAdapter(selectedDiscountsAdapter);
+    }
+
 
 
 
@@ -294,12 +311,14 @@ public class AddProductFragment extends Fragment  {
             }
         });
     }
+
     private void updateRecyclerView(View view, List<Integer> selectedColors) {
         RecyclerView recyclerView = view.findViewById(R.id.rvChosseCL);
         ColorAdapter colorAdapter = new ColorAdapter(selectedColors);
         recyclerView.setAdapter(colorAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
     }
+
     private void saveProductToRealtimeDatabase() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference productsRef = database.getReference("products");
@@ -307,10 +326,10 @@ public class AddProductFragment extends Fragment  {
 
         String productId = productsRef.push().getKey();
 
-         Title = String.valueOf(edtTitle.getText()).trim();
-         Price = Integer.parseInt(String.valueOf(edtPrice.getText()).trim());
-         Des = String.valueOf(edtDes.getText()).trim();
-         Brand = String.valueOf(edtBrand.getText()).trim();
+        Title = String.valueOf(edtTitle.getText()).trim();
+        Price = Integer.parseInt(String.valueOf(edtPrice.getText()).trim());
+        Des = String.valueOf(edtDes.getText()).trim();
+        Brand = String.valueOf(edtBrand.getText()).trim();
 
         String selectedProductType = (String) sizeSpinner.getSelectedItem();
         int Quantity = Integer.parseInt(String.valueOf(edtQuantity.getText()));
@@ -335,10 +354,10 @@ public class AddProductFragment extends Fragment  {
 
 //                        List<Product> selectedDiscounts = discountSelectionAdapter.getSelectedDiscountIds();
 
-                        // Tạo đối tượng Product và đánh dấu là sản phẩm do người dùng đăng
+
                         Product product = new Product(
                                 productId, userId, Title, productType,
-                                "categoryID", Brand, Des, imageUrls, selectedColors, 1000, "ngon", Quantity, Price, selectedSize,selectedDiscounts
+                                "categoryID", Brand, Des, imageUrls, selectedColors, 1000, "ngon", Quantity, Price, selectedSize, selectedDiscounts
                         );
                         product.setUserProduct(true);
 
@@ -353,6 +372,7 @@ public class AddProductFragment extends Fragment  {
             });
         }
     }
+
     private boolean validateInput() {
         String title = edtTitle.getText().toString().trim();
         String priceString = edtPrice.getText().toString().trim();
@@ -391,7 +411,6 @@ public class AddProductFragment extends Fragment  {
             showToast("Bạn cần chọn ít nhất một màu");
             return false;
         }
-
 
 
         return true;

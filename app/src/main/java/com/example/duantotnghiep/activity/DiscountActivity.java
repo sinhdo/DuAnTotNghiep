@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.DiscountAdapter;
 import com.example.duantotnghiep.model.Discount;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -66,33 +68,36 @@ public class DiscountActivity extends AppCompatActivity {
         String name = edtNameDiscount.getText().toString().trim();
         String valueString = edtValueDiscount.getText().toString().trim();
 
-
-        if (name.isEmpty() || valueString.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-
-        double value = Double.parseDouble(valueString);
-
-
-        Discount discount = new Discount();
-        discount.setCode(name);
-        discount.setAmount(value);
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String sellerId = currentUser.getUid();
+            if (name.isEmpty() || valueString.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
 
-        String discountId = discountRef.push().getKey();
-        if (discountId != null) {
-            discountRef.child(discountId).setValue(discount);
+            double value = Double.parseDouble(valueString);
 
 
-            Toast.makeText(this, "Thêm Discount thành công", Toast.LENGTH_SHORT).show();
+            Discount discount = new Discount();
+            discount.setCode(name);
+            discount.setAmount(value);
+            discount.setSellerId(sellerId);
+
+            String discountId = discountRef.push().getKey();
+            if (discountId != null) {
+                discountRef.child(discountId).setValue(discount);
 
 
-            edtNameDiscount.setText("");
-            edtValueDiscount.setText("");
-        } else {
-            Toast.makeText(this, "Lỗi khi thêm Discount", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Thêm Discount thành công", Toast.LENGTH_SHORT).show();
+
+
+                edtNameDiscount.setText("");
+                edtValueDiscount.setText("");
+            } else {
+                Toast.makeText(this, "Lỗi khi thêm Discount", Toast.LENGTH_SHORT).show();
+            }
         }
     }
     private void getDiscountsFromFirebase() {
@@ -103,13 +108,15 @@ public class DiscountActivity extends AppCompatActivity {
 
                 discountList.clear();
 
-
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
                     Discount discount = snapshot.getValue(Discount.class);
 
 
-                    discountList.add(discount);
+                    if (currentUser != null && discount != null && currentUser.getUid().equals(discount.getSellerId())) {
+                        discountList.add(discount);
+                    }
                 }
 
 
