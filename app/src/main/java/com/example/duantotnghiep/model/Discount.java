@@ -5,6 +5,8 @@ public class Discount  {
     private String code;
     private double amount;
 
+    private String sellerId;
+
     public String getId() {
         return id;
     }
@@ -35,6 +37,21 @@ public class Discount  {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public Discount(String id, String code, double amount, String sellerId) {
+        this.id = id;
+        this.code = code;
+        this.amount = amount;
+        this.sellerId = sellerId;
+    }
+
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
     }
 
     public Discount(String id, String code, double amount) {
