@@ -21,17 +21,22 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.XacNhanCardViewHolder> {
     private List<Card> cardList;
     private Context context; // Thêm context
+    private List<Card> pendingCards;
+    private List<Card> successCards;
 
 
     public XacNhanCardAdapter(Context context, List<Card> cardList) {
         this.context = context;
 
         this.cardList = cardList;
+        this.pendingCards = new ArrayList<>();
+        this.successCards = new ArrayList<>();
     }
 
     @NonNull
@@ -75,6 +80,12 @@ public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.
 
 
     }
+    public void setCardLists(List<Card> pendingCards) {
+        this.cardList.clear();
+        this.cardList.addAll(pendingCards);
+        notifyDataSetChanged();
+    }
+
 
 
     // Phương thức hiển thị Toast
