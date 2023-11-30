@@ -145,31 +145,32 @@ public class Card {
                         User user = dataSnapshot.getValue(User.class);
 
                         if (user != null) {
-                            Log.d("uservualay", "onDataChange: "+user);
-                            // Thực hiện cộng tiền cho người dùng
-                            String currentWallet = user.getWallet();
-                            Log.d("wallethientai", "onDataChange: " + currentWallet);
+                            Log.d("uservualay", "onDataChange: " + user);
 
-                            if (currentWallet != null && !currentWallet.isEmpty()) {
+                            // Thực hiện cộng tiền cho người dùng
+                            Double currentWallet = user.getWallet();
+
+                            if (currentWallet != null) {
                                 // Thực hiện cộng tiền cho người dùng
-                                int cardValueInt = Integer.parseInt(getCardValue());
-                                int currentWalletInt = Integer.parseInt(currentWallet);
-                                int newWalletValueInt = currentWalletInt + cardValueInt;
+                                double cardValueDouble = Double.parseDouble(getCardValue());
+                                double currentWalletDouble = currentWallet;
+                                double newWalletValueDouble = currentWalletDouble + cardValueDouble;
 
                                 // Log thông tin trước khi cập nhật
-                                Log.d("zzzzz", "Thông tin trước khi cập nhật - Số dư ví hiện tại: " + currentWallet + ", Giá trị thẻ: " + cardValueInt);
+                                Log.d("zzzzz", "Thông tin trước khi cập nhật - Số dư ví hiện tại: " + currentWallet + ", Giá trị thẻ: " + cardValueDouble);
 
                                 // Cập nhật thông tin người dùng sau khi cộng tiền
                                 DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("user").child(userId);
                                 Map<String, Object> updateData = new HashMap<>();
-                                updateData.put("wallet", String.valueOf(newWalletValueInt));
+                                updateData.put("wallet", newWalletValueDouble);
                                 userReference.updateChildren(updateData);
 
                                 // Log thông tin sau khi cập nhật
                             } else {
                                 Log.d("wallethientai", "Số dư ví trống hoặc không hợp lệ");
                             }
-                        } else {
+                        }
+                        else {
                             Log.d("usernull", "Lỗi: user là null");
                         }
                     } else {
@@ -190,4 +191,16 @@ public class Card {
             cardReference.setValue(this);
         }
     }
+    public void updateFailedStatus() {
+        if (!statusChanged && status.equals("pending")) {
+            // Cập nhật trạng thái không thành công
+            setStatus("failed");
+            setStatusChanged(true);
+
+            // Lưu lại thẻ sau khi cập nhật trạng thái
+            DatabaseReference cardReference = FirebaseDatabase.getInstance().getReference("cards").child(cardId);
+            cardReference.setValue(this);
+        }
+    }
+
 }

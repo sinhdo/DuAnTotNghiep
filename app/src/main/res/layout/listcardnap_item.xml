@@ -52,6 +52,12 @@
         android:id="@+id/btnToggleStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Chuyển đổi Trạng thái" />
+        android:text="Chuyển đổi Trạng thái thành công" />
+    <Button
+        android:id="@+id/btnToggleFailedStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chuyển đổi Trạng thái Không thành công" />
+
 
 </LinearLayout>

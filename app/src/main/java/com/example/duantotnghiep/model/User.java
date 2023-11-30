@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 public class User {
-    private String id,username,password,email,address,phone,wallet;
+    private Double wallet;
+    private String id,username,password,email,address,phone;
     private String img;
     private Boolean user_type;
     private Map<String, Location> location;  // Thay vì List<Location>
@@ -73,12 +74,11 @@ public class User {
     }
 
 
-
-    public String getWallet() {
+    public Double getWallet() {
         return wallet;
     }
 
-    public void setWallet(String wallet) {
+    public void setWallet(Double wallet) {
         this.wallet = wallet;
     }
 
@@ -93,14 +93,14 @@ public class User {
         this.location = location;
     }
 
-    public User(String id, String username, String password, String email, String address, String phone, String wallet, String img, Boolean user_type,Map<String, Location> location) {
+    public User(Double wallet, String id, String username, String password, String email, String address, String phone, String img, Boolean user_type, Map<String, Location> location) {
+        this.wallet = wallet;
         this.id = id;
         this.username = username;
         this.password = password;
         this.email = email;
         this.address = address;
         this.phone = phone;
-        this.wallet = wallet;
         this.img = img;
         this.user_type = user_type;
         this.location = location;

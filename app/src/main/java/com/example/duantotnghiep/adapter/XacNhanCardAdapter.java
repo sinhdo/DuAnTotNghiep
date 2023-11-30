@@ -64,6 +64,15 @@ public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.
                 notifyDataSetChanged();
             }
         });
+        // Xử lý sự kiện khi nút "Chuyển đổi Trạng thái (Không thành công)" được nhấn
+        holder.btnToggleFailedStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                card.updateFailedStatus();
+                notifyDataSetChanged();
+            }
+        });
+
 
     }
 
@@ -88,6 +97,8 @@ public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.
         TextView textUsername;
         TextView textStatus;
         Button btnToggleStatus;
+        Button btnToggleFailedStatus;
+
 
         public XacNhanCardViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -99,6 +110,8 @@ public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.
             textUsername = itemView.findViewById(R.id.textUsername);
             textStatus = itemView.findViewById(R.id.textStatus);
             btnToggleStatus = itemView.findViewById(R.id.btnToggleStatus);
+            btnToggleFailedStatus = itemView.findViewById(R.id.btnToggleFailedStatus);
+
         }
     }
 }

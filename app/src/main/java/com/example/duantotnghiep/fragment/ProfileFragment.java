@@ -360,11 +360,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 boolean isAdmin = FireBaseType.isAdmin(dataSnapshot);
                 if (isAdmin) {
                     cvQLUser.setVisibility(View.VISIBLE);
-                    cvXacNhanCard.setVisibility(View.GONE);
+                    cvXacNhanCard.setVisibility(View.VISIBLE);
                     cvQLProduct.setVisibility(View.GONE);
                 } else {
                     cvQLUser.setVisibility(View.GONE);
-                    cvXacNhanCard.setVisibility(View.VISIBLE);
+                    cvXacNhanCard.setVisibility(View.GONE);
                     cvQLProduct.setVisibility(View.VISIBLE);
                 }
             }
