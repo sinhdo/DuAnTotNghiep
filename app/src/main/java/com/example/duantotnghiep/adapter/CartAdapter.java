@@ -43,7 +43,17 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public Set<AddProductToCart> getSelectedItems() {
         return selectedItems;
     }
+    public void selectAllItems() {
+        selectedItems.addAll(productsList);
+        notifyDataSetChanged();
+        updateTotalPrice();
+    }
 
+    public void deselectAllItems() {
+        selectedItems.clear();
+        notifyDataSetChanged();
+        updateTotalPrice();
+    }
 
     @NonNull
     @Override

@@ -68,7 +68,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
     double totalPrice;
     private double totalDiscount = 0;
     Button addOrderDetailCart;
-    private boolean canPlaceOrder = true;
+
     private boolean finalPaid;
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -137,7 +137,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         return root;
     }
 
-    private void CreateOrder() {
+    private void  CreateOrder() {
         if (txtPayment_Cart.getText().toString().equalsIgnoreCase("Payment methods")) {
 
             Toast.makeText(getContext(), "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
@@ -199,13 +199,13 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                                 status
                         );
 
-                        DatabaseReference orderRef = userRef.child("orders").push();
+                        DatabaseReference orderRef = userRef.child("list_order").push();
                         orderRef.setValue(order);
                         DatabaseReference cartItemRef = userRef.child("cart").child(firebaseUser.getUid()).child(product.getCartItemId());
                         cartItemRef.removeValue();
                         updateProductQuantity(product.getId_product(), product.getQuantity_product());
                     } else {
-                            canPlaceOrder = false;
+
                             showOutOfStockDialog();
 
                         }
@@ -222,10 +222,10 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         if (txtPayment_Cart.getText().toString().equals("Pay with wallet")) {
             updateWalletAfterOrder();
         }
-        if (canPlaceOrder) {
+
 
             showDialogOrder();
-        }
+
     }
     private void showOutOfStockDialog() {
 
@@ -339,20 +339,27 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
     }
 
     private void checkWalletBalanceBeforeOrder() {
+        if (txtPayment_Cart.getText().toString().equals("Pay with wallet")) {
+            String walletAmountString = txtMoneyCart.getText().toString().replaceAll("[^\\d.]", "");
+            double currentWalletAmount = Double.parseDouble(walletAmountString);
 
-        String walletAmountString = txtMoneyCart.getText().toString().replaceAll("[^\\d.]", "");
+            if (totalDiscount > 0) {
+                TotalPay = TotalPlusShip - totalDiscount;
+            } else {
+                TotalPay = TotalPlusShip;
+            }
 
-
-        double currentWalletAmount = Double.parseDouble(walletAmountString);
-
-        if (TotalPay > currentWalletAmount) {
-
-            showInsufficientBalanceDialog();
+            if (TotalPay > currentWalletAmount) {
+                showInsufficientBalanceDialog();
+            } else {
+                CreateOrder();
+            }
         } else {
 
             CreateOrder();
         }
     }
+
 
 
     private void showInsufficientBalanceDialog() {
