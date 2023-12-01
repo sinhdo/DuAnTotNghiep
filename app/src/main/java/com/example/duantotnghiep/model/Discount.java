@@ -4,8 +4,8 @@ public class Discount  {
     private String id;
     private String code;
     private double amount;
-
     private String sellerId;
+    private boolean checked = false;
 
     public String getId() {
         return id;
@@ -63,5 +63,12 @@ public class Discount  {
     public Discount(String code, double amount) {
         this.code = code;
         this.amount = amount;
+    }
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 }

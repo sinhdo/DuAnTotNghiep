@@ -32,6 +32,5 @@
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:listitem="@layout/item_discount"
         android:id="@+id/rv_discount"/>
 </LinearLayout>

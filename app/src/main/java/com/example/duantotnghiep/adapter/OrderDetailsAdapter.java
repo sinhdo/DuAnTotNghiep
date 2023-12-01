@@ -79,7 +79,7 @@ public class OrderDetailsAdapter extends RecyclerView.Adapter<OrderDetailsAdapte
             tvColor = itemView.findViewById(R.id.tvColor_dt);
             tvPrice = itemView.findViewById(R.id.priceOrder_dt);
             tvCum = itemView.findViewById(R.id.tvCum_dt);
-            tv_km_dt = itemView.findViewById(R.id.tv_km_dt);
+//            tv_km_dt = itemView.findViewById(R.id.tv_km_dt);
             idPR = itemView.findViewById(R.id.idPR);
             idSl = itemView.findViewById(R.id.idSL);
         }
@@ -101,13 +101,13 @@ public class OrderDetailsAdapter extends RecyclerView.Adapter<OrderDetailsAdapte
 
             tvCum.setText(String.format("Số lượng %s", product.getQuantity()));
 
-            Discount discount = product.getDiscount();
-            if (discount != null) {
-                double discountAmount = discount.getAmount();
-                tv_km_dt.setText("Discount: " + discountAmount + "%");
-            } else {
-                tv_km_dt.setText("No Discount");
-            }
+//            Discount discount = product.getDiscount();
+//            if (discount != null) {
+//                double discountAmount = discount.getAmount();
+//                tv_km_dt.setText("Discount: " + discountAmount + "%");
+//            } else {
+//                tv_km_dt.setText("No Discount");
+//            }
 
             if (product.getImgProduct() != null && !product.getImgProduct().isEmpty()) {
                 Picasso.get().load(product.getImgProduct().get(0)).into(imgProduct);
