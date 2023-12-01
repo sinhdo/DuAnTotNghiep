@@ -14,6 +14,8 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +44,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.Callb
     private AddProductToCart product;
     private List<AddProductToCart> list = new ArrayList<>();
     private FirebaseUser firebaseUser;
+    CheckBox checkboxAllItem;
 
     Button addOrderDetail;
 
@@ -51,6 +54,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.Callb
         setContentView(R.layout.activity_cart);
         recyclerViewCart = findViewById(R.id.rcv_cart);
         total_item = findViewById(R.id.total_item);
+        checkboxAllItem = findViewById(R.id.checkboxAllItem);
         addOrderDetail = findViewById(R.id.addOrderDetail);
         totalPriceCart =findViewById(R.id.total_price_cart);
         recyclerViewCart.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
@@ -61,26 +65,38 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.Callb
         addOrderDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 List<AddProductToCart> selectedProducts = cartAdapter.getSelectedItemsList();
 
+                if (selectedProducts.isEmpty()) {
 
-                Bundle bundle = new Bundle();
-                bundle.putParcelableArrayList("selectedProducts", new ArrayList<>(selectedProducts));
+                    Toast.makeText(CartActivity.this, "Xin hãy vui lòng chọn sản phẩm bạn muốn mua", Toast.LENGTH_SHORT).show();
+                } else {
 
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelableArrayList("selectedProducts", new ArrayList<>(selectedProducts));
 
-                CartToOrderFragment cartToOrderFragment = new CartToOrderFragment();
-                cartToOrderFragment.setArguments(bundle);
+                    CartToOrderFragment cartToOrderFragment = new CartToOrderFragment();
+                    cartToOrderFragment.setArguments(bundle);
 
-
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, cartToOrderFragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container, cartToOrderFragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
             }
         });
 
+        checkboxAllItem.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    cartAdapter.selectAllItems();
+                } else {
+                    cartAdapter.deselectAllItems();
+                }
+            }
+        });
 
     }
     private void getListProductAddCart() {

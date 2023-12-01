@@ -57,7 +57,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.tvQuantity.setText(String.valueOf(oder.getQuantity()));
         holder.tvTotal.setText(String.valueOf(oder.getTotal()));
         holder.colorProduct.setBackgroundColor(oder.getColor());
-        if (oder.getNotes().isEmpty() || oder.getNotes() == "") {
+        if (oder.getNotes()==null || oder.getNotes() == "") {
             holder.tvnote.setVisibility(View.GONE);
         } else {
             holder.tvnote.setText("Note : " + oder.getNotes());
