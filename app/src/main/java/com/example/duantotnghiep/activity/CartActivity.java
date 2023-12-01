@@ -2,18 +2,24 @@ package com.example.duantotnghiep.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.CartAdapter;
+import com.example.duantotnghiep.fragment.CartToOrderFragment;
 import com.example.duantotnghiep.model.AddProductToCart;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -27,27 +33,55 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class CartActivity extends AppCompatActivity implements CartAdapter.Callback {
     private RecyclerView recyclerViewCart;
-    private TextView totalPriceItem,totalPriceCart;
+    private TextView total_item,totalPriceCart;
     private CartAdapter cartAdapter;
     private AddProductToCart product;
     private List<AddProductToCart> list = new ArrayList<>();
     private FirebaseUser firebaseUser;
+
+    Button addOrderDetail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
         recyclerViewCart = findViewById(R.id.rcv_cart);
-        totalPriceItem = findViewById(R.id.total_price_item);
+        total_item = findViewById(R.id.total_item);
+        addOrderDetail = findViewById(R.id.addOrderDetail);
         totalPriceCart =findViewById(R.id.total_price_cart);
         recyclerViewCart.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         getListProductAddCart();
-        cartAdapter =new CartAdapter(CartActivity.this,list,this);
+        cartAdapter = new CartAdapter(CartActivity.this, list, this, totalPriceCart);
         recyclerViewCart.setAdapter(cartAdapter);
-        sumPriceProduct();
+//        sumPriceProduct();
+        addOrderDetail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                List<AddProductToCart> selectedProducts = cartAdapter.getSelectedItemsList();
+
+
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("selectedProducts", new ArrayList<>(selectedProducts));
+
+
+                CartToOrderFragment cartToOrderFragment = new CartToOrderFragment();
+                cartToOrderFragment.setArguments(bundle);
+
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, cartToOrderFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
+
+
     }
     private void getListProductAddCart() {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -75,42 +109,42 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.Callb
             }
         });
     }
-    private void sumPriceProduct() {
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        String id_user = firebaseUser.getUid();
-        DatabaseReference myReference = firebaseDatabase.getReference("cart").child(id_user);
-        myReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<AddProductToCart> list = new ArrayList<>();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    AddProductToCart product = dataSnapshot.getValue(AddProductToCart.class);
-                    list.add(product);
-                }
-
-                if (list.size() == 0) {
-                    return;
-                } else {
-                    double totalCart = caculatorTotalPrice(list);
-                    totalPriceItem.setText(" " + list.size());
-                    totalPriceCart.setText(String.valueOf(totalCart));
-
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("Loi", "onCancelled: " + error.getMessage());
-            }
-        });
-    }
-    private double caculatorTotalPrice(List<AddProductToCart> productList) {
-        double totalPrice = 0;
-        for (AddProductToCart product : productList) {
-            totalPrice += product.getPricetotal_product() * product.getQuantity_product();
-        }
-        return totalPrice;
-    }
+//    private void sumPriceProduct() {
+//        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+//        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+//        String id_user = firebaseUser.getUid();
+//        DatabaseReference myReference = firebaseDatabase.getReference("cart").child(id_user);
+//        myReference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                List<AddProductToCart> list = new ArrayList<>();
+//                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//                    AddProductToCart product = dataSnapshot.getValue(AddProductToCart.class);
+//                    list.add(product);
+//                }
+//
+//                if (list.size() == 0) {
+//                    return;
+//                } else {
+//                    double totalCart = caculatorTotalPrice(list);
+//                    total_item.setText(" " + list.size());
+//                    totalPriceCart.setText(String.valueOf(totalCart));
+//
+//                }
+//            }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                Log.d("Loi", "onCancelled: " + error.getMessage());
+//            }
+//        });
+//    }
+//    private double caculatorTotalPrice(List<AddProductToCart> productList) {
+//        double totalPrice = 0;
+//        for (AddProductToCart product : productList) {
+//            totalPrice += product.getPricetotal_product() * product.getQuantity_product();
+//        }
+//        return totalPrice;
+//    }
 
     @Override
     public void deleteItemCart(AddProductToCart products) {
@@ -144,6 +178,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.Callb
         });
         AlertDialog alertDialog = aBuilder.create();
         alertDialog.show();
+
     }
 
     @Override
@@ -154,6 +189,6 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.Callb
     @Override
     protected void onResume() {
         super.onResume();
-        sumPriceProduct();
+//        sumPriceProduct();
     }
 }

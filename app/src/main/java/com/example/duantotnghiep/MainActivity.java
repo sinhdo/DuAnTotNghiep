@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
-        requestPermissions();
+//        requestPermissions();
     }
 
     private void replaceFragment(Fragment fragment) {

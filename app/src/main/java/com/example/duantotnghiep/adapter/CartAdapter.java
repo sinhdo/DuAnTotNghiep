@@ -2,9 +2,11 @@ package com.example.duantotnghiep.adapter;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,20 +20,30 @@ import com.example.duantotnghiep.model.AddProductToCart;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
     private Context context;
     private List<AddProductToCart> productsList;
+
     private Callback callback;
+    private Set<AddProductToCart> selectedItems = new HashSet<>();
     TextView tv_totalbill;
-    public CartAdapter(Context context,List<AddProductToCart> productsList, Callback callback) {
+    public CartAdapter(Context context, List<AddProductToCart> productsList, Callback callback, TextView tv_totalbill) {
         this.context = context;
         this.productsList = productsList;
         this.callback = callback;
+        this.tv_totalbill = tv_totalbill;
         notifyDataSetChanged();
     }
+    public Set<AddProductToCart> getSelectedItems() {
+        return selectedItems;
+    }
+
 
     @NonNull
     @Override
@@ -39,6 +51,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cart,parent,false);
         return new CartViewHolder(view);
     }
+    public List<AddProductToCart> getSelectedItemsList() {
+        return new ArrayList<>(selectedItems);
+    }
+
 
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
@@ -67,6 +83,22 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.cvLickitem.setOnClickListener(view -> {
             callback.updateItemCart(products);
         });
+        holder.checkboxOrder.setChecked(selectedItems.contains(products));
+        holder.checkboxOrder.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                selectedItems.add(products);
+            } else {
+                selectedItems.remove(products);
+            }
+            updateTotalPrice();
+        });
+    }
+    private void updateTotalPrice() {
+        double selectedTotalPrice = 0.0;
+        for (AddProductToCart product : selectedItems) {
+            selectedTotalPrice += product.getPricetotal_product() * product.getQuantity_product();
+        }
+        tv_totalbill.setText(String.valueOf(selectedTotalPrice));
     }
 
     @Override
@@ -84,6 +116,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         private CardView cvLickitem;
         private ImageView imgDeleteProductCart;
         private TextView priceAllQuantity;
+
+        CheckBox checkboxOrder;
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -96,6 +130,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             tvColor = (ImageView) itemView.findViewById(R.id.tv_colorProductCart);
             tvSize = (TextView) itemView.findViewById(R.id.tv_sizeProductCart);
             priceAllQuantity = (TextView) itemView.findViewById(R.id.priceAllQuantity);
+            checkboxOrder = itemView.findViewById(R.id.checkboxOrder);
         }
     }
     public interface Callback{
