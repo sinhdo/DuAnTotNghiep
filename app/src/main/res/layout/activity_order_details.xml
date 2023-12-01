@@ -171,47 +171,57 @@
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:background="@color/white"
                 android:padding="8dp"
-                android:visibility="gone"
+                android:orientation="vertical"
                 android:layout_height="match_parent">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/txtVoucher"
-                    android:text="Voucher"
+                    android:id="@+id/txtVC"
+                    android:text="Your Voucher"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"/>
-                <ImageView
+                <LinearLayout
+                    android:id="@+id/lrlVC"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/imgVoucher"
-                    android:src="@drawable/baseline_card_giftcard_24"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="@id/txtVoucher"
-                    app:layout_constraintTop_toBottomOf="@id/txtVoucher"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/txtYourVoucher"
-                    android:layout_marginStart="8dp"
-                    android:text="Free Ship"
-                    style="@style/textStyleBold"
-                    app:layout_constraintBottom_toBottomOf="@id/imgVoucher"
-                    app:layout_constraintStart_toEndOf="@id/imgVoucher"
-                    app:layout_constraintTop_toTopOf="@id/imgVoucher"/>
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/imgChooseVoucher"
-                    app:layout_constraintBottom_toBottomOf="@id/txtYourVoucher"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/txtVoucher"
-                    android:src="@drawable/baseline_navigate_next_24"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/imVC"
+                        android:src="@drawable/baseline_airplane_ticket_24"
+                        android:layout_marginTop="8dp"
+                        />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/txtVoucher"
+                            android:layout_marginStart="8dp"
+                            android:text="Chosse Voucher"
+                            style="@style/textStyleBold"
+                            />
+                    </LinearLayout>
+                    <ImageView
+                        android:layout_marginTop="8dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:id="@+id/imgChooseVoucher"
+                        app:layout_constraintBottom_toBottomOf="@id/txtAddress"
+                        android:layout_marginLeft="110dp"
+                        android:src="@drawable/baseline_navigate_next_24"/>
+                </LinearLayout>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/txtV2"

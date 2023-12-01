@@ -232,17 +232,11 @@ public class AddProductFragment extends Fragment {
     }
 
     private void showSelectedDiscounts(List<Discount> selectedDiscountIds) {
-
-
-
         rvMutilpeDiscount.setLayoutManager(new LinearLayoutManager(requireContext()));
-        DiscountAdapter selectedDiscountsAdapter = new DiscountAdapter(selectedDiscountIds);
+        DiscountAdapter selectedDiscountsAdapter = new DiscountAdapter(new ArrayList<>());
         rvMutilpeDiscount.setAdapter(selectedDiscountsAdapter);
+        selectedDiscountsAdapter.updateDiscountList(selectedDiscountIds);
     }
-
-
-
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -357,7 +351,7 @@ public class AddProductFragment extends Fragment {
 
                         Product product = new Product(
                                 productId, userId, Title, productType,
-                                "categoryID", Brand, Des, imageUrls, selectedColors, 1000, "ngon", Quantity, Price, selectedSize, selectedDiscounts
+                                "categoryID", Brand, Des, imageUrls, selectedColors, 1000, "ngon", Quantity, (double) Price, selectedSize, (Discount) selectedDiscounts
                         );
                         product.setUserProduct(true);
 

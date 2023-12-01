@@ -7,7 +7,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="115dp"
+        android:layout_height="100dp"
         android:background="@drawable/bg_dialog"
         android:orientation="horizontal">
 
@@ -89,15 +89,15 @@
                 android:text="$ 100"
                 android:textColor="#ff00"
                 android:textSize="20dp" />
-            <TextView
-                android:id="@+id/tv_km_dt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Giảm giá : ..."
-                android:textStyle="bold"
-                android:layout_marginLeft="50dp"
-                android:textColor="#ff00"
-                android:textSize="20dp"/>
+<!--            <TextView-->
+<!--                android:id="@+id/tv_km_dt"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Giảm giá : ..."-->
+<!--                android:textStyle="bold"-->
+<!--                android:layout_marginLeft="50dp"-->
+<!--                android:textColor="#ff00"-->
+<!--                android:textSize="20dp"/>-->
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
