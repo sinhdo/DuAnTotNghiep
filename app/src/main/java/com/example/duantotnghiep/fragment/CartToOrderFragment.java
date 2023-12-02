@@ -180,9 +180,9 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                         String status = "waiting";
 
                         String idSeller = associatedProduct.getSellerId();
-
+                            String orderId = userRef.child("list_order").push().getKey();
                         Order order = new Order(
-                                null,
+                                orderId,
                                 idBuyer,
                                 idSeller,
                                 idProduct,
@@ -199,7 +199,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                                 status
                         );
 
-                        DatabaseReference orderRef = userRef.child("list_order").push();
+                            DatabaseReference orderRef = userRef.child("list_order").child(orderId);
                         orderRef.setValue(order);
                         DatabaseReference cartItemRef = userRef.child("cart").child(firebaseUser.getUid()).child(product.getCartItemId());
                         cartItemRef.removeValue();
