@@ -42,6 +42,7 @@ import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.activity.OrderOfShopActivity;
 import com.example.duantotnghiep.activity.StatisticalActivity;
 import com.example.duantotnghiep.activity.TopUpCardActivity;
+import com.example.duantotnghiep.activity.XacNhanCardActivity;
 import com.example.duantotnghiep.database.FireBaseType;
 import com.example.duantotnghiep.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -67,8 +68,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private DatabaseReference mReference;
     private FirebaseUser firebaseUser;
     private ImageView imgUser;
-    private CardView cvOut, cvOder, cvPayment, cvReview, cvTK, cvPromotion, cvQLUser, cvQLProduct, cvChangePass, cvAdddiachi;
-    private TextView textViewName, textSDT, textViewEmail, textFixInfor,textWallet;
+
+  private   CardView cvOut,cvOder,cvPayment,cvReview,cvTK,cvPromotion,cvQLUser,cvQLProduct,cvChangePass,cvAdddiachi,cvXacNhanCard;
+    private TextView textViewName,textSDT,textViewEmail,textFixInfor,textWallet;
+
     private ImageView dialog_AVT;
     private TextInputEditText edImg;
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -110,6 +113,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         cvQLProduct = view.findViewById(R.id.cvQLProduct);
         cvChangePass = view.findViewById(R.id.cvChangePass);
         cvAdddiachi = view.findViewById(R.id.cvAdddiachi);
+        cvXacNhanCard = view.findViewById(R.id.cvXacNhanCard);
 
         imgUser = view.findViewById(R.id.imageViewAvatar);
         textViewName = view.findViewById(R.id.textViewName);
@@ -154,6 +158,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), TopUpCardActivity.class);
+                startActivity(intent);
+            }
+        });
+        cvXacNhanCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), XacNhanCardActivity.class);
                 startActivity(intent);
             }
         });
@@ -373,6 +384,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 boolean isAdmin = FireBaseType.isAdmin(dataSnapshot);
                 if (isAdmin) {
                     cvQLUser.setVisibility(View.VISIBLE);
+                    cvXacNhanCard.setVisibility(View.VISIBLE);
                     cvQLProduct.setVisibility(View.GONE);
                     cvOder.setVisibility(View.GONE);
                     cvReview.setVisibility(View.GONE);
@@ -380,8 +392,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
                 } else {
                     cvQLUser.setVisibility(View.GONE);
+                    cvXacNhanCard.setVisibility(View.GONE);
+
                     cvOder.setVisibility(View.VISIBLE);
                     cvReview.setVisibility(View.VISIBLE);
+
                     cvQLProduct.setVisibility(View.VISIBLE);
                     cvTK.setVisibility(View.VISIBLE);
                 }

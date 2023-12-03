@@ -16,6 +16,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
@@ -120,12 +121,12 @@ public class TopUpCardActivity extends AppCompatActivity {
                         if (dataSnapshot.exists()) {
                             String username = dataSnapshot.child("username").getValue(String.class);
 
-                            // Tạo đối tượng Card
-                            Card card = new Card(cardSerial, cardPin, cardProvider, cardValue, time, username, buyerID);
 
-                            // Thêm đối tượng Card vào Realtime Database
                             DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference("cards");
                             String cardId = cardRef.push().getKey(); // Tạo ID mới cho thẻ
+
+                            // Thêm đối tượng Card vào Realtime Database
+                            Card card = new Card(cardId, cardSerial, cardPin, cardProvider, cardValue, time, username, userId, "pending", false);
                             cardRef.child(cardId).setValue(card);
 
                             // Xóa thông tin trên giao diện
@@ -157,7 +158,13 @@ public class TopUpCardActivity extends AppCompatActivity {
     private void loadCardDataFromFirebase() {
         DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference("cards");
 
-        cardRef.addValueEventListener(new ValueEventListener() {
+        // Lấy ID người dùng hiện tại
+        String currentUserId = mAuth.getUid();
+
+        // Tạo truy vấn để chỉ lấy dữ liệu thẻ của người dùng hiện tại
+        Query query = cardRef.orderByChild("userId").equalTo(currentUserId);
+
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 cardList.clear();
@@ -184,4 +191,9 @@ public class TopUpCardActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }
+
+
+
