@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 public class User {
-    private Double wallet;
+
     private String id,username,password,email,address,phone;
+    private Double wallet;
+
     private String img;
     private Boolean user_type;
     private Map<String, Location> location;  // Thay vì List<Location>
@@ -92,6 +94,7 @@ public class User {
     public void setLocation(Map<String, Location> location) {
         this.location = location;
     }
+
 
     public User(Double wallet, String id, String username, String password, String email, String address, String phone, String img, Boolean user_type, Map<String, Location> location) {
         this.wallet = wallet;

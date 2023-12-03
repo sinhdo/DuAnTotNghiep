@@ -9,7 +9,7 @@
     tools:context=".activity.OrderActivity">
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="160dp"
+        android:layout_height="200dp"
         android:id="@+id/imgProduct"/>
     <TextView
         android:layout_width="match_parent"
@@ -26,7 +26,14 @@
         android:textColor="#ff00"
         android:text="$ 100"
         android:textSize="20dp"
-        android:layout_marginVertical="10dp"/>
+        android:layout_marginVertical="5dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvQuantity"
+        android:text="Số lượng"
+        android:textSize="20dp"
+        android:layout_marginVertical="5dp"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,7 +47,7 @@
         android:layout_marginVertical="10dp"
         android:id="@+id/tvDescriptionPro"/>
     <LinearLayout
-        android:layout_marginTop="290dp"
+        android:layout_marginTop="230dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">

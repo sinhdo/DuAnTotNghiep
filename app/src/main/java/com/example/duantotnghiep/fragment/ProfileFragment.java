@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.duantotnghiep.activity.DiscountActivity;
 import com.example.duantotnghiep.activity.ListUserActivity;
 import com.example.duantotnghiep.activity.LocationActivity;
 import com.example.duantotnghiep.activity.ManagerProductActivity;
@@ -39,6 +40,7 @@ import com.example.duantotnghiep.activity.ManHinhChoActivity;
 import com.example.duantotnghiep.activity.ChangePassword_Activity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.activity.OrderOfShopActivity;
+import com.example.duantotnghiep.activity.StatisticalActivity;
 import com.example.duantotnghiep.activity.TopUpCardActivity;
 import com.example.duantotnghiep.activity.XacNhanCardActivity;
 import com.example.duantotnghiep.database.FireBaseType;
@@ -66,30 +68,37 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private DatabaseReference mReference;
     private FirebaseUser firebaseUser;
     private ImageView imgUser;
+
   private   CardView cvOut,cvOder,cvPayment,cvReview,cvTK,cvPromotion,cvQLUser,cvQLProduct,cvChangePass,cvAdddiachi,cvXacNhanCard;
-    private TextView textViewName,textSDT,textViewEmail,textFixInfor;
+    private TextView textViewName,textSDT,textViewEmail,textFixInfor,textWallet;
+
     private ImageView dialog_AVT;
     private TextInputEditText edImg;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Picasso picasso = Picasso.get();
+
     public ProfileFragment() {
 
     }
+
     public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
         return fragment;
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         return view;
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -110,6 +119,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         textViewName = view.findViewById(R.id.textViewName);
         textSDT = view.findViewById(R.id.textSDT);
         textViewEmail = view.findViewById(R.id.textViewEmail);
+        textWallet = view.findViewById(R.id.textWallet);
         textFixInfor = view.findViewById(R.id.textFixInfor);
 
         firebaseAuth = FirebaseAuth.getInstance();
@@ -119,6 +129,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         String name = sharedPreferences.getString("username", "");
         String phone = sharedPreferences.getString("phone", "");
         String email = sharedPreferences.getString("email", "");
+        float walletFloat = sharedPreferences.getFloat("wallet", 0);
+        double wallet = (double) walletFloat;
         String img = sharedPreferences.getString("img", "");
 
 
@@ -128,6 +140,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             textViewName.setText(name);
             textSDT.setText(phone);
             textViewEmail.setText(email);
+            textWallet.setText("Ví : "+wallet+" VNĐ");
             if (img.equals("")) {
                 imgUser.setImageResource(R.drawable.baseline_person_24);
             } else {
@@ -169,6 +182,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         });
         textFixInfor.setOnClickListener(this);
     }
+
     private void setInfoProfile() {
         String id = firebaseUser.getUid();
         DatabaseReference userRef = mReference.child("user").child(id);
@@ -178,11 +192,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 String name = snapshot.child("username").getValue(String.class);
                 String phone = snapshot.child("phone").getValue(String.class);
                 String email = snapshot.child("email").getValue(String.class);
+                double wallet = snapshot.child("wallet").getValue(Double.class);
+                float walletFloat = (float) wallet;
                 String img = snapshot.child("img").getValue(String.class);
                 textViewName.setText(name);
                 textViewEmail.setText(email);
+                textWallet.setText("Ví : "+wallet+" VNĐ");
 
-                if (img.equals("")||img.isEmpty()) {
+                if (img.equals("") || img.isEmpty()) {
                     imgUser.setImageResource(R.drawable.baseline_person_24);
                 } else {
                     picasso.load(img).into(imgUser);
@@ -193,42 +210,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     editor.putString("username", name);
                     editor.putString("phone", phone);
                     editor.putString("email", email);
+                    editor.putFloat("wallet", walletFloat);
                     editor.putString("img", img);
                     editor.apply();
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.d("Loi", "onCancelled: " + error.getMessage());
             }
         });
     }
-    private void showDialogOut(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        LayoutInflater inflater = getLayoutInflater();
-        View view = inflater.inflate(R.layout.dialog_out_app, null);
 
-        Button btnCancel = view.findViewById(R.id.btnCancel);
-        Button btnConfirm = view.findViewById(R.id.btnConfirm);
-
-        builder.setView(view);
-        final AlertDialog alertDialog = builder.create();
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-        btnConfirm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                        startActivity(new Intent(getContext(), ManHinhChoActivity.class));
-                alertDialog.dismiss();
-            }
-        });
-
-        alertDialog.show();
-    }
     private void showDialogFigProfile() {
         Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.dialog_fix_profile);
@@ -239,7 +233,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         Button btnCancel = dialog.findViewById(R.id.btnCancel);
         Button btnConfirm = dialog.findViewById(R.id.btnConfirm);
         dialog_AVT = dialog.findViewById(R.id.dialog_AVT);
-        Button btnImg= dialog.findViewById(R.id.btnImg);
+        Button btnImg = dialog.findViewById(R.id.btnImg);
         edImg = dialog.findViewById(R.id.edImg);
 
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -250,21 +244,21 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    User user = dataSnapshot.getValue(User.class);
-                    if (user != null) {
-                        edUserName.setText(user.getUsername());
-                        edPhone.setText(user.getPhone());
-                        edAddress.setText(user.getAddress());
-                        edImg.setText(user.getImg());
+                String name = dataSnapshot.child("username").getValue(String.class);
+                String phone = dataSnapshot.child("phone").getValue(String.class);
+                String address = dataSnapshot.child("address").getValue(String.class);
+                String img = dataSnapshot.child("img").getValue(String.class);
+                edUserName.setText(name);
+                edPhone.setText(phone);
+                edAddress.setText(address);
+                edImg.setText(img);
 
-                        String imgUrl = user.getImg();
-                        if (!TextUtils.isEmpty(imgUrl)) {
-                            Picasso.get().load(imgUrl).into(dialog_AVT);
-                        }
-                    }
+                String imgUrl = img;
+                if (!TextUtils.isEmpty(imgUrl)) {
+                    Picasso.get().load(imgUrl).into(dialog_AVT);
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -291,7 +285,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
                 if (!newImgUrl.isEmpty()) {
                     Picasso.get().load(newImgUrl).into(imgUser);
-                }else if (dialog_AVT.getDrawable() != null) {
+                } else if (dialog_AVT.getDrawable() != null) {
                     Bitmap bitmap = ((BitmapDrawable) dialog_AVT.getDrawable()).getBitmap();
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
@@ -322,6 +316,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 replaceFragment(new ProfileFragment());
                 dialog.dismiss();
             }
+
             private void replaceFragment(ProfileFragment profileFragment) {
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -341,6 +336,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         dialog.show();
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -351,7 +347,35 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             edImg.setText(imageUrl);
         }
     }
-    public void setRoleListUser(){
+
+    private void showDialogOut() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.dialog_out_app, null);
+
+        Button btnCancel = view.findViewById(R.id.btnCancel);
+        Button btnConfirm = view.findViewById(R.id.btnConfirm);
+
+        builder.setView(view);
+        final AlertDialog alertDialog = builder.create();
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+        btnConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext(), ManHinhChoActivity.class));
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
+    }
+
+    public void setRoleListUser() {
         String id = firebaseUser.getUid();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(id);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -362,47 +386,59 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     cvQLUser.setVisibility(View.VISIBLE);
                     cvXacNhanCard.setVisibility(View.VISIBLE);
                     cvQLProduct.setVisibility(View.GONE);
+                    cvOder.setVisibility(View.GONE);
+                    cvReview.setVisibility(View.GONE);
+                    cvTK.setVisibility(View.GONE);
+
                 } else {
                     cvQLUser.setVisibility(View.GONE);
                     cvXacNhanCard.setVisibility(View.GONE);
+
+                    cvOder.setVisibility(View.VISIBLE);
+                    cvReview.setVisibility(View.VISIBLE);
+
                     cvQLProduct.setVisibility(View.VISIBLE);
+                    cvTK.setVisibility(View.VISIBLE);
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d("Loi", "onCancelled: " + databaseError.getMessage());
             }
         });
     }
+
     @Override
     public void onResume() {
         super.onResume();
         setInfoProfile();
     }
+
     @Override
     public void onClick(View view) {
 
-            if (view.getId()==R.id.cvOut){
-                showDialogOut();
-                firebaseAuth.signOut();
-            }else if (view.getId()==R.id.cvOderForShop){
-                startActivity(new Intent(getContext(), OrderOfShopActivity.class));
-            }else if (view.getId()==R.id.cvPayment){
+        if (view.getId() == R.id.cvOut) {
+            showDialogOut();
+            firebaseAuth.signOut();
+        } else if (view.getId() == R.id.cvOderForShop) {
+            startActivity(new Intent(getContext(), OrderOfShopActivity.class));
+        } else if (view.getId() == R.id.cvPayment) {
 
-            }else if (view.getId()==R.id.cvPromotion){
+        } else if (view.getId() == R.id.cvPromotion) {
+            startActivity(new Intent(getContext(), DiscountActivity.class));
+        } else if (view.getId() == R.id.cvTK) {
+            startActivity(new Intent(getContext(), StatisticalActivity.class));
+        } else if (view.getId() == R.id.cvQLUser) {
+            startActivity(new Intent(getContext(), ListUserActivity.class));
+        } else if (view.getId() == R.id.cvQLProduct) {
+            startActivity(new Intent(getContext(), ManagerProductActivity.class));
+        } else if (view.getId() == R.id.cvReView) {
 
-            }else if (view.getId()==R.id.cvTK){
-
-            }else if (view.getId()==R.id.cvQLUser){
-                startActivity(new Intent(getContext(), ListUserActivity.class));
-            }else if (view.getId()==R.id.cvQLProduct){
-                startActivity(new Intent(getContext(),ManagerProductActivity.class));
-            }else if (view.getId()==R.id.cvReView){
-
-            }else if (view.getId()==R.id.cvChangePass){
-                startActivity(new Intent(getContext(), ChangePassword_Activity.class));
-            } else if (view.getId()==R.id.textFixInfor) {
-                showDialogFigProfile();
-            }
+        } else if (view.getId() == R.id.cvChangePass) {
+            startActivity(new Intent(getContext(), ChangePassword_Activity.class));
+        } else if (view.getId() == R.id.textFixInfor) {
+            showDialogFigProfile();
+        }
     }
 }

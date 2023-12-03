@@ -1,6 +1,6 @@
 package com.example.duantotnghiep.model;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Product {
@@ -19,15 +19,29 @@ public class Product {
     private double price;
     private List<String> size;
 
+    private List<Discount> selectedDiscounts;
+
+
+    private boolean isUserProduct;
+
+    private int selectedQuantity;
+
+    public Discount getDiscount() {
+        return null;
+    }
+
+
     public enum ProductType {
         CLOTHING,
         FOOTWEAR
     }
 
     public Product() {
+
     }
 
-    public Product(String id, String sellerId, String name, ProductType productType, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int sold, String reviewId, int quantity, double price, List<String> size) {
+
+    public Product(String id, String sellerId, String name, ProductType productType, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int sold, String reviewId, int quantity, double price, List<String> size, Discount discount) {
         this.id = id;
         this.sellerId = sellerId;
         this.name = name;
@@ -42,22 +56,33 @@ public class Product {
         this.quantity = quantity;
         this.price = price;
         this.size = size;
+        this.selectedDiscounts = Collections.singletonList(discount);
+    }
 
+    public List<Discount> getSelectedDiscounts() {
+        return selectedDiscounts;
+    }
+
+    public void setSelectedDiscounts(List<Discount> selectedDiscounts) {
+        this.selectedDiscounts = selectedDiscounts;
+    }
+
+    public int getSelectedQuantity() {
+        return selectedQuantity;
+    }
+
+    public void setSelectedQuantity(int selectedQuantity) {
+        this.selectedQuantity = selectedQuantity;
+    }
+    public boolean isUserProduct() {
+        return isUserProduct;
+    }
+
+    public void setUserProduct(boolean userProduct) {
+        isUserProduct = userProduct;
     }
 
 
-    public Product(String id, String name, ProductType size, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int quantity, double price) {
-        this.id = id;
-        this.name = name;
-        this.productType = size;
-        this.categoryID = categoryID;
-        this.brand = brand;
-        this.description = description;
-        this.imgProduct = imgProduct;
-        this.color = color;
-        this.quantity = quantity;
-        this.price = price;
-    }
 
     public List<String> getSize() {
         return size;

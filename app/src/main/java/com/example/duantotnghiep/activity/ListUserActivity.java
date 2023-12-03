@@ -1,13 +1,5 @@
 package com.example.duantotnghiep.activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.SearchView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -24,6 +16,14 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.SearchView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.UserAdapter;
@@ -122,10 +122,10 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                 }
                 adapter.notifyDataSetChanged();
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ListUserActivity.this, "Get Fail !!!"+error.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d("====", "onCancelled: "+error.getMessage());
+                Toast.makeText(ListUserActivity.this, "Get Fail !!!", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -206,11 +206,12 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                                             User user = new User();
                                             user.setId(id);
                                             user.setUsername(name);
-                                            user.setImg("");
+                                            user.setImg("https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=");
                                             user.setEmail(email);
                                             user.setPhone(phone);
                                             user.setPassword(password);
                                             user.setAddress(address);
+                                            user.setWallet(0.0);
                                             if (role == "ADMIN") {
                                                 user.setUser_type(true);
                                             } else {

@@ -35,8 +35,6 @@
                     android:layout_margin="10dp"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
-
-
                     android:src="@drawable/stone"
                     app:shapeAppearanceOverlay="@style/roundImg" />
 

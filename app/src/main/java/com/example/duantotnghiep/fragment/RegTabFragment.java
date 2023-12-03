@@ -68,13 +68,16 @@ public class RegTabFragment extends Fragment {
                                         String id = firebaseUser.getUid();
                                         User user = new User();
                                         user.setId(id);
+                                        user.setImg("https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=");
                                         user.setUsername(username);
                                         user.setPassword(pass);
                                         user.setAddress(address);
                                         user.setEmail(email);
                                         user.setPhone(phone);
                                         user.setUser_type(false);
-                                        user.setWallet((double) 0);
+
+                                        user.setWallet(0.0);
+
                                         user.setImg("");
                                         usersRef = firebaseHelper.getUsersRef();
                                         usersRef.child(id).setValue(user);

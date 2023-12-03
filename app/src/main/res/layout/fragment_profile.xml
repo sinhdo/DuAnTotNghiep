@@ -20,7 +20,7 @@
     <LinearLayout
         android:id="@+id/topUS"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="172dp"
         android:layout_below="@id/tlt"
         android:background="#DDA95B"
         android:orientation="horizontal"
@@ -74,6 +74,14 @@
                 android:layout_below="@id/textSDT"
                 android:layout_centerHorizontal="true"
                 android:text="FPT@fpt.edu.vn"
+                android:textSize="19sp" />
+            <TextView
+                android:id="@+id/textWallet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="Ví : 0 VNĐ"
+                android:textStyle="italic"
                 android:textSize="19sp" />
 
             <TextView
@@ -375,6 +383,7 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
+
                 android:layout_margin="16dp"
                 android:backgroundTint="#FFD772"
                 app:cardCornerRadius="8dp"
@@ -383,6 +392,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+
                     android:layout_gravity="center_horizontal|center_vertical"
                     android:layout_margin="16dp"
                     android:orientation="horizontal">
