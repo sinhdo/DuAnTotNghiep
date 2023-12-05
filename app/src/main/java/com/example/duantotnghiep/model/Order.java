@@ -1,6 +1,33 @@
 package com.example.duantotnghiep.model;
 
+import java.util.List;
+
 public class Order {
+
+//    private String userId;
+//
+//    public String getUserId() {
+//        return userId;
+//    }
+
+//    public void setUserId(String userId) {
+//        this.userId = userId;
+//    }
+
+    private String idReview;
+
+    public Order(String idReview) {
+        this.idReview = idReview;
+    }
+
+    public String getIdReview() {
+        return idReview;
+    }
+
+    public void setIdReview(String idReview) {
+        this.idReview = idReview;
+    }
+
     private String id,idBuyer,idSeller,idProduct, nameProduct,imgProduct;
     private int color;
     private Double total;
@@ -20,6 +47,46 @@ public class Order {
 
     private Boolean paid;
     private String status;
+    private Boolean review;
+
+    private List<String> reviewsList;
+
+    public Order(List<String> reviewsList) {
+        this.reviewsList = reviewsList;
+    }
+
+    public List<String> getReviewsList() {
+        return reviewsList;
+    }
+
+    public void setReviewsList(List<String> reviewsList) {
+        this.reviewsList = reviewsList;
+    }
+
+    public Order(Boolean review) {
+        this.review = review;
+    }
+
+    public Boolean getReview() {
+        return review;
+    }
+
+    public void setReview(Boolean review) {
+        this.review = review;
+    }
+
+    private List<Reviews> reviewList;
+
+    // Constructor và các phương thức khác của Order
+
+    // Phương thức để thiết lập danh sách đánh giá cho đơn hàng
+    public void setReviewList(List<Reviews> reviewList) {
+        this.reviewList = reviewList;
+    }
+
+    public List<Reviews> getReviewList() {
+        return reviewList;
+    }
 
     public Order(String id, String idBuyer, String idSeller, String idProduct, String nameProduct, String imgProduct, int color, Double total, String date, String address, String numberPhone, int quantity, String notes, Boolean paid, String status) {
         this.id = id;
@@ -153,4 +220,6 @@ public class Order {
 
     public Order() {
     }
+
+
 }

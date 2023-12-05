@@ -123,6 +123,8 @@ public class WaitForShopFragment extends Fragment implements OrderAdapter.Callba
         windowAttributes.gravity = Gravity.BOTTOM;
         Button btnCancel = dialog.findViewById(R.id.btn1);
         Button btnExit = dialog.findViewById(R.id.btn2);
+        Button btn_review = dialog.findViewById(R.id.btn_review);
+        btn_review.setVisibility(View.INVISIBLE);
         btnExit.setText("Xác nhận đơn hàng");
         btnExit.setOnClickListener(view -> {
             order.setStatus("confirmed");

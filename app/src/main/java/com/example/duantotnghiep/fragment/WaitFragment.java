@@ -87,6 +87,8 @@ public class WaitFragment extends Fragment implements OrderAdapter.Callback{
         windowAttributes.gravity = Gravity.BOTTOM;
         Button btnCancel = dialog.findViewById(R.id.btn1);
         Button btnExit = dialog.findViewById(R.id.btn2);
+        Button btn_review = dialog.findViewById(R.id.btn_review);
+        btn_review.setVisibility(View.INVISIBLE);
         btnExit.setOnClickListener(view -> {
             dialog.cancel();
         });

@@ -23,8 +23,12 @@ import android.widget.Toast;
 import com.example.duantotnghiep.R;
 
 import com.example.duantotnghiep.adapter.ColorAdapter;
+import com.example.duantotnghiep.adapter.OrderAdapter;
+import com.example.duantotnghiep.adapter.ReviewAdapter;
 import com.example.duantotnghiep.adapter.SizeAdapter;
 import com.example.duantotnghiep.model.AddProductToCart;
+import com.example.duantotnghiep.model.Order;
+import com.example.duantotnghiep.model.Reviews;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -32,6 +36,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -46,6 +51,11 @@ public class OrderActivity extends AppCompatActivity {
     private ColorAdapter selectedColorAdapter;
     private int num;
 
+    private RecyclerView recyclerView;
+
+    private OrderAdapter orderAdapter;
+    private ArrayList<Order> orderList = new ArrayList<>();
+
     private String idProduct;
     List<String> sizeList;
     ArrayList<Integer> colors;
@@ -53,14 +63,141 @@ public class OrderActivity extends AppCompatActivity {
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
 
+    private List<Reviews> reviewsList;
+
+    private ReviewAdapter reviewAdapter;
+
+    private List<Reviews> reviewsList1 = new ArrayList<>();
+
+    private List<String> userIds;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         AnhXa();
+        loadReviewsFromFirebase();
+        reviewAdapter = new ReviewAdapter(this, reviewsList1 ); // Khởi tạo adapter
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(reviewAdapter); // Thiết lập adapter cho RecyclerView
+
+        String userId = ""; // Thay bằng ID người dùng thực tế từ nguồn dữ liệu của bạn
+        String userName = ""; // Thay bằng tên người dùng tương ứng
+
+        // Ánh xạ id user với tên người dùng trong ReviewAdapter
+
+
+
+        hienthi();
         loadDataFromFirebase();
+
     }
+
+
+
+    private void loadReviewsFromFirebase() {
+        DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference().child("reviews");
+        reviewsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                reviewsList1.clear(); // Xóa danh sách hiện tại (nếu cần)
+                List<String> userIds = new ArrayList<>();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String userId = snapshot.child("user_id").getValue(String.class);
+                    String comment = snapshot.child("comment").getValue(String.class);
+                    String productId = snapshot.child("id_product").getValue(String.class);
+
+                    // Kiểm tra và thêm dữ liệu vào reviewsList1 nếu đúng sản phẩm và dữ liệu không null
+                    if (productId != null && productId.equals(idProduct) && userId != null && comment != null) {
+                        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users").child(userId);
+                        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
+                                String displayName = userDataSnapshot.child("userName").getValue(String.class);
+                                Reviews review = new Reviews( userId,displayName, productId, comment);
+                                reviewsList1.add(review);
+                                // Gọi phương thức cập nhật RecyclerView tại đây nếu cần
+                                reviewAdapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                // Xử lý khi có lỗi xảy ra trong quá trình truy vấn dữ liệu người dùng
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Xử lý khi có lỗi xảy ra trong quá trình truy vấn dữ liệu từ Firebase
+            }
+        });
+    }
+
+
+
+
+
+
+    private void hienthi() {
+        DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference().child("reviews");
+        reviewsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                reviewsList1.clear();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String userId = snapshot.child("user_id").getValue(String.class);
+                    String comment = snapshot.child("comment").getValue(String.class);
+                    String productId = snapshot.child("id_product").getValue(String.class);
+
+                    if (productId != null && productId.equals(idProduct) && userId != null && comment != null) {
+                        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("user").child(userId);
+                        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
+                                String displayName = userDataSnapshot.child("username").getValue(String.class);
+
+                                Reviews review = new Reviews(userId, displayName, productId, comment);
+                                reviewAdapter.notifyDataSetChanged();
+
+                                if (!reviewsList1.isEmpty()) {
+                                    recyclerView.setVisibility(View.VISIBLE);
+                                } else {
+                                    TextView noReviewsTextView = findViewById(R.id.noReviewsTextView);
+                                    noReviewsTextView.setVisibility(View.VISIBLE);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                // Xử lý khi có lỗi xảy ra trong quá trình truy vấn dữ liệu người dùng
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Xử lý khi có lỗi xảy ra trong quá trình truy vấn dữ liệu từ Firebase
+            }
+        });
+    }
+
+
+
+
+
+
+
+
+
+
     private void AnhXa(){
         imgProduct =findViewById(R.id.imgProduct);
         tvNameProduct =findViewById(R.id.tvNameProduct);
@@ -70,6 +207,12 @@ public class OrderActivity extends AppCompatActivity {
         btnAddToCart =findViewById(R.id.btnAddToCart);
         btnBuyProduct =findViewById(R.id.btnBuyProduct);
         idProduct = getIntent().getStringExtra("idPro");
+
+        recyclerView = findViewById(R.id.rcv_review);
+
+
+
+
 
         btnBuyProduct.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,6 +244,10 @@ public class OrderActivity extends AppCompatActivity {
         });
 
     }
+
+
+
+
     private void loadDataFromFirebase() {
         idProduct = getIntent().getStringExtra("idPro");
         DatabaseReference productRef = FirebaseDatabase.getInstance().getReference().child("products").child(idProduct);
@@ -257,4 +404,5 @@ public class OrderActivity extends AppCompatActivity {
         }
         dialog.show();
     }
+    
 }
