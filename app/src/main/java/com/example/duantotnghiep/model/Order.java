@@ -3,31 +3,6 @@ package com.example.duantotnghiep.model;
 import java.util.List;
 
 public class Order {
-
-//    private String userId;
-//
-//    public String getUserId() {
-//        return userId;
-//    }
-
-//    public void setUserId(String userId) {
-//        this.userId = userId;
-//    }
-
-    private String idReview;
-
-    public Order(String idReview) {
-        this.idReview = idReview;
-    }
-
-    public String getIdReview() {
-        return idReview;
-    }
-
-    public void setIdReview(String idReview) {
-        this.idReview = idReview;
-    }
-
     private String id,idBuyer,idSeller,idProduct, nameProduct,imgProduct;
 
     private double amount;

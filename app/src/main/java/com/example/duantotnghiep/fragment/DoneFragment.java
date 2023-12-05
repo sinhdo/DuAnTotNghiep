@@ -3,13 +3,6 @@ package com.example.duantotnghiep.fragment;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +10,18 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.activity.InforOrderActivity;
+import com.example.duantotnghiep.activity.ReviewsActivity;
 import com.example.duantotnghiep.adapter.OrderAdapter;
 import com.example.duantotnghiep.model.Order;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -112,41 +111,12 @@ public class DoneFragment extends Fragment implements OrderAdapter.Callback{
         });
 
 
-        String idReview = order.getIdReview();
-        String idProduct = order.getIdProduct();
-
         btn_review.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Dialog reviewDialog = new Dialog(getActivity());
-                reviewDialog.setContentView(R.layout.dialog_review);
-                reviewDialog.setTitle("Viết đánh giả của bạn !!!");
-
-                EditText reviewEditText = reviewDialog.findViewById(R.id.reviewEditText);
-                Button saveReviewButton = reviewDialog.findViewById(R.id.saveReviewButton);
-
-                saveReviewButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        String reviewComment = reviewEditText.getText().toString().trim();
-                        int rating = 5;
-                        boolean hasComment = !reviewComment.isEmpty();
-
-                        if (hasComment) {
-                            String userId = firebaseUser.getUid();
-                            String idReview = ""; // Thay thế bằng id đánh giá thực tế
-                            String idProduct = ""; // Thay thế bằng id sản phẩm thực tế
-
-                            // Gọi phương thức saveReviewToFirebase với các thông tin mới
-                            saveReviewToFirebase(order.getId(), reviewComment, rating, userId, idReview, idProduct);
-
-                            reviewDialog.dismiss();
-                        } else {
-                            Toast.makeText(getContext(), "Vui lòng nhập đánh giá của bạn.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-                reviewDialog.show();
+                Intent intent = new Intent(getContext(), ReviewsActivity.class);
+                intent.putExtra("idOrder",order.getId());
+                startActivity(intent);
             }
         });
 
