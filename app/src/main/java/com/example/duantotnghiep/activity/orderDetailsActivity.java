@@ -72,7 +72,7 @@ public class orderDetailsActivity extends AppCompatActivity {
     private List<Integer> colorList;
     private OrderDetailsAdapter adapter;
     private String idProduct;
-    private DatabaseReference productRef, userRef, discountRef;
+    private DatabaseReference productRef, userRef, discountRef, buyerRef;
     private FirebaseUser firebaseUser;
     private int quantity = 0;
     private double delivery;
@@ -115,7 +115,7 @@ public class orderDetailsActivity extends AppCompatActivity {
         discountRef = FirebaseDatabase.getInstance().getReference("discounts");
         productRef = FirebaseDatabase.getInstance().getReference().child("products").child(idProduct);
         String buyerID = firebaseUser.getUid();
-        DatabaseReference buyerRef = userRef.child("user").child(buyerID).child("wallet");
+        buyerRef = userRef.child("user").child(buyerID).child("wallet");
         buyerRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
