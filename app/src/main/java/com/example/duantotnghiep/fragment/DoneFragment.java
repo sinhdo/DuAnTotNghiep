@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,8 @@ import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.activity.InforOrderActivity;
 import com.example.duantotnghiep.adapter.OrderAdapter;
 import com.example.duantotnghiep.model.Order;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -33,12 +36,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DoneFragment extends Fragment implements OrderAdapter.Callback{
     private RecyclerView recyclerView;
     private OrderAdapter oderAdapter;
     private ArrayList<Order> list = new ArrayList<>();
     private FirebaseUser firebaseUser;
+
     private TextView noResultsTextView;
 
 
@@ -64,6 +70,8 @@ public class DoneFragment extends Fragment implements OrderAdapter.Callback{
         return inflater.inflate(R.layout.fragment_done, container, false);
     }
 
+
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -88,6 +96,8 @@ public class DoneFragment extends Fragment implements OrderAdapter.Callback{
         Button btnCancel = dialog.findViewById(R.id.btn1);
         btnCancel.setVisibility(View.GONE);
         Button btnExit = dialog.findViewById(R.id.btn2);
+        Button btn_review = dialog.findViewById(R.id.btn_review);
+        btn_review.setVisibility(View.VISIBLE);
         btnExit.setOnClickListener(view -> {
             dialog.cancel();
         });
@@ -101,7 +111,177 @@ public class DoneFragment extends Fragment implements OrderAdapter.Callback{
             }
         });
 
+
+        String idReview = order.getIdReview();
+        String idProduct = order.getIdProduct();
+
+        btn_review.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Dialog reviewDialog = new Dialog(getActivity());
+                reviewDialog.setContentView(R.layout.dialog_review);
+                reviewDialog.setTitle("Viết đánh giả của bạn !!!");
+
+                EditText reviewEditText = reviewDialog.findViewById(R.id.reviewEditText);
+                Button saveReviewButton = reviewDialog.findViewById(R.id.saveReviewButton);
+
+                saveReviewButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String reviewComment = reviewEditText.getText().toString().trim();
+                        int rating = 5;
+                        boolean hasComment = !reviewComment.isEmpty();
+
+                        if (hasComment) {
+                            String userId = firebaseUser.getUid();
+                            String idReview = ""; // Thay thế bằng id đánh giá thực tế
+                            String idProduct = ""; // Thay thế bằng id sản phẩm thực tế
+
+                            // Gọi phương thức saveReviewToFirebase với các thông tin mới
+                            saveReviewToFirebase(order.getId(), reviewComment, rating, userId, idReview, idProduct);
+
+                            reviewDialog.dismiss();
+                        } else {
+                            Toast.makeText(getContext(), "Vui lòng nhập đánh giá của bạn.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                reviewDialog.show();
+            }
+        });
+
         dialog.show();
+    }
+
+
+
+
+
+    private void saveReviewToFirebase(String orderId, String reviewComment, int rating, String userId, String idReview, String idProduct) {
+
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users").child(userId);
+
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference myReference = firebaseDatabase.getReference();
+
+        DatabaseReference reviewsRef = myReference.child("reviews");
+
+        String reviewId = reviewsRef.push().getKey(); // Tạo id mới cho đánh giá
+
+        userId = firebaseUser.getUid();
+
+
+        Map<String, Object> reviewData = new HashMap<>();
+        reviewData.put("order_id", orderId);
+        reviewData.put("comment", reviewComment);
+        reviewData.put("rating", rating);
+        reviewData.put("user_id", userId);
+        reviewData.put("id_review", reviewId); // Gán giá trị id_review mới tạo
+
+
+        // Truy vấn id_product từ id_order
+        DatabaseReference ordersRef = myReference.child("list_order").child(orderId);
+        ordersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String idProduct = snapshot.child("idProduct").getValue(String.class);
+
+                    // Truy vấn danh sách sản phẩm để tìm sản phẩm có id_product trùng khớp
+                    DatabaseReference productsRef = myReference.child("products");
+                    productsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot productsSnapshot) {
+                            for (DataSnapshot productSnapshot : productsSnapshot.getChildren()) {
+                                String productId = productSnapshot.getKey();
+
+                                // So sánh id_product từ list_order với id của từng sản phẩm trong danh sách sản phẩm
+                                if (idProduct.equals(productId)) {
+                                    String productName = productSnapshot.child("productName").getValue(String.class);
+                                    // Thêm thông tin sản phẩm vào dữ liệu đánh giá
+                                    reviewData.put("id_product", idProduct);
+                                    reviewData.put("product_name", productName);
+
+                                    // Lưu đánh giá với thông tin sản phẩm vào collection "reviews"
+                                    reviewsRef.child(reviewId).setValue(reviewData)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    // Thông báo thành công khi thêm đánh giá vào collection "reviews"
+                                                    Toast.makeText(getContext(), "Đánh giá đã được thêm vào.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    // Thông báo khi thêm đánh giá không thành công
+                                                    Toast.makeText(getContext(), "Thêm đánh giá thất bại.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                    break; // Kết thúc vòng lặp sau khi tìm thấy sản phẩm tương ứng
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            // Xử lý khi có lỗi truy xuất dữ liệu danh sách sản phẩm
+                        }
+                    });
+                } else {
+                    // Xử lý khi không tìm thấy thông tin đơn hàng
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Xử lý khi có lỗi truy xuất dữ liệu đơn hàng
+            }
+        });
+    }
+
+
+
+    private void getProductDetails(String idOrder) {
+        DatabaseReference ordersRef = FirebaseDatabase.getInstance().getReference().child("list_order").child(idOrder);
+
+        ordersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String idProduct = snapshot.child("idProduct").getValue(String.class);
+
+                    if (idProduct != null) {
+                        DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference().child("products").child(idProduct);
+
+                        productsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    // Retrieve product details here
+                                    String productName = snapshot.child("productName").getValue(String.class);
+                                    // Continue with the product details as needed
+                                } else {
+                                    // Handle case where product details are not found
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                // Handle database error while fetching product details
+                            }
+                        });
+                    }
+                } else {
+                    // Handle case where order details are not found
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle database error while fetching order details
+            }
+        });
     }
     private void GetDataDoneListForBuyer() {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -141,6 +321,7 @@ public class DoneFragment extends Fragment implements OrderAdapter.Callback{
 
     @Override
     public void logic(Order order) {
+        getProductDetails(order.getId());
         dialogForUser(order);
     }
 }

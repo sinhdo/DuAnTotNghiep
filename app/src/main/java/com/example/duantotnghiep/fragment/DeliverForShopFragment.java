@@ -117,6 +117,8 @@ public class DeliverForShopFragment extends Fragment implements OrderAdapter.Cal
         window.setAttributes(windowAttributes);
         windowAttributes.gravity = Gravity.BOTTOM;
         Button btnCancel = dialog.findViewById(R.id.btn1);
+        Button btn_review = dialog.findViewById(R.id.btn_review);
+        btn_review.setVisibility(View.INVISIBLE);
 
         btnCancel.setText("Đã nhận được hàng");
         btnCancel.setOnClickListener(view -> {

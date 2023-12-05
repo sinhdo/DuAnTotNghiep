@@ -86,6 +86,8 @@ public class DoneForShopFragment extends Fragment implements OrderAdapter.Callba
         Button btnCancel = dialog.findViewById(R.id.btn1);
         btnCancel.setVisibility(View.GONE);
         Button btnExit = dialog.findViewById(R.id.btn2);
+        Button btn_review = dialog.findViewById(R.id.btn_review);
+        btn_review.setVisibility(View.INVISIBLE);
         btnExit.setOnClickListener(view -> {
             dialog.cancel();
         });
