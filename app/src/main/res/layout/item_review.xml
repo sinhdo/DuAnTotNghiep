@@ -2,23 +2,44 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="8dp"
     android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="40dp"
+            android:src="@drawable/baseline_person_24"
+            android:layout_height="40dp"
+            android:id="@+id/imgUser"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:textStyle="bold"
+            android:text="ten nguoi mua"
+            android:layout_marginLeft="20dp"
+            android:layout_gravity="center"
+            android:id="@+id/nameBuyer"/>
 
+    </LinearLayout>
     <TextView
-        android:id="@+id/userNameTextView"
+        android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:padding="8dp"/>
-
-    <TextView
-        android:id="@+id/commentTextView"
+        android:text="time"/>
+    <RatingBar
+        android:id="@+id/start"
         android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:numStars="5"
+        android:stepSize="1"
+         />
+    <TextView
+        android:id="@+id/tvreviews"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:padding="8dp"
-        />
+        android:text="day la danh gia"/>
 
-   
 </LinearLayout>

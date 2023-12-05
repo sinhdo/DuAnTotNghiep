@@ -1,10 +1,11 @@
 package com.example.duantotnghiep.adapter;
 
 import android.content.Context;
-import android.util.Log;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -13,36 +14,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.model.Reviews;
-import com.example.duantotnghiep.model.User;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
     private Context context;
-    private List<Reviews> reviewList1 ;
-
-    private List<String> userIds;
-
-
-
+    private List<Reviews> list ;
 
     public ReviewAdapter(Context context, List<Reviews> reviewList1) {
         this.context = context;
-        this.reviewList1 = reviewList1;
+        this.list = reviewList1;
     }
 
 
-    // Các phương thức khác của adapter
 
     @NonNull
     @Override
@@ -53,26 +38,21 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     @Override
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
-        Reviews review = reviewList1.get(position);
-
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("user").child(review.getUserId());
-        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    String displayName = dataSnapshot.child("username").getValue(String.class);
-                    // Hiển thị displayName lên TextView tvUserName
-                    holder.tvUserName.setText(displayName);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Xử lý khi có lỗi xảy ra trong quá trình truy vấn dữ liệu từ Firebase
-            }
-        });
-
+        Reviews review = list.get(position);
+        holder.tvUserName.setText(review.getDisplayName());
         holder.tvComment.setText(review.getComment());
+        if (review.getImgUser() != null && !review.getImgUser().isEmpty()) {
+            Uri imageUri = Uri.parse(review.getImgUser());
+            Picasso.get()
+                    .load(imageUri)
+                    .placeholder(R.drawable.tnf)
+                    .error(R.drawable.tnf)
+                    .into(holder.imgUser);
+        } else {
+            holder.imgUser.setImageResource(R.drawable.baseline_person_24);
+        }
+        holder.date.setText("Đánh giá vào ngày : "+review.getTime());
+        holder.ratingBar.setRating(Float.valueOf(review.getStart()));
 
     }
 
@@ -81,22 +61,27 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     @Override
     public int getItemCount() {
-        if (reviewList1 != null) {
-            return reviewList1.size(); // Kiểm tra xem danh sách có giá trị null hay không trước khi gọi size()
+        if (list != null) {
+            return list.size();
         } else {
-            return 0; // Trả về 0 hoặc giá trị mặc định tùy thuộc vào logic của bạn
+            return 0;
         }
     }
 
     public class ReviewViewHolder extends RecyclerView.ViewHolder {
         TextView tvUserName;
-        TextView tvComment;
+        ImageView imgUser;
+        RatingBar ratingBar;
+
+        TextView tvComment,date;
 
         public ReviewViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvUserName = itemView.findViewById(R.id.userNameTextView);
-            tvComment = itemView.findViewById(R.id.commentTextView);
-//            tv_noReviewsTextView = itemView.findViewById(R.id.noReviewsTextView)
+            imgUser = itemView.findViewById(R.id.imgUser);
+            ratingBar = itemView.findViewById(R.id.start);
+            tvUserName = itemView.findViewById(R.id.nameBuyer);
+            tvComment = itemView.findViewById(R.id.tvreviews);
+            date = itemView.findViewById(R.id.time);
         }
     }
 }

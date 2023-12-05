@@ -1,12 +1,5 @@
 package com.example.duantotnghiep.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
-import androidx.recyclerview.widget.LinearLayoutManager;
-
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,8 +13,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.duantotnghiep.R;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.ColorAdapter;
 import com.example.duantotnghiep.adapter.OrderAdapter;
 import com.example.duantotnghiep.adapter.ReviewAdapter;
@@ -36,7 +33,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -59,109 +55,42 @@ public class OrderActivity extends AppCompatActivity {
     private Picasso picasso = Picasso.get();
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
-    private List<Reviews> reviewsList;
     private ReviewAdapter reviewAdapter;
-    private List<Reviews> reviewsList1 = new ArrayList<>();
-    private List<String> userIds;
+    private List<Reviews> reviewsList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         AnhXa();
-        loadReviewsFromFirebase();
-        reviewAdapter = new ReviewAdapter(this, reviewsList1 ); // Khởi tạo adapter
+        reviewAdapter = new ReviewAdapter(this, reviewsList);
+        hienthi();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(reviewAdapter);
-
-        String userId = "";
-        String userName = "";
-
-        hienthi();
         loadDataFromFirebase();
     }
 
-    private void loadReviewsFromFirebase() {
-        DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference().child("reviews");
-        reviewsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                reviewsList1.clear();
-                List<String> userIds = new ArrayList<>();
-
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String userId = snapshot.child("user_id").getValue(String.class);
-                    String comment = snapshot.child("comment").getValue(String.class);
-                    String productId = snapshot.child("id_product").getValue(String.class);
-
-                    if (productId != null && productId.equals(idProduct) && userId != null && comment != null) {
-                        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users").child(userId);
-                        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-                                String displayName = userDataSnapshot.child("userName").getValue(String.class);
-                                Reviews review = new Reviews( userId,displayName, productId, comment);
-                                reviewsList1.add(review);
-                                reviewAdapter.notifyDataSetChanged();
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                // Xử lý khi có lỗi xảy ra trong quá trình truy vấn dữ liệu người dùng
-                            }
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Xử lý khi có lỗi xảy ra trong quá trình truy vấn dữ liệu từ Firebase
-            }
-        });
-    }
     private void hienthi() {
         DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference().child("reviews");
-        reviewsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        reviewsRef.orderByChild("productId").equalTo(idProduct).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                reviewsList1.clear();
-
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String userId = snapshot.child("user_id").getValue(String.class);
-                    String comment = snapshot.child("comment").getValue(String.class);
-                    String productId = snapshot.child("id_product").getValue(String.class);
-
-                    if (productId != null && productId.equals(idProduct) && userId != null && comment != null) {
-                        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("user").child(userId);
-                        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-                                String displayName = userDataSnapshot.child("username").getValue(String.class);
-
-                                Reviews review = new Reviews(userId, displayName, productId, comment);
-                                reviewAdapter.notifyDataSetChanged();
-
-                                if (!reviewsList1.isEmpty()) {
-                                    recyclerView.setVisibility(View.VISIBLE);
-                                } else {
-                                    TextView noReviewsTextView = findViewById(R.id.noReviewsTextView);
-                                    noReviewsTextView.setVisibility(View.VISIBLE);
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                // Xử lý khi có lỗi xảy ra trong quá trình truy vấn dữ liệu người dùng
-                            }
-                        });
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                reviewsList.clear();
+                for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
+                    Reviews review = reviewSnapshot.getValue(Reviews.class);
+                    if (review != null) {
+                        reviewsList.add(review);
                     }
                 }
+                Log.d("=====", "onDataChange: "+reviewsList+"    vs    "+idProduct);
+                reviewAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Xử lý khi có lỗi xảy ra trong quá trình truy vấn dữ liệu từ Firebase
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Xử lý lỗi nếu cần
             }
         });
     }
@@ -175,7 +104,6 @@ public class OrderActivity extends AppCompatActivity {
         btnAddToCart =findViewById(R.id.btnAddToCart);
         btnBuyProduct =findViewById(R.id.btnBuyProduct);
         idProduct = getIntent().getStringExtra("idPro");
-
         recyclerView = findViewById(R.id.rcv_review);
         btnBuyProduct.setOnClickListener(new View.OnClickListener() {
             @Override

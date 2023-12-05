@@ -2,6 +2,7 @@ package com.example.duantotnghiep.adapter;
 
 import android.content.Context;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.model.Order;
-import com.example.duantotnghiep.model.OrderClickListener;
 import com.example.duantotnghiep.model.Reviews;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,8 +26,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.security.auth.callback.Callback;
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
 
@@ -89,8 +87,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
        // Gọi phương thức để lấy dữ liệu đánh giá từ Firebase và hiển thị lên RecyclerView
         fetchReviewsForProduct(productId, holder);
         //
-        if (oder.getNotes()==null || oder.getNotes() == "") {
-
+        if (TextUtils.isEmpty(oder.getNotes()) || oder.getNotes().equals("")) {
             holder.tvnote.setVisibility(View.GONE);
         } else {
             holder.tvnote.setText("Note : " + oder.getNotes());
@@ -170,7 +167,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             imgMenu = (ImageView) itemView.findViewById(R.id.img_menu);
             tvnote = (TextView) itemView.findViewById(R.id.tvNoteOrder);
             tv_paid = (TextView) itemView.findViewById(R.id.tv_paid);
-            recyclerView = (RecyclerView) itemView.findViewById(R.id.rcv_review);
+//            recyclerView = (RecyclerView) itemView.findViewById(R.id.rcv_review);
 
         }
     }

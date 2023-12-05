@@ -1,11 +1,6 @@
 package com.example.duantotnghiep.adapter;
 
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +8,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
-import com.example.duantotnghiep.model.Discount;
 import com.example.duantotnghiep.model.Product;
 import com.squareup.picasso.Picasso;
 
@@ -108,7 +101,7 @@ public class OrderDetailsAdapter extends RecyclerView.Adapter<OrderDetailsAdapte
 //            } else {
 //                tv_km_dt.setText("No Discount");
 //            }
-
+//
             if (product.getImgProduct() != null && !product.getImgProduct().isEmpty()) {
                 Picasso.get().load(product.getImgProduct().get(0)).into(imgProduct);
             }
