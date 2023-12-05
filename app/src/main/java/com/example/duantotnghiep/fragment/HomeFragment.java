@@ -28,6 +28,7 @@ import com.example.duantotnghiep.adapter.ProductAdapter;
 import com.example.duantotnghiep.adapter.ProductHomeAdapter;
 import com.example.duantotnghiep.adapter.SlideImageAdapter;
 import com.example.duantotnghiep.adapter.SliderImageAdapter;
+import com.example.duantotnghiep.model.AddProductToCart;
 import com.example.duantotnghiep.model.Product;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -49,10 +50,11 @@ public class HomeFragment extends Fragment {
     private Timer timer;
     private ViewPager slideImage;
     private CircleIndicator circleIndicator;
-    private TextView textViewName;
+    private TextView textViewName,totalCart;
     private ImageView imgCart;
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
+    private int totalCartQuantity = 0;
     RecyclerView rvManager;
 
     ProductAdapter productAdapter;
@@ -82,13 +84,15 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         Handler handler = new Handler();     
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-
+        totalCart = view.findViewById(R.id.totalCart);
         textViewName = view.findViewById(R.id.txtName);
         imgCart = view.findViewById(R.id.imageView4);
+        imgCart = view.findViewById(R.id.imageView3);
         slideImage = view.findViewById(R.id.silde_image);
         circleIndicator = view.findViewById(R.id.circle_indicator);
         RecyclerView recyclerView = view.findViewById(R.id.view1);
         RecyclerView recyclerView2 = view.findViewById(R.id.view2);
+
         imgCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -96,7 +100,7 @@ public class HomeFragment extends Fragment {
                startActivity(intent);
             }
         });
-
+        TotalItemCart();
          productHomeAdapter = new ProductHomeAdapter(getContext(), productList);
         recyclerView.setAdapter(productHomeAdapter);
         recyclerView2.setAdapter(productHomeAdapter);
@@ -170,6 +174,8 @@ public class HomeFragment extends Fragment {
 
         return view;
     }
+
+
     private void loadDataFromFirebase() {
         databaseReference = FirebaseDatabase.getInstance().getReference("products");
 
@@ -187,10 +193,12 @@ public class HomeFragment extends Fragment {
                             continue;
                         }
                         productList.add(product);
+
                     }
                 }
 
                 productHomeAdapter.setData(productList);
+
             }
 
             @Override
@@ -199,6 +207,36 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+    private void TotalItemCart() {
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        String id_user = firebaseUser.getUid();
+        DatabaseReference myReference = firebaseDatabase.getReference("cart").child(id_user);
+        myReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<AddProductToCart> list = new ArrayList<>();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    AddProductToCart product = dataSnapshot.getValue(AddProductToCart.class);
+                    list.add(product);
+                }
+
+                if (list.size() == 0) {
+                    return;
+                } else {
+
+                    totalCart.setText(" " + list.size());
+
+
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("Loi", "onCancelled: " + error.getMessage());
+            }
+        });
+    }
+
     private void setInfoProfile() {
         String id = firebaseUser.getUid();
         DatabaseReference userRef = mReference.child("user").child(id);

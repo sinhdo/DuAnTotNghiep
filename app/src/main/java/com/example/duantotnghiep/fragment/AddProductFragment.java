@@ -2,6 +2,7 @@ package com.example.duantotnghiep.fragment;
 
 import android.app.Activity;
 import android.content.ClipData;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -33,13 +34,19 @@ import com.example.duantotnghiep.activity.ManagerProductActivity;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.ColorAdapter;
+import com.example.duantotnghiep.adapter.DiscountAdapter;
+import com.example.duantotnghiep.adapter.DiscountSelectionAdapter;
 import com.example.duantotnghiep.adapter.MutilpleColorAdapter;
 import com.example.duantotnghiep.adapter.MutilpleImgAdapter;
 import com.example.duantotnghiep.model.Discount;
 import com.example.duantotnghiep.model.Product;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -49,23 +56,30 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AddProductFragment extends Fragment  {
-    ImageView btnColor;
+public class AddProductFragment extends Fragment {
+    ImageView btnColor, btnDiscount;
     private FirebaseAuth firebaseAuth;
     private List<Uri> selectedImageUris = new ArrayList<>();
     private List<Integer> selectedColors = new ArrayList<>();
     private MutilpleColorAdapter mAdapter = new MutilpleColorAdapter();
     private ImageView chooseImg;
     List<String> selectedSize;
+    String Title, Des, Brand;
     MutilpleImgAdapter adapter;
+    DiscountSelectionAdapter discountSelectionAdapter;
     private boolean isAddingProduct = false;
     private RecyclerView multipleImg;
     private static final int REQUEST_CODE_SELECT_IMAGES = 1;
     EditText edtTitle, edtPrice, edtQuantity, edtBrand, edtDes;
     Button addProduct;
+    int Price;
+    List<Discount> selectedDiscounts;
+    List<Discount> allDiscounts;
+    RecyclerView rvMutilpeDiscount;
     private Spinner sizeSpinner;
     Product product;
     private StorageReference storageReference;
+
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.add_product_fragment, container, false);
         firebaseAuth = FirebaseAuth.getInstance();
@@ -77,6 +91,8 @@ public class AddProductFragment extends Fragment  {
         edtPrice = root.findViewById(R.id.priceProductSeller);
         edtQuantity = root.findViewById(R.id.QuantityProduct);
         edtDes = root.findViewById(R.id.descriptionProduct);
+        btnDiscount = root.findViewById(R.id.btnDiscount);
+        rvMutilpeDiscount = root.findViewById(R.id.rvMutilpeDiscount);
         edtBrand = root.findViewById(R.id.BrandProduct);
         chooseImg = root.findViewById(R.id.chooseImg);
         multipleImg = root.findViewById(R.id.mutilpeImg);
@@ -87,6 +103,12 @@ public class AddProductFragment extends Fragment  {
             @Override
             public void onClick(View v) {
                 showDialogColor();
+            }
+        });
+        btnDiscount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialogDiscount();
             }
         });
         ((ManagerProductActivity) requireActivity()).hideFloatingActionButton();
@@ -111,9 +133,13 @@ public class AddProductFragment extends Fragment  {
         addProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isAddingProduct) {
-                    isAddingProduct = true;
-                    saveProductToRealtimeDatabase();
+                if (validateInput()) {
+                    if (!isAddingProduct) {
+                        isAddingProduct = true;
+                        saveProductToRealtimeDatabase();
+                    }
+                } else {
+
                 }
             }
         });
@@ -136,6 +162,7 @@ public class AddProductFragment extends Fragment  {
                     selectedSize.addAll(Arrays.asList("36", "37", "38", "39", "40", "41", "42", "43", "44"));
                 }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
 
@@ -143,6 +170,74 @@ public class AddProductFragment extends Fragment  {
         });
         return root;
     }
+
+    private void showDialogDiscount() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        LayoutInflater layoutInflater = LayoutInflater.from(requireContext());
+
+        View view = layoutInflater.inflate(R.layout.dialog_discount_selection, null);
+        builder.setView(view);
+
+        RecyclerView recyclerView = view.findViewById(R.id.rvDiscountSelection);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        DatabaseReference discountsRef = FirebaseDatabase.getInstance().getReference("discounts");
+
+        discountsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                 allDiscounts = new ArrayList<>();
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Discount discount = snapshot.getValue(Discount.class);
+
+
+                    if (currentUser != null && discount != null && currentUser.getUid().equals(discount.getSellerId())) {
+                        allDiscounts.add(discount);
+                    }
+                }
+
+                List<Discount> selectedDiscountIds = new ArrayList<>();
+                DiscountSelectionAdapter adapter = new DiscountSelectionAdapter(allDiscounts, selectedDiscountIds);
+                recyclerView.setAdapter(adapter);
+
+                Log.d("DiscountActivity", "Size of allDiscounts: " + allDiscounts.size());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(requireContext(), "Lỗi khi đọc dữ liệu từ Firebase", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setPositiveButton("Xác nhận", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                DiscountSelectionAdapter discountSelectionAdapter1 = (DiscountSelectionAdapter) recyclerView.getAdapter();
+                selectedDiscounts = discountSelectionAdapter1.getSelectedDiscountIds();
+                showSelectedDiscounts(selectedDiscounts);
+            }
+        });
+
+        builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void showSelectedDiscounts(List<Discount> selectedDiscountIds) {
+        rvMutilpeDiscount.setLayoutManager(new LinearLayoutManager(requireContext()));
+        DiscountAdapter selectedDiscountsAdapter = new DiscountAdapter(new ArrayList<>());
+        rvMutilpeDiscount.setAdapter(selectedDiscountsAdapter);
+        selectedDiscountsAdapter.updateDiscountList(selectedDiscountIds);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -210,12 +305,14 @@ public class AddProductFragment extends Fragment  {
             }
         });
     }
+
     private void updateRecyclerView(View view, List<Integer> selectedColors) {
         RecyclerView recyclerView = view.findViewById(R.id.rvChosseCL);
         ColorAdapter colorAdapter = new ColorAdapter(selectedColors);
         recyclerView.setAdapter(colorAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
     }
+
     private void saveProductToRealtimeDatabase() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference productsRef = database.getReference("products");
@@ -223,10 +320,10 @@ public class AddProductFragment extends Fragment  {
 
         String productId = productsRef.push().getKey();
 
-        String Title = String.valueOf(edtTitle.getText());
-        int Price = Integer.parseInt(String.valueOf(edtPrice.getText()));
-        String Des = String.valueOf(edtDes.getText());
-        String Brand = String.valueOf(edtBrand.getText());
+        Title = String.valueOf(edtTitle.getText()).trim();
+        Price = Integer.parseInt(String.valueOf(edtPrice.getText()).trim());
+        Des = String.valueOf(edtDes.getText()).trim();
+        Brand = String.valueOf(edtBrand.getText()).trim();
 
         String selectedProductType = (String) sizeSpinner.getSelectedItem();
         int Quantity = Integer.parseInt(String.valueOf(edtQuantity.getText()));
@@ -249,18 +346,18 @@ public class AddProductFragment extends Fragment  {
                     if (imageUrls.size() == selectedImageUris.size()) {
                         String userId = firebaseAuth.getCurrentUser().getUid();
 
-                        Discount discount = new Discount();
-                        discount.setAmount(10.0);
-                        // Tạo đối tượng Product và đánh dấu là sản phẩm do người dùng đăng
+//                        List<Product> selectedDiscounts = discountSelectionAdapter.getSelectedDiscountIds();
+
+
                         Product product = new Product(
                                 productId, userId, Title, productType,
-                                "categoryID", Brand, Des, imageUrls, selectedColors, 1000, "ngon", Quantity, Price, selectedSize, discount
+                                "categoryID", Brand, Des, imageUrls, selectedColors, 1000, "ngon", Quantity, (double) Price, selectedSize, (Discount) selectedDiscounts
                         );
                         product.setUserProduct(true);
 
                         productsRef.child(productId).setValue(product);
                         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-                        fragmentManager.popBackStack(); // Quay lại màn hình trước đó
+                        fragmentManager.popBackStack();
 
                         ((ManagerProductActivity) requireActivity()).showFloatingActionButton();
                         isAddingProduct = false;
@@ -269,4 +366,53 @@ public class AddProductFragment extends Fragment  {
             });
         }
     }
+
+    private boolean validateInput() {
+        String title = edtTitle.getText().toString().trim();
+        String priceString = edtPrice.getText().toString().trim();
+        String quantityString = edtQuantity.getText().toString().trim();
+        String brand = edtBrand.getText().toString().trim();
+        String description = edtDes.getText().toString().trim();
+
+        if (title.isEmpty()) {
+            showToast("Tiêu đề không được để trống");
+            return false;
+        }
+
+        if (priceString.isEmpty()) {
+            showToast("Giá không được để trống");
+            return false;
+        }
+        if (quantityString.isEmpty()) {
+            showToast("Số lượng không được để trống");
+            return false;
+        }
+
+        if (brand.isEmpty()) {
+            showToast("Hãng không được để trống");
+            return false;
+        }
+        if (description.isEmpty()) {
+            showToast("Des4 không được để trống");
+            return false;
+        }
+        if (selectedImageUris.isEmpty()) {
+            showToast("Bạn cần chọn ít nhất một ảnh");
+            return false;
+        }
+
+        if (selectedColors.isEmpty()) {
+            showToast("Bạn cần chọn ít nhất một màu");
+            return false;
+        }
+
+
+        return true;
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+
 }

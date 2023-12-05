@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -33,11 +34,16 @@ import android.widget.Toast;
 
 import com.example.duantotnghiep.MainActivity;
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.adapter.DiscountAdapter;
+import com.example.duantotnghiep.adapter.DiscountDetailsAdapter;
 import com.example.duantotnghiep.adapter.OrderDetailsAdapter;
 import com.example.duantotnghiep.fragment.CartFragment;
 import com.example.duantotnghiep.fragment.ConfirmFragment;
+import com.example.duantotnghiep.model.Discount;
 import com.example.duantotnghiep.model.Order;
 import com.example.duantotnghiep.model.Product;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -59,21 +65,27 @@ import java.util.Locale;
 public class orderDetailsActivity extends AppCompatActivity {
     private Button btnOrder;
     private RecyclerView rcvOrderDetail;
-
-    private TextView txtSubtotal, txtDelivery, txtTax, txtTotal, txtAddress, txtPayment, txtPhone, txtMoney;
-
-    private LinearLayout linearLayouAddress, idlr;
+    private TextView txtSubtotal, txtDelivery, txtTax, txtTotal, txtAddress, txtPayment, txtPhone, txtMoney, txtVoucher;
+    private LinearLayout linearLayouAddress, idlr, lrlVC;
     private EditText notes;
-
     private List<Product> productList;
     private List<Integer> colorList;
     private OrderDetailsAdapter adapter;
     private String idProduct;
-    private DatabaseReference productRef, userRef;
+    private DatabaseReference productRef, userRef, discountRef;
     private FirebaseUser firebaseUser;
+    private int quantity = 0;
+    private double delivery;
+    private double tax;
+    private double discountAmount;
+    private double subtotal;
+    private double discountedPrice;
+    private double price;
+    private List<Discount> discountList;
+    private boolean isVoucherSelected = false;
+    private Discount selectedDiscount;
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    boolean paid = false;
-
+    private boolean finalPaid;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,14 +102,17 @@ public class orderDetailsActivity extends AppCompatActivity {
         txtPhone = findViewById(R.id.txtPhone);
         txtPayment = findViewById(R.id.txtPayment);
         txtMoney = findViewById(R.id.txtMoney);
+        txtVoucher = findViewById(R.id.txtVoucher);
         notes = findViewById(R.id.editTextMessageToSeller);
         linearLayouAddress = findViewById(R.id.lrlAddress);
+        lrlVC = findViewById(R.id.lrlVC);
         idlr = findViewById(R.id.idlr);
         userRef = FirebaseDatabase.getInstance().getReference();
         poppuGetListPayment();
 
         Intent intent = getIntent();
         idProduct = intent.getStringExtra("idPro");
+        discountRef = FirebaseDatabase.getInstance().getReference("discounts");
         productRef = FirebaseDatabase.getInstance().getReference().child("products").child(idProduct);
         String buyerID = firebaseUser.getUid();
         DatabaseReference buyerRef = userRef.child("user").child(buyerID).child("wallet");
@@ -109,10 +124,21 @@ public class orderDetailsActivity extends AppCompatActivity {
                     txtMoney.setText(String.format(walletAmount + " VND"));
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Xử lý khi có lỗi xảy ra
+            }
+        });
+        lrlVC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showdialogVoucher();
+            }
+        });
+        linearLayouAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDiaLogAddress();
             }
         });
         productRef.addValueEventListener(new ValueEventListener() {
@@ -127,7 +153,7 @@ public class orderDetailsActivity extends AppCompatActivity {
                     String description = dataSnapshot.child("description").getValue(String.class);
                     String reviewId = dataSnapshot.child("reviewId").getValue(String.class);
                     int sold = dataSnapshot.child("sold").getValue(Integer.class);
-                    double price = dataSnapshot.child("price").getValue(Double.class);
+                    price = dataSnapshot.child("price").getValue(Double.class);
                     int currentQuantity = dataSnapshot.child("quantity").getValue(Integer.class);
                     List<String> imgProduct = dataSnapshot.child("imgProduct").getValue(new GenericTypeIndicator<List<String>>() {
                     });
@@ -136,15 +162,18 @@ public class orderDetailsActivity extends AppCompatActivity {
                     adapter = new OrderDetailsAdapter();
 
                     if (bundle != null) {
+                        double discountAmount = bundle.getDouble("discountAmount", 0.0);
 
                         colorList = bundle.getIntegerArrayList("Color");
                         String size = bundle.getString("Size");
-                        int quantity = bundle.getInt("Quantity");
+                        quantity = bundle.getInt("Quantity");
                         List<String> sizeList = new ArrayList<>();
                         sizeList.add(size);
 
-                        Product product = new Product(idProduct, idseller, name, null, categoryID, brand,
-                                description, imgProduct, colorList, sold, reviewId, quantity, price, Collections.singletonList(size), null);
+                        Discount discount = new Discount(discountAmount);
+
+                        Product product = new Product(idProduct, idseller, name,null, categoryID, brand,
+                                description, imgProduct, colorList, sold, reviewId, quantity, price, Collections.singletonList(size), discount);
 
                         product.setSelectedQuantity(quantity);
                         productList = new ArrayList<>();
@@ -156,11 +185,9 @@ public class orderDetailsActivity extends AppCompatActivity {
                         rcvOrderDetail.setLayoutManager(new LinearLayoutManager(orderDetailsActivity.this));
                         rcvOrderDetail.setAdapter(adapter);
 
-                        double subtotal = price * quantity;
-                        txtSubtotal.setText(String.format(subtotal + " VND"));
-
-                        double delivery = 0.0;
-                        double tax = 0.0;
+                        subtotal = price * quantity;
+                        delivery = 0.0;
+                        tax = 0.0;
 
                         String deliveryText = txtDelivery.getText().toString().replace("VND", "");
                         String taxText = txtTax.getText().toString().replace("VND", "");
@@ -168,23 +195,23 @@ public class orderDetailsActivity extends AppCompatActivity {
                         if (!TextUtils.isEmpty(deliveryText)) {
                             delivery = Double.parseDouble(deliveryText);
                         }
-
                         if (!TextUtils.isEmpty(taxText)) {
                             tax = Double.parseDouble(taxText);
                         }
-
                         double total = subtotal + delivery + tax;
-                        txtTotal.setText(String.valueOf(total));
+                        discountedPrice = total - discountAmount;
 
-                    } else {
-                        productList = new ArrayList<>();
+                        // Hiển thị thông tin đơn hàng
+                        txtSubtotal.setText(String.format("%.0f VND", subtotal));
+                        txtDelivery.setText(String.format("%.0f VND", delivery));
+                        txtTax.setText(String.format("%.0f VND", tax));
+                        txtTotal.setText(String.valueOf(discountedPrice));
                     }
                 }
             }
-
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Xử lý khi có lỗi xảy ra
             }
         });
         btnOrder.setOnClickListener(new View.OnClickListener() {
@@ -203,28 +230,209 @@ public class orderDetailsActivity extends AppCompatActivity {
                     return;
                 }
 
-                boolean paid = false;
+                finalPaid = false;
                 if (txtPayment.getText().toString().equalsIgnoreCase("Payment on delivery")) {
-                    paid = false;
+                    finalPaid = false;
                 } else if (txtPayment.getText().toString().equalsIgnoreCase("Pay with wallet")) {
-                    paid = true;
+                    finalPaid = true;
                 }
-
-                if (paid) {
+                if (finalPaid) {
                     double totalAmount = Double.parseDouble(txtTotal.getText().toString());
                     String buyerID = firebaseUser.getUid();
-                    deductAmountFromBuyerWallet(buyerID, totalAmount, newKey, idBuyer, date);
+                    checkSufficientWalletAmount(buyerID, totalAmount, newKey, idBuyer, date);
                 } else {
                     performNextSteps(newKey, idBuyer, date);
                 }
             }
         });
-        linearLayouAddress.setOnClickListener(new View.OnClickListener() {
+    }
+    private void showdialogVoucher() {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_voucher);
+
+        RecyclerView rcvVoucher = dialog.findViewById(R.id.rcvVoucher);
+        rcvVoucher.setLayoutManager(new LinearLayoutManager(this));
+
+        discountList = new ArrayList<>();
+        DiscountDetailsAdapter Detailsadapter = new DiscountDetailsAdapter(discountList);
+        rcvVoucher.setAdapter(Detailsadapter);
+        discountRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onClick(View view) {
-                showDiaLogAddress();
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                discountList.clear();
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Discount discount = snapshot.getValue(Discount.class);
+                    if (currentUser != null && discount != null && currentUser.getUid().equals(discount.getSellerId())) {
+                        discountList.add(discount);
+                    }
+                }
+                Detailsadapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(orderDetailsActivity.this, "Lỗi khi đọc dữ liệu từ Firebase", Toast.LENGTH_SHORT).show();
             }
         });
+
+        Detailsadapter.setOnItemClickListener(new DiscountDetailsAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Discount discount) {
+                if (discount != null) {
+                    if (selectedDiscount != null && discount.getCode().equals(selectedDiscount.getCode())) {
+                        // Hủy bỏ việc sử dụng voucher nếu voucher đã được chọn trước đó
+                        selectedDiscount = null; // Đặt selectedDiscount về null
+                        discountedPrice = price * quantity;
+                        txtSubtotal.setText(String.format("%.0f VND", discountedPrice));
+                        txtVoucher.setText("Chosse Voucher"); // Xóa nội dung voucher
+
+                        Toast.makeText(orderDetailsActivity.this, "Đã hủy bỏ sử dụng voucher", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Sử dụng voucher
+                        selectedDiscount = discount;
+                        double discountPercentage = discount.getAmount() / 100.0;
+                        double originalPrice = price * quantity;
+                        discountedPrice = originalPrice - (originalPrice * discountPercentage);
+
+                        txtSubtotal.setText(String.format("%.0f VND", discountedPrice));
+
+                        double discountValue = originalPrice * discountPercentage;
+                        String discountMessage = String.format("Sản phẩm đã được giảm: %.0f VND", discountValue);
+                        Toast.makeText(orderDetailsActivity.this, discountMessage, Toast.LENGTH_SHORT).show();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putDouble("discountAmount", discount.getAmount());
+                        Intent intent = new Intent();
+                        intent.putExtra("productData", bundle);
+                        setResult(Activity.RESULT_OK, intent);
+
+                        // Hiển thị thông tin voucher
+                        if (discount.getCode() != null) {
+                            String voucherCode = discount.getCode();
+                            double voucherAmount = discount.getAmount();
+                            String voucherText = String.format("Mã voucher: %s\nDiscount: %.0f%%\nĐã giảm: %.0f VND", voucherCode, voucherAmount, discountValue);
+                            txtVoucher.setText(voucherText);
+                        } else {
+                            Toast.makeText(orderDetailsActivity.this, "Mã voucher không tồn tại", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    updateTotal();
+                    Intent intentT = new Intent();
+                    intentT.putExtra("discountedPrice", discountedPrice);
+                    intentT.putExtra("subtotal", subtotal);
+                    setResult(Activity.RESULT_OK, intentT);
+                }
+                isVoucherSelected = true;
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 10 && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                if (isVoucherSelected) {
+                    txtSubtotal.setText(String.format("%.0f VND", discountedPrice));
+                } else {
+                    txtSubtotal.setText(String.format("%.0f VND", subtotal));
+                }
+
+                double total = Double.parseDouble(txtSubtotal.getText().toString()) + delivery + tax;
+                txtTotal.setText(String.valueOf(total));
+            }
+        }
+        if (resultCode == Activity.RESULT_OK) {
+            Bundle bundle = data.getExtras();
+            if (bundle == null) {
+                Toast.makeText(this, "Chưa chọn địa chỉ", Toast.LENGTH_SHORT).show();
+                Log.d("GGGGGGG", "setLocation: ");
+            } else {
+                idlr.setVisibility(View.VISIBLE);
+                String name = bundle.getString("nameLocation");
+                Log.d("HHHHHHHHHHH", "setLocation: " + name);
+                String phone = bundle.getString("phoneLocation");
+                String location = bundle.getString("location");
+                txtAddress.setText(location);
+                txtPhone.setVisibility(View.VISIBLE);
+                txtPhone.setText(phone);
+            }
+        }
+    }
+    private void updateTotal() {
+        double subtotal = Double.parseDouble(txtSubtotal.getText().toString().replaceAll("[^\\d.]", ""));
+        double total = subtotal + delivery + tax;
+        txtTotal.setText(String.valueOf(total));
+    }
+    private void performNextSteps(String newKey, String idBuyer, String date) {
+        DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference("products");
+        DatabaseReference discountRef = FirebaseDatabase.getInstance().getReference("discounts"); // Thêm tham chiếu đến danh sách mã voucher trong Firebase
+
+        for (int i = 0; i < adapter.getItemCount(); i++) {
+            Product product = adapter.getProduct(i);
+            if (product != null) {
+                List<Integer> listColor = product.getColor();
+                int color = listColor.get(i);
+
+                Bundle bundle = getIntent().getBundleExtra("productData");
+                if (bundle != null) {
+                    int receivedQuantity = bundle.getInt("Quantity");
+
+                    productsRef.child(product.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            int currentQuantity = dataSnapshot.child("quantity").getValue(Integer.class);
+                            int remainingQuantity = currentQuantity - receivedQuantity;
+
+                            if (remainingQuantity >= 0) {
+                                productsRef.child(product.getId()).child("quantity").setValue(remainingQuantity);
+
+                                Order order = new Order(newKey, idBuyer, product.getSellerId(), product.getId(), product.getName(),
+                                        product.getImgProduct().get(0), color, Double.parseDouble(txtTotal.getText().toString()),
+                                        date, txtAddress.getText().toString(), txtPhone.getText().toString(),
+                                        receivedQuantity, notes.getText().toString(), finalPaid, "waiting");
+
+                                On_Create_Bill(order);
+                                Log.d("=====", "onClick: sl" + product.getSellerId() + " pr " + product.getId());
+                                if (isVoucherSelected) {
+                                    Log.d("OrderDetailsActivity", "isVoucherSelected: true");
+                                    if (selectedDiscount != null && selectedDiscount.getId() != null) {
+                                        Log.d("OrderDetailsActivity", "selectedDiscount ID: " + selectedDiscount.getId());
+                                        discountRef.child(selectedDiscount.getId()).removeValue()
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        // Xóa thành công
+                                                        selectedDiscount = null; // Đặt lại selectedDiscount về null
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Toast.makeText(orderDetailsActivity.this, "Lỗi xóa voucher!!!", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                    } else {
+                                        Log.d("OrderDetailsActivity", "selectedDiscount is null or has no ID");
+                                    }
+                                }
+                            } else {
+                                Toast.makeText(orderDetailsActivity.this, "Số lượng sản phẩm không đủ", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
+                        }
+                    });
+                }
+            }
+        }
     }
     private void showDiaLogAddress() {
         Intent intent = new Intent(orderDetailsActivity.this, ShowListLocationActivity.class);
@@ -232,6 +440,56 @@ public class orderDetailsActivity extends AppCompatActivity {
         bundle.putString("key", "value");
         intent.putExtras(bundle);
         startActivityForResult(intent, Activity.RESULT_CANCELED);
+    }
+    private void On_Create_Bill(Order order) {
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = firebaseDatabase.getReference("list_order");
+        String id = order.getId();
+        myRef.child(id).setValue(order, (error, ref) -> {
+            if (error == null) {
+                showDialogOrder();
+            } else {
+                Toast.makeText(orderDetailsActivity.this, "Lỗi khi lưu sản phẩm vào Realtime Database", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void poppuGetListPayment() {
+        String[] listPayment = {"Payment on delivery", "Pay with wallet"};
+        txtPayment.setOnClickListener(view -> {
+            PopupMenu popupMenu = new PopupMenu(orderDetailsActivity.this, txtPayment);
+            for (String address : listPayment) {
+                popupMenu.getMenu().add(address);
+            }
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    String selectedAddress = item.getTitle().toString();
+                    txtPayment.setText(selectedAddress);
+                    return true;
+                }
+            });
+            popupMenu.show();
+        });
+    }
+    private void checkSufficientWalletAmount(String buyerID, double amount, String newKey, String idBuyer, String date) {
+        DatabaseReference buyerRef = userRef.child("user").child(buyerID).child("wallet");
+        buyerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                double walletAmount = snapshot.getValue(Double.class);
+                boolean isWalletEnough = walletAmount >= amount;
+                if (isWalletEnough) {
+                    performNextSteps(newKey, idBuyer, date);
+                } else {
+                    Toast.makeText(orderDetailsActivity.this, "Số tiền trong ví không đủ", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
+            }
+        });
     }
     private void showDialogOrder() {
         ConstraintLayout successDialog = findViewById(R.id.successDialog);
@@ -254,143 +512,14 @@ public class orderDetailsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (alertDialog.isShowing()) {
-                   Intent intent = new Intent(orderDetailsActivity.this, MainActivity.class);
-                   startActivity(intent);
-                   finish();
+                    Intent intent = new Intent(orderDetailsActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
                 }
             }
         }, 1000);
     }
-    private void On_Create_Bill(Order order) {
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = firebaseDatabase.getReference("list_order");
-        String id = order.getId();
-        myRef.child(id).setValue(order, (error, ref) -> {
-            if (error == null) {
-                showDialogOrder();
-            } else {
-                Toast.makeText(orderDetailsActivity.this, "Lỗi khi lưu sản phẩm vào Realtime Database", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            Bundle bundle = data.getExtras();
-            if (bundle == null) {
-                Toast.makeText(this, "Chưa chọn địa chỉ", Toast.LENGTH_SHORT).show();
-                Log.d("GGGGGGG", "setLocation: ");
-            } else {
-                idlr.setVisibility(View.VISIBLE);
-                String name = bundle.getString("nameLocation");
-                Log.d("HHHHHHHHHHH", "setLocation: " + name);
-                String phone = bundle.getString("phoneLocation");
-                String location = bundle.getString("location");
-                txtAddress.setText(location);
-                txtPhone.setVisibility(View.VISIBLE);
-                txtPhone.setText(phone);
-            }
-        }
-    }
 
-    private void poppuGetListPayment() {
-        String[] listPayment = {"Payment on delivery", "Pay with wallet"};
-        txtPayment.setOnClickListener(view -> {
-            PopupMenu popupMenu = new PopupMenu(orderDetailsActivity.this, txtPayment);
-            for (String address : listPayment) {
-                popupMenu.getMenu().add(address);
-            }
-            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    String selectedAddress = item.getTitle().toString();
-                    txtPayment.setText(selectedAddress);
-                    return true;
-                }
-            });
-            popupMenu.show();
-        });
-    }
-    private void deductAmountFromBuyerWallet(String buyerID, double amount, String newKey, String idBuyer, String date) {
-        DatabaseReference buyerRef = userRef.child("user").child(buyerID).child("wallet");
-        buyerRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                double walletAmount = snapshot.getValue(Double.class);
-                boolean isWalletEnough = walletAmount >= amount;
-                if (isWalletEnough) {
-                    walletAmount -= amount;
-                    buyerRef.setValue(walletAmount);
-                    performNextSteps(newKey, idBuyer, date);
-                } else {
-                    Toast.makeText(orderDetailsActivity.this, "Số tiền trong ví không đủ", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
-            }
-        });
-    }
-    private void performNextSteps(String newKey, String idBuyer, String date) {
-        DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference("products");
-        for (int i = 0; i < adapter.getItemCount(); i++) {
-            Product product = adapter.getProduct(i);
-            if (product != null) {
-                List<Integer> listColor = product.getColor();
-                int color = listColor.get(i);
-
-                Bundle bundle = getIntent().getBundleExtra("productData");
-                if (bundle != null) {
-                    int receivedQuantity = bundle.getInt("Quantity");
-
-                    boolean finalPaid = paid;
-                    productsRef.child(product.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            int currentQuantity = dataSnapshot.child("quantity").getValue(Integer.class);
-                            int remainingQuantity = currentQuantity - receivedQuantity;
-
-                            if (remainingQuantity >= 0) {
-                                productsRef.child(product.getId()).child("quantity").setValue(remainingQuantity);
-
-                                Order order = new Order(newKey, idBuyer, product.getSellerId(), product.getId(), product.getName(),
-                                        product.getImgProduct().get(0), color, Double.parseDouble(txtTotal.getText().toString()),
-                                        date, txtAddress.getText().toString(), txtPhone.getText().toString(),
-                                        receivedQuantity, notes.getText().toString(), finalPaid, "waiting");
-
-                                On_Create_Bill(order);
-                                Log.d("=====", "onClick: sl" + product.getSellerId() + " pr " + product.getId());
-                            } else {
-                                Toast.makeText(orderDetailsActivity.this, "Số lượng sản phẩm không đủ", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
-                        }
-                    });
-                }
-            }
-        }
-    }
-    private void addAmountToSellerWallet(String idSeller, double amount) {
-        DatabaseReference sellerRef = userRef.child("user").child(idSeller).child("wallet");
-        sellerRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                double walletAmount = snapshot.getValue(Double.class);
-                walletAmount += amount;
-                sellerRef.setValue(walletAmount);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
     private String getCurrentTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
         Date currentDate = new Date();

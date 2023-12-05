@@ -389,16 +389,16 @@ public class OrderActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     String selectedColor = selectedColorAdapter.getSelectedColor();
-                   if (selectedColor==null||sizeAdapter.getSelectedSize()==null){
-                       Toast.makeText(OrderActivity.this, "Vui lòng chọn đủ màu và kích cỡ", Toast.LENGTH_SHORT).show();
-                   }else {
-                       mReference = FirebaseDatabase.getInstance().getReference().child("cart");
-                       String newKey = mReference.push().getKey();
-                       AddProductToCart product1 = new AddProductToCart(newKey, id_user, idProduct, productName,Integer.parseInt(selectedColor), sizeAdapter.getSelectedSize(), productImageUrl, num, productPrice);
-                       mReference.child(id_user).child(newKey).setValue(product1);
-                       Toast.makeText(OrderActivity.this, "Thêm vào giỏ hàng thành công", Toast.LENGTH_SHORT).show();
-                       dialog.dismiss();
-                   }
+                    if (selectedColor == null || sizeAdapter.getSelectedSize() == null) {
+                        Toast.makeText(OrderActivity.this, "Vui lòng chọn đủ màu và kích cỡ", Toast.LENGTH_SHORT).show();
+                    } else {
+                        mReference = FirebaseDatabase.getInstance().getReference().child("cart");
+                        String newKey = idProduct; // Sử dụng ID sản phẩm làm khóa
+                        AddProductToCart product1 = new AddProductToCart(newKey, id_user, idProduct, productName, Integer.parseInt(selectedColor), sizeAdapter.getSelectedSize(), productImageUrl, num, productPrice);
+                        mReference.child(id_user).child(newKey).setValue(product1);
+                        Toast.makeText(OrderActivity.this, "Thêm vào giỏ hàng thành công", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
                 }
             });
         }

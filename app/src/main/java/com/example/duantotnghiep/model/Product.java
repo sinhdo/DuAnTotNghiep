@@ -1,5 +1,6 @@
 package com.example.duantotnghiep.model;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Product {
@@ -18,11 +19,16 @@ public class Product {
     private double price;
     private List<String> size;
 
-    private Discount discount;
+    private List<Discount> selectedDiscounts;
+
 
     private boolean isUserProduct;
 
     private int selectedQuantity;
+
+    public Discount getDiscount() {
+        return null;
+    }
 
 
     public enum ProductType {
@@ -33,6 +39,8 @@ public class Product {
     public Product() {
 
     }
+
+
     public Product(String id, String sellerId, String name, ProductType productType, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int sold, String reviewId, int quantity, double price, List<String> size, Discount discount) {
         this.id = id;
         this.sellerId = sellerId;
@@ -48,8 +56,17 @@ public class Product {
         this.quantity = quantity;
         this.price = price;
         this.size = size;
-        this.discount = discount;
+        this.selectedDiscounts = Collections.singletonList(discount);
     }
+
+    public List<Discount> getSelectedDiscounts() {
+        return selectedDiscounts;
+    }
+
+    public void setSelectedDiscounts(List<Discount> selectedDiscounts) {
+        this.selectedDiscounts = selectedDiscounts;
+    }
+
     public int getSelectedQuantity() {
         return selectedQuantity;
     }
@@ -65,13 +82,7 @@ public class Product {
         isUserProduct = userProduct;
     }
 
-    public Discount getDiscount() {
-        return discount;
-    }
 
-    public void setDiscount(Discount discount) {
-        this.discount = discount;
-    }
 
     public List<String> getSize() {
         return size;

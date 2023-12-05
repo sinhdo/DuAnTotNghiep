@@ -86,12 +86,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
         //
         String productId = list.get(position).getId(); // Lấy productId từ Order tại vị trí position
-
-        // Gọi phương thức để lấy dữ liệu đánh giá từ Firebase và hiển thị lên RecyclerView
+       // Gọi phương thức để lấy dữ liệu đánh giá từ Firebase và hiển thị lên RecyclerView
         fetchReviewsForProduct(productId, holder);
         //
+        if (oder.getNotes()==null || oder.getNotes() == "") {
 
-        if ( oder.getNotes() != null && oder.getNotes().isEmpty()) {
             holder.tvnote.setVisibility(View.GONE);
         } else {
             holder.tvnote.setText("Note : " + oder.getNotes());
