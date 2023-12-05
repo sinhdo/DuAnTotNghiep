@@ -20,6 +20,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class TopUpCardActivity extends AppCompatActivity {
-//    private TextView moneyTextView;
     private EditText etCardSerial, etCardPin;
     private Spinner spinnerCardProvider, spinnerCardValue;
     private Button btnAddCard;
@@ -62,7 +62,6 @@ public class TopUpCardActivity extends AppCompatActivity {
         spinnerCardValue = findViewById(R.id.spinnerCardValue);
         btnAddCard = findViewById(R.id.btnAddCard);
         lvCardList = findViewById(R.id.lvCardList);
-//        moneyTextView = findViewById(R.id.Money);
 
         cardList = new ArrayList<>();
         cardAdapter = new CardAdapter(this, cardList);
@@ -81,29 +80,12 @@ public class TopUpCardActivity extends AppCompatActivity {
         spinnerCardValue.setAdapter(cardValueAdapter);
 
         mAuth = FirebaseAuth.getInstance();
-//        firebaseUser = mAuth.getCurrentUser(); // Khởi tạo firebaseUser
-//        if (firebaseUser != null) {
-//            String buyerID = firebaseUser.getUid();
-//            userRef = FirebaseDatabase.getInstance().getReference("user");
-//            buyerRef = userRef.child("user").child(buyerID).child("wallet");
-//            buyerRef.addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                    if (dataSnapshot.exists()) {
-//                        Number walletValue = dataSnapshot.getValue(Number.class);
-//                        if (walletValue != null) {
-//                            double wallet = walletValue.doubleValue();
-//                            moneyTextView.setText(String.format("%.0f VND", wallet));
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError databaseError) {
-//                    // Xử lý khi có lỗi xảy ra
-//                }
-//            });
-//        }
+        firebaseUser = mAuth.getCurrentUser();
+        if (firebaseUser != null) {
+            String buyerID = firebaseUser.getUid();
+            userRef = FirebaseDatabase.getInstance().getReference("user");
+            buyerRef = userRef.child("user").child(buyerID).child("wallet");
+        }
         loadCardDataFromFirebase();
 
         btnAddCard.setOnClickListener(new View.OnClickListener() {
@@ -116,9 +98,7 @@ public class TopUpCardActivity extends AppCompatActivity {
                 String cardValue = spinnerCardValue.getSelectedItem().toString();
                 String time = getCurrentTime();
                 String userId = mAuth.getUid();
-                Log.d("YourTag", "Buyer reference: " + userId.toString());
                 if (validateInput(cardSerial, cardPin, cardProvider, cardValue)) {
-
                     userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -137,6 +117,15 @@ public class TopUpCardActivity extends AppCompatActivity {
                                 cardList.add(card);
                                 cardAdapter.notifyDataSetChanged();
                                 Toast.makeText(TopUpCardActivity.this, "Gửi thẻ thành công, vui lòng chờ trong giây lát", Toast.LENGTH_SHORT).show();
+
+                                Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast toast = Toast.makeText(TopUpCardActivity.this, "", Toast.LENGTH_SHORT);
+                                        toast.cancel();
+                                    }
+                                }, 3000);
                             }
                         }
 
@@ -155,6 +144,7 @@ public class TopUpCardActivity extends AppCompatActivity {
         Date currentDate = new Date();
         return sdf.format(currentDate);
     }
+
     private void loadCardDataFromFirebase() {
 
         DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference("cards");
@@ -234,4 +224,5 @@ public class TopUpCardActivity extends AppCompatActivity {
         }
         return true;
     }
+
 }

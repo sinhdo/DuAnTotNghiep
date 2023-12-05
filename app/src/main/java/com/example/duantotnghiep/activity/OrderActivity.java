@@ -45,32 +45,24 @@ import java.util.List;
 
 public class OrderActivity extends AppCompatActivity {
     private ImageView imgProduct;
-    private TextView tvNameProduct,tvPriceProduct,tvDescriptionPro, tvQuantity;
+    private TextView tvNameProduct,tvPriceProduct,tvDescriptionPro, tvQuantity, tvSold;
     private Button btnAddToCart,btnBuyProduct;
-    private int productQuantity; // Biến thành viên lưu trữ số lượng sản phẩm từ Firebase
+    private int productQuantity;
     private ColorAdapter selectedColorAdapter;
     private int num;
-
     private RecyclerView recyclerView;
-
     private OrderAdapter orderAdapter;
     private ArrayList<Order> orderList = new ArrayList<>();
-
     private String idProduct;
     List<String> sizeList;
     ArrayList<Integer> colors;
     private Picasso picasso = Picasso.get();
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
-
     private List<Reviews> reviewsList;
-
     private ReviewAdapter reviewAdapter;
-
     private List<Reviews> reviewsList1 = new ArrayList<>();
-
     private List<String> userIds;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,28 +72,21 @@ public class OrderActivity extends AppCompatActivity {
         loadReviewsFromFirebase();
         reviewAdapter = new ReviewAdapter(this, reviewsList1 ); // Khởi tạo adapter
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(reviewAdapter); // Thiết lập adapter cho RecyclerView
+        recyclerView.setAdapter(reviewAdapter);
 
-        String userId = ""; // Thay bằng ID người dùng thực tế từ nguồn dữ liệu của bạn
-        String userName = ""; // Thay bằng tên người dùng tương ứng
-
-        // Ánh xạ id user với tên người dùng trong ReviewAdapter
-
-
+        String userId = "";
+        String userName = "";
 
         hienthi();
         loadDataFromFirebase();
-
     }
-
-
 
     private void loadReviewsFromFirebase() {
         DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference().child("reviews");
         reviewsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                reviewsList1.clear(); // Xóa danh sách hiện tại (nếu cần)
+                reviewsList1.clear();
                 List<String> userIds = new ArrayList<>();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -109,7 +94,6 @@ public class OrderActivity extends AppCompatActivity {
                     String comment = snapshot.child("comment").getValue(String.class);
                     String productId = snapshot.child("id_product").getValue(String.class);
 
-                    // Kiểm tra và thêm dữ liệu vào reviewsList1 nếu đúng sản phẩm và dữ liệu không null
                     if (productId != null && productId.equals(idProduct) && userId != null && comment != null) {
                         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users").child(userId);
                         usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -118,7 +102,6 @@ public class OrderActivity extends AppCompatActivity {
                                 String displayName = userDataSnapshot.child("userName").getValue(String.class);
                                 Reviews review = new Reviews( userId,displayName, productId, comment);
                                 reviewsList1.add(review);
-                                // Gọi phương thức cập nhật RecyclerView tại đây nếu cần
                                 reviewAdapter.notifyDataSetChanged();
                             }
 
@@ -137,12 +120,6 @@ public class OrderActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
-
-
-
     private void hienthi() {
         DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference().child("reviews");
         reviewsRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -188,37 +165,23 @@ public class OrderActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
-
-
-
-
-
-
-
     private void AnhXa(){
         imgProduct =findViewById(R.id.imgProduct);
         tvNameProduct =findViewById(R.id.tvNameProduct);
         tvPriceProduct =findViewById(R.id.tvPriceProduct);
         tvDescriptionPro =findViewById(R.id.tvDescriptionPro);
         tvQuantity =findViewById(R.id.tvQuantity);
+        tvSold = findViewById(R.id.tvSold);
         btnAddToCart =findViewById(R.id.btnAddToCart);
         btnBuyProduct =findViewById(R.id.btnBuyProduct);
         idProduct = getIntent().getStringExtra("idPro");
 
         recyclerView = findViewById(R.id.rcv_review);
-
-
-
-
-
         btnBuyProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String productName = tvNameProduct.getText().toString();
-                Double productPrice = Double.parseDouble(tvPriceProduct.getText().toString().replace("$ ", ""));
+                Double productPrice = Double.parseDouble(tvPriceProduct.getText().toString().replace(" VND", ""));
                 String productImageUrl = imgProduct.getTag().toString();
                 if (productImageUrl != null && !productImageUrl.isEmpty()) {
                     dialogToBuy(productName, productPrice, productImageUrl,0);
@@ -232,7 +195,7 @@ public class OrderActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String productName = tvNameProduct.getText().toString();
-                Double productPrice = Double.parseDouble(tvPriceProduct.getText().toString().replace("$ ", ""));
+                Double productPrice = Double.parseDouble(tvPriceProduct.getText().toString().replace(" VND", ""));
                 String productImageUrl = imgProduct.getTag().toString();
                 if (productImageUrl != null && !productImageUrl.isEmpty()) {
                     dialogToBuy(productName, productPrice, productImageUrl,1);
@@ -244,10 +207,6 @@ public class OrderActivity extends AppCompatActivity {
         });
 
     }
-
-
-
-
     private void loadDataFromFirebase() {
         idProduct = getIntent().getStringExtra("idPro");
         DatabaseReference productRef = FirebaseDatabase.getInstance().getReference().child("products").child(idProduct);
@@ -259,18 +218,19 @@ public class OrderActivity extends AppCompatActivity {
                 Double price = snapshot.child("price").getValue(Double.class);
                 String description = snapshot.child("description").getValue(String.class);
                 Integer quantity = snapshot.child("quantity").getValue(Integer.class);
+                Integer sold = snapshot.child("sold").getValue(Integer.class);
                 if (quantity != null) {
                     productQuantity = quantity;
                 }
-
                 ArrayList<String> imgProductUrls = snapshot.child("imgProduct").getValue(new GenericTypeIndicator<ArrayList<String>>() {});
 
                 tvNameProduct.setText(name);
-                tvPriceProduct.setText("$ " + price);
-                tvDescriptionPro.setText(description);
+                tvPriceProduct.setText(price + " VND");
+                tvDescriptionPro.setText("Mô tả sản phẩm: " + description);
                 if (quantity != null) {
                     tvQuantity.setText("Số lượng còn: " + quantity);
                 }
+                tvSold.setText("Đã bán: " + sold);
 
                 if (imgProductUrls != null && !imgProductUrls.isEmpty()) {
                     String imgUrl = imgProductUrls.get(0);
@@ -350,7 +310,7 @@ public class OrderActivity extends AppCompatActivity {
             }
         });
         nameProduct.setText(productName);
-        priceOrder.setText("$ " + productPrice);
+        priceOrder.setText(productPrice + " VND");
         if (productImageUrl != null && !productImageUrl.isEmpty()) {
             picasso.load(productImageUrl).into(imgOrder);
         } else {

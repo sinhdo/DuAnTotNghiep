@@ -41,7 +41,7 @@ public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.
     public void onBindViewHolder(@NonNull ProductHomeViewHolder holder, int position) {
         Product product = productList.get(position);
 
-        holder.binding.tvPriceHome.setText(String.valueOf(product.getPrice()) + " $");
+        holder.binding.tvPriceHome.setText(String.valueOf(product.getPrice()) + " VND");
         holder.binding.tvTitleHome.setText(product.getName());
         holder.binding.tvSoldHome.setText(String.valueOf(product.getSold()));
         if (product.getImgProduct() != null && !product.getImgProduct().isEmpty()) {
