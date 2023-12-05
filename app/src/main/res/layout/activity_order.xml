@@ -97,5 +97,5 @@
             android:text="Mua ngay"
             android:id="@+id/btnBuyProduct"/>
     </LinearLayout>
-
+<!--a-->
 </LinearLayout>
