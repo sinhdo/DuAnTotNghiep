@@ -30,42 +30,80 @@
             android:layout_height="wrap_content"
             android:id="@+id/tvPriceProduct"
             android:textColor="#ff00"
-            android:text="$ 100"
+            android:text="100 VND"
             android:textSize="20dp"
             android:layout_marginVertical="5dp"/>
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/tvQuantity"
-            android:text="Số lượng"
-            android:textSize="20dp"
-            android:layout_marginVertical="5dp"/>
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvQuantity"
+                android:text="Số lượng"
+                android:textSize="16dp"
+                android:layout_marginVertical="5dp"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvSold"
+                    android:text="Đã bán"
+                    android:textSize="16dp"
+                    android:layout_marginVertical="5dp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="25dp"
-            android:text="MÔ TẢ SẢN PHẨM"/>
-        <TextView
-            android:text="Mô tả sản phẩm"
+            android:text="Text Mô tả"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18dp"
             android:layout_marginVertical="10dp"
             android:id="@+id/tvDescriptionPro"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:id="@+id/rcv_review"
-            />
         <TextView
-            android:id="@+id/noReviewsTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Chưa có đánh giá sản phẩm!!"
-            android:textSize="16sp"
-            android:gravity="center"
-            android:visibility="gone" />
+            android:textSize="20dp"
+            android:text="Các lượt đánh giá của khách hàng:"/>
+        <View
+            android:id="@+id/vd"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="#D3C0C0" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="170dp"
+            android:background="@drawable/bg_dialog"
+            android:orientation="horizontal">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="170dp"
+                android:id="@+id/rcv_review"
+                />
+            <TextView
+                android:id="@+id/noReviewsTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Chưa có đánh giá sản phẩm!!"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:visibility="gone" />
+        </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
