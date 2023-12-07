@@ -338,7 +338,7 @@ public class orderDetailsActivity extends AppCompatActivity {
 
 
     private String getCurrentTime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
         Date currentDate = new Date();
         return sdf.format(currentDate);
     }
