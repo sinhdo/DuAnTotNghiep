@@ -50,7 +50,7 @@ public class StatisticalActivity extends AppCompatActivity {
     private TextInputEditText edEndDate;
     private ImageView imgEndDate;
     private Button btnQuerry;
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
     private String startDate,endDate;
     int mYear, mMonth, mDate;
     private List<Order> orderList = new ArrayList<>();
@@ -111,32 +111,34 @@ public class StatisticalActivity extends AppCompatActivity {
         DatabaseReference databaseReference = firebaseDatabase.getReference("list_order");
         Query query = databaseReference.orderByChild("date")
                 .startAt(startDay)
-                .endAt(endDay);
+                .endAt(endDay + " 23:59:59");
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Map<String,Statistical> statisticalMap = new HashMap<>();
                 int totalQuantitySum = 0;
                 double totalAmountSum = 0;
-                for (DataSnapshot transactionSnapshot : snapshot.getChildren()) {
-                    Order order = transactionSnapshot.getValue(Order.class);
-                    if (order.getStatus().equals("done")&&order.getIdSeller().equals(id_user)){
-                        Statistical statistical = statisticalMap.get(order.getIdProduct());
-                        if (statistical == null) {
+               if (snapshot.exists()){
+                   for (DataSnapshot transactionSnapshot : snapshot.getChildren()) {
+                       Order order = transactionSnapshot.getValue(Order.class);
+                       if (order.getStatus().equals("done")&&order.getIdSeller().equals(id_user)){
+                           Statistical statistical = statisticalMap.get(order.getIdProduct());
+                           if (statistical == null) {
 
-                            statistical = new Statistical(order.getIdProduct(),order.getImgProduct(), order.getNameProduct(), order.getQuantity(),order.getTotal());
-                            statisticalMap.put(order.getIdProduct(), statistical);
-                        } else {
+                               statistical = new Statistical(order.getIdProduct(),order.getImgProduct(), order.getNameProduct(), order.getQuantity(),order.getTotal());
+                               statisticalMap.put(order.getIdProduct(), statistical);
+                           } else {
 
-                            statistical.setTotalQuantity(statistical.getTotalQuantity() + order.getQuantity());
-                            statistical.setTotalAmount(statistical.getTotalAmount() + order.getTotal());
-                        }
-                        totalQuantitySum += order.getQuantity();
-                        totalAmountSum += order.getTotal();
-                    }else {
-                        Log.d("=======", "onDataChange: Không có");
-                    }
-                }
+                               statistical.setTotalQuantity(statistical.getTotalQuantity() + order.getQuantity());
+                               statistical.setTotalAmount(statistical.getTotalAmount() + order.getTotal());
+                           }
+                           totalQuantitySum += order.getQuantity();
+                           totalAmountSum += order.getTotal();
+                       }else {
+                           Log.d("=======", "onDataChange: Không có");
+                       }
+                   }
+               }
                 if (statisticalMap.isEmpty()) {
                     nullData.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
