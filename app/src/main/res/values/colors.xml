@@ -7,4 +7,5 @@
     <color name="processed">#383C51</color>
     <color name="backgroud">#EFEFEF</color>
     <color name="status_bar_color">#D97E14</color>
+    <color name="yellow">#FFEB3B</color>
 </resources>

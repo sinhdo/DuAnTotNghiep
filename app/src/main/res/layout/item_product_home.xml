@@ -21,16 +21,13 @@
     android:layout_height="150dp">
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imvProductHome"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_width="145dp"
+        android:layout_height="140dp"
         android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-
-
-
-
+        android:scaleType="centerCrop"
         android:layout_marginBottom="112dp"
-
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="4dp"
         android:src="@drawable/product"
         app:layout_constraintBottom_toBottomOf="@id/line"
         app:layout_constraintEnd_toEndOf="@id/line"
@@ -59,7 +56,7 @@
         android:id="@+id/imageView14"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="5dp"
         android:src="@drawable/star"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.029"
@@ -76,7 +73,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView14"
-        app:layout_constraintVertical_bias="0.631" />
+        app:layout_constraintVertical_bias="0.222" />
 
     <TextView
         android:id="@+id/tvSoldHome"
@@ -92,10 +89,11 @@
         app:layout_constraintVertical_bias="0.865" />
 
     <TextView
-        android:id="@+id/textView19"
+        android:id="@+id/tvStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
         android:text="5.0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.032"

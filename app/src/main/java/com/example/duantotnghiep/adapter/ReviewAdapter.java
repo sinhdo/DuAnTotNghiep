@@ -26,9 +26,6 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         this.context = context;
         this.list = reviewList1;
     }
-
-
-
     @NonNull
     @Override
     public ReviewViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -55,10 +52,6 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         holder.ratingBar.setRating(Float.valueOf(review.getStart()));
 
     }
-
-
-
-
     @Override
     public int getItemCount() {
         if (list != null) {
