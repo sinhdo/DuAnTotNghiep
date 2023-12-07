@@ -7,14 +7,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.duantotnghiep.activity.OrderActivity;
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.activity.OrderActivity;
 import com.example.duantotnghiep.databinding.ItemProductHomeBinding;
 import com.example.duantotnghiep.model.Product;
 import com.example.duantotnghiep.model.Reviews;
@@ -26,10 +25,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.ProductHomeViewHolder> {
+public class ProductHomeAdapter2 extends RecyclerView.Adapter<ProductHomeAdapter2.ProductHomeViewHolder> {
     private Context context;
     private List<Product> productList;
-    public ProductHomeAdapter(Context context, List<Product> productList) {
+    public ProductHomeAdapter2(Context context, List<Product> productList) {
         this.context = context;
         this.productList = productList;
     }
@@ -37,7 +36,6 @@ public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.
         this.productList = productList;
         notifyDataSetChanged();
     }
-
     @NonNull
     @Override
     public ProductHomeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -67,7 +65,7 @@ public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.
         });
         // Truy cập đến nhánh "reviews" trong Firebase
         DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference("reviews");
-        DatabaseReference productRef = FirebaseDatabase.getInstance().getReference("products").child(product.getId());
+
         reviewsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -85,8 +83,6 @@ public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.
                 if (numRatings > 0) {
                     float averageRating = totalRating / numRatings;
                     holder.binding.tvStart.setText(String.valueOf(averageRating));
-                    productRef.child("averageRating").setValue(averageRating);
-                    productRef.child("numRatings").setValue(numRatings);
                 } else {
                     // Nếu không có đánh giá, đặt số sao mặc định là 5
                     holder.binding.tvStart.setText("5.0");
@@ -109,6 +105,7 @@ public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.
         productList = updatedList;
         notifyDataSetChanged();
     }
+
     public class ProductHomeViewHolder extends RecyclerView.ViewHolder {
         ItemProductHomeBinding binding;
 

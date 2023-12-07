@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.ProductAdapter;
 import com.example.duantotnghiep.adapter.ProductHomeAdapter;
+import com.example.duantotnghiep.adapter.ProductHomeAdapter2;
 import com.example.duantotnghiep.adapter.UserAdapter;
 import com.example.duantotnghiep.model.Product;
 import com.example.duantotnghiep.model.User;
@@ -38,6 +39,7 @@ import java.util.List;
 
 
 public class SearchProductFragment extends Fragment {
+    private View view;
     private SearchView searchView;
     private RecyclerView recyclerView;
     private FirebaseAuth firebaseAuth;
@@ -45,14 +47,12 @@ public class SearchProductFragment extends Fragment {
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
     private TextView textViewNull;
-    private ProductHomeAdapter adapter;
-
+    ProductHomeAdapter2 productHomeAdapter2;
 
     public SearchProductFragment() {
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
     public static SearchProductFragment newInstance() {
         SearchProductFragment fragment = new SearchProductFragment();
         return fragment;
@@ -61,28 +61,33 @@ public class SearchProductFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search_product, container, false);
+        if (view == null) {
+            // Inflate the layout for this fragment
+            view = inflater.inflate(R.layout.fragment_search_product, container, false);
+        }
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        searchView=view.findViewById(R.id.svListProduct);
-        recyclerView =view.findViewById(R.id.listProduct);
+        searchView = view.findViewById(R.id.svListProduct);
+        recyclerView = view.findViewById(R.id.listProduct);
         textViewNull = view.findViewById(R.id.noResultsTextView);
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
 
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
-        adapter = new ProductHomeAdapter(getContext(),list);
-        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        productHomeAdapter2 = new ProductHomeAdapter2(getContext(), list);
+        recyclerView.setAdapter(productHomeAdapter2);
+
+        loadAllProducts(); // Hiển thị tất cả các sản phẩm khi màn hình được chạy
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -91,43 +96,30 @@ public class SearchProductFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText == null ||newText.isEmpty()){
-                    textViewNull.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                }else {
-                    SearchProduct(newText);
+                if (newText == null || newText.isEmpty()) {
+                    loadAllProducts(); // Hiển thị tất cả các sản phẩm nếu không có từ khóa tìm kiếm
+                } else {
+                    searchProducts(newText); // Tìm kiếm và cập nhật danh sách sản phẩm theo từ khóa
                 }
                 return true;
             }
         });
     }
-    private void SearchProduct(String query) {
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = firebaseDatabase.getReference("products");
 
-        Query searchQuery = myRef.orderByChild("name")
-                .startAt(query)
-                .endAt(query + "\uf8ff");
+    private void loadAllProducts() {
+        DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("products");
 
-        searchQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                list.clear();
+                List<Product> productList = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Product product = snapshot.getValue(Product.class);
                     if (product != null && !product.getSellerId().equals(firebaseUser.getUid())) {
-                        list.add(product);
+                        productList.add(product);
                     }
                 }
-                adapter.setData(list);
-                adapter.notifyDataSetChanged();
-                if (list.isEmpty()) {
-                    textViewNull.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                } else {
-                    textViewNull.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                }
+                updateRecyclerView(productList);
             }
 
             @Override
@@ -137,4 +129,44 @@ public class SearchProductFragment extends Fragment {
         });
     }
 
+    private void searchProducts(String query) {
+        DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("products");
+
+        Query searchQuery = myRef.orderByChild("name")
+                .startAt(query)
+                .endAt(query + "\uf8ff");
+
+        searchQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<Product> productList = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Product product = snapshot.getValue(Product.class);
+                    if (product != null && !product.getSellerId().equals(firebaseUser.getUid())) {
+                        productList.add(product);
+                    }
+                }
+                updateRecyclerView(productList);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("loi", "onCancelled: " + databaseError.getMessage());
+            }
+        });
+    }
+
+    private void updateRecyclerView(List<Product> productList) {
+        list.clear();
+        list.addAll(productList);
+        productHomeAdapter2.updateProductList(productList);
+
+        if (productList.isEmpty()) {
+            textViewNull.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            textViewNull.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+    }
 }

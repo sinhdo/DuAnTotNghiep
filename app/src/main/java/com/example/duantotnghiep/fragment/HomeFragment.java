@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -26,6 +27,7 @@ import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.activity.CartActivity;
 import com.example.duantotnghiep.adapter.ProductAdapter;
 import com.example.duantotnghiep.adapter.ProductHomeAdapter;
+import com.example.duantotnghiep.adapter.ProductHomeAdapter2;
 import com.example.duantotnghiep.adapter.SlideImageAdapter;
 import com.example.duantotnghiep.adapter.SliderImageAdapter;
 import com.example.duantotnghiep.model.AddProductToCart;
@@ -54,14 +56,11 @@ public class HomeFragment extends Fragment {
     private ImageView imgCart;
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
-    private int totalCartQuantity = 0;
-    RecyclerView rvManager;
-
-    ProductAdapter productAdapter;
     List<Product> productList;
+    List<Product> productList2;
     DatabaseReference databaseReference;
-
     ProductHomeAdapter productHomeAdapter;
+    ProductHomeAdapter2 productHomeAdapter2;
     public static HomeFragment newInstance() {
         HomeFragment fragment = new HomeFragment();
         return fragment;
@@ -73,15 +72,12 @@ public class HomeFragment extends Fragment {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         mReference = FirebaseDatabase.getInstance().getReference();
         productList = new ArrayList<>();
-
-
+        productList2 = new ArrayList<>();
         loadDataFromFirebase();
     }
-
     @SuppressLint("MissingInflatedId")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Handler handler = new Handler();     
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         totalCart = view.findViewById(R.id.totalCart);
@@ -92,7 +88,6 @@ public class HomeFragment extends Fragment {
         circleIndicator = view.findViewById(R.id.circle_indicator);
         RecyclerView recyclerView = view.findViewById(R.id.view1);
         RecyclerView recyclerView2 = view.findViewById(R.id.view2);
-
         imgCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,9 +96,10 @@ public class HomeFragment extends Fragment {
             }
         });
         TotalItemCart();
-         productHomeAdapter = new ProductHomeAdapter(getContext(), productList);
+        productHomeAdapter = new ProductHomeAdapter(getContext(), productList);
         recyclerView.setAdapter(productHomeAdapter);
-        recyclerView2.setAdapter(productHomeAdapter);
+        productHomeAdapter2 = new ProductHomeAdapter2(getContext(), productList);
+        recyclerView2.setAdapter(productHomeAdapter2);
         List<Integer> listImageSlide =new ArrayList<>();
         listImageSlide.add(R.drawable.img);
         listImageSlide.add(R.drawable.img1);
@@ -131,7 +127,7 @@ public class HomeFragment extends Fragment {
                 }
             }
         },2000,2000);
-        LinearLayoutManager layoutManager2 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        GridLayoutManager layoutManager2 = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         ViewPager2 viewPager2 = view.findViewById(R.id.viewPaperSlider);
 
@@ -154,7 +150,6 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView2.setLayoutManager(layoutManager2);
 
-        
         Runnable sliderRunnable = new Runnable() {
             @Override
             public void run() {
@@ -170,22 +165,17 @@ public class HomeFragment extends Fragment {
                 handler.postDelayed(sliderRunnable, 3000);
             }
         });
-
-
         return view;
     }
 
-
     private void loadDataFromFirebase() {
         databaseReference = FirebaseDatabase.getInstance().getReference("products");
-
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 productList.clear();
-
+                productList2.clear();
                 String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Product product = snapshot.getValue(Product.class);
                     if (product.getQuantity() > 0) {
@@ -193,14 +183,12 @@ public class HomeFragment extends Fragment {
                             continue;
                         }
                         productList.add(product);
-
+                        productList2.add(product);
                     }
                 }
-
                 productHomeAdapter.setData(productList);
-
+                productHomeAdapter2.setData(productList2);
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -220,14 +208,10 @@ public class HomeFragment extends Fragment {
                     AddProductToCart product = dataSnapshot.getValue(AddProductToCart.class);
                     list.add(product);
                 }
-
                 if (list.size() == 0) {
                     return;
                 } else {
-
                     totalCart.setText(" " + list.size());
-
-
                 }
             }
             @Override

@@ -274,36 +274,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             }
         }
     }
-//    private void requestPermissions() {
-//
-//        TedPermission.Builder builderTed = TedPermission.create();
-//        PermissionListener permissionlistener = new PermissionListener() {
-//            @Override
-//            public void onPermissionGranted() {
-//
-//            }
-//            @Override
-//            public void onPermissionDenied(List<String> deniedPermissions) {
-//                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//                builder.setTitle("Chú ý");
-//                builder.setMessage("Bạn cần cấp quyền thì mới sử dụng được ứng dụng");
-//                builder.setNegativeButton("Cấp quyến", (dialogInterface, i) -> {
-//                    dialogInterface.dismiss();
-//                    builderTed.check();
-//                });
-//                builder.setPositiveButton("Thoát", (dialogInterface, i) -> System.exit(0));
-//                AlertDialog dialog = builder.create();
-//                dialog.show();
-//            }
-//        };
-//        builderTed.setPermissionListener(permissionlistener)
-//                .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA)
-//                .check();
-//    }
     private void openImagePicker() {
         Toast.makeText(context, "clicked", Toast.LENGTH_SHORT).show();
-//        requestPermissions();
-
         TedImagePicker
                 .with(context)
 
@@ -312,8 +284,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                     imageUris = new ArrayList<>(uriList);
 
                 });
-
-
     }
 
 

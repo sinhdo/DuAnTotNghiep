@@ -68,9 +68,9 @@ public class ReviewsActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 if (TextUtils.isEmpty(edReviews.getText().toString())){
-                    Toast.makeText(ReviewsActivity.this, "Vui lòng nhập đánh giá", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ReviewsActivity.this, "Hãy viết đánh giá", Toast.LENGTH_SHORT).show();
                 } else if (numStart==0) {
-                    Toast.makeText(ReviewsActivity.this, "Vui lòng đánh giá bằng sao", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ReviewsActivity.this, "Hãy chọn số sao để đánh giá sự hài lòng của bạn", Toast.LENGTH_SHORT).show();
                 }else {
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                     DatabaseReference reviewRef = database.getReference("reviews");
