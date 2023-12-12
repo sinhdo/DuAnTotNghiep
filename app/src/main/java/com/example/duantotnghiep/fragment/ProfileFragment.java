@@ -154,13 +154,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         cvOder.setOnClickListener(this);
         cvOut.setOnClickListener(this);
         cvPromotion.setOnClickListener(this);
-        cvPayment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), TopUpCardActivity.class);
-                startActivity(intent);
-            }
-        });
         cvXacNhanCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -173,6 +166,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         cvReview.setOnClickListener(this);
         cvTK.setOnClickListener(this);
         cvQLUser.setOnClickListener(this);
+        cvPayment.setOnClickListener(this);
         cvAdddiachi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -389,14 +383,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     cvOder.setVisibility(View.GONE);
                     cvReview.setVisibility(View.GONE);
                     cvTK.setVisibility(View.GONE);
+                    cvPayment.setVisibility(View.GONE);
+                    cvPromotion.setVisibility(View.GONE);
 
                 } else {
                     cvQLUser.setVisibility(View.GONE);
                     cvXacNhanCard.setVisibility(View.GONE);
-
+                    cvPayment.setVisibility(View.VISIBLE);
                     cvOder.setVisibility(View.VISIBLE);
-                    cvReview.setVisibility(View.VISIBLE);
-
+                    cvReview.setVisibility(View.GONE);
+                    cvPromotion.setVisibility(View.VISIBLE);
                     cvQLProduct.setVisibility(View.VISIBLE);
                     cvTK.setVisibility(View.VISIBLE);
                 }
@@ -424,7 +420,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         } else if (view.getId() == R.id.cvOderForShop) {
             startActivity(new Intent(getContext(), OrderOfShopActivity.class));
         } else if (view.getId() == R.id.cvPayment) {
-
+            startActivity(new Intent(getContext(), TopUpCardActivity.class));
         } else if (view.getId() == R.id.cvPromotion) {
             startActivity(new Intent(getContext(), DiscountActivity.class));
         } else if (view.getId() == R.id.cvTK) {

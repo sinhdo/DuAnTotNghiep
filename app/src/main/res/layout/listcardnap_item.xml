@@ -48,16 +48,25 @@
         android:layout_height="wrap_content"
         android:text="Trạng thái: " />
 
-    <Button
-        android:id="@+id/btnToggleStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Chuyển đổi Trạng thái thành công" />
-    <Button
-        android:id="@+id/btnToggleFailedStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Chuyển đổi Trạng thái Không thành công" />
+  <LinearLayout
+      android:id="@+id/learNapthe"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      android:orientation="horizontal">
+      <Button
+          android:layout_weight="1"
+          android:id="@+id/btnToggleStatus"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Nạp thẻ thành công" />
+      <Button
+          android:layout_weight="1"
+          android:id="@+id/btnToggleFailedStatus"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Nạp thẻ thất bại" />
+  </LinearLayout>
 
 
 </LinearLayout>
