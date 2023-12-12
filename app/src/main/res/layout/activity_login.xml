@@ -62,59 +62,6 @@ android:background="#f3f3f3"
 
         </com.google.android.material.tabs.TabLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_google"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/white"
-            android:contentDescription="google"
-            android:elevation="35dp"
-            android:src="@drawable/google"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view_paper"
-            >
-
-        </com.google.android.material.floatingactionbutton.FloatingActionButton>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_facebook"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:layout_marginRight="10dp"
-            android:backgroundTint="@color/white"
-            android:contentDescription="facebook"
-            android:elevation="35dp"
-            android:src="@drawable/facebook"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/fab_google"
-            app:layout_constraintHorizontal_bias="1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view_paper">
-
-        </com.google.android.material.floatingactionbutton.FloatingActionButton>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_ins"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:backgroundTint="@color/white"
-            android:contentDescription="instaram"
-            android:elevation="35dp"
-            android:src="@drawable/instagram"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintStart_toEndOf="@+id/fab_google"
-            app:layout_constraintTop_toBottomOf="@+id/view_paper">
-
-        </com.google.android.material.floatingactionbutton.FloatingActionButton>
-
-
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
