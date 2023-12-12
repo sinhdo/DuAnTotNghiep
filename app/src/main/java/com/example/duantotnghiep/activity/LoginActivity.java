@@ -21,9 +21,9 @@ float v=0;
         setContentView(R.layout.activity_login);
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_paper);
-        fb = findViewById(R.id.fab_facebook);
-        gg = findViewById(R.id.fab_google);
-        ins = findViewById(R.id.fab_ins);
+//        fb = findViewById(R.id.fab_facebook);
+//        gg = findViewById(R.id.fab_google);
+//        ins = findViewById(R.id.fab_ins);
 
         tabLayout.addTab(tabLayout.newTab().setText("Login"));
         tabLayout.addTab(tabLayout.newTab().setText("Register"));
@@ -52,19 +52,19 @@ tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
         viewPager.setAdapter(adapter);
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        fb.setTranslationY(300);
-        gg.setTranslationY(300);
-        ins.setTranslationY(300);
-        tabLayout.setTranslationY(300);
-
-        fb.setAlpha(v);
-        gg.setAlpha(v);
-        ins.setAlpha(v);
-        tabLayout.setAlpha(v);
-
-        fb.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(400).start();
-        gg.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(600).start();
-        ins.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(800).start();
-        tabLayout.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(100).start();
+//        fb.setTranslationY(300);
+//        gg.setTranslationY(300);
+//        ins.setTranslationY(300);
+//        tabLayout.setTranslationY(300);
+//
+//        fb.setAlpha(v);
+//        gg.setAlpha(v);
+//        ins.setAlpha(v);
+//        tabLayout.setAlpha(v);
+//
+//        fb.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(400).start();
+//        gg.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(600).start();
+//        ins.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(800).start();
+//        tabLayout.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(100).start();
     }
 }
