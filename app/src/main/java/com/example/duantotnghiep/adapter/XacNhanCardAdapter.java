@@ -1,11 +1,13 @@
 package com.example.duantotnghiep.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,9 +61,9 @@ public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.
         holder.textTime.setText("Thời gian: " + card.getTime());
         holder.textUsername.setText("Người dùng: " + card.getUsername());
         holder.textStatus.setText("Trạng thái: " + card.getStatus());
-
-        // Xử lý sự kiện khi nút được nhấn
-        // Xử lý sự kiện khi nút được nhấn
+        if (card.getStatus().equals("success")||card.getStatus().equals("failed")){
+            holder.learNapthe.setVisibility(View.GONE);
+        }
         holder.btnToggleStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,6 +111,7 @@ public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.
         TextView textStatus;
         Button btnToggleStatus;
         Button btnToggleFailedStatus;
+        LinearLayout learNapthe;
 
 
         public XacNhanCardViewHolder(@NonNull View itemView) {
@@ -122,6 +125,8 @@ public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.
             textStatus = itemView.findViewById(R.id.textStatus);
             btnToggleStatus = itemView.findViewById(R.id.btnToggleStatus);
             btnToggleFailedStatus = itemView.findViewById(R.id.btnToggleFailedStatus);
+            learNapthe = itemView.findViewById(R.id.learNapthe);
+
 
         }
     }
