@@ -63,6 +63,8 @@ public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.
         holder.textStatus.setText("Trạng thái: " + card.getStatus());
         if (card.getStatus().equals("success")||card.getStatus().equals("failed")){
             holder.learNapthe.setVisibility(View.GONE);
+        }else{
+            holder.learNapthe.setVisibility(View.VISIBLE);
         }
         holder.btnToggleStatus.setOnClickListener(new View.OnClickListener() {
             @Override
