@@ -1,12 +1,9 @@
 package com.example.duantotnghiep.fragment;
 
-import static android.content.Intent.getIntent;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,9 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.duantotnghiep.MainActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.activity.ShowListLocationActivity;
-import com.example.duantotnghiep.activity.orderDetailsActivity;
 import com.example.duantotnghiep.adapter.CartOrderAdapter;
-import com.example.duantotnghiep.adapter.OrderAdapter;
 import com.example.duantotnghiep.model.AddProductToCart;
 import com.example.duantotnghiep.model.Order;
 import com.example.duantotnghiep.model.Product;
@@ -290,7 +285,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
 
 
     private String getCurrentDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
         return sdf.format(new Date());
     }
 
