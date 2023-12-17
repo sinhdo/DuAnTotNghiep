@@ -82,8 +82,6 @@ public class Product {
         isUserProduct = userProduct;
     }
 
-
-
     public List<String> getSize() {
         return size;
     }
