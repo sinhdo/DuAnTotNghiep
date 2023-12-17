@@ -47,7 +47,6 @@ public class OrderActivity extends AppCompatActivity {
     private ColorAdapter selectedColorAdapter;
     private int num;
     private RecyclerView recyclerView;
-    private OrderAdapter orderAdapter;
     private ArrayList<Order> orderList = new ArrayList<>();
     private String idProduct;
     List<String> sizeList;
@@ -70,7 +69,6 @@ public class OrderActivity extends AppCompatActivity {
         recyclerView.setAdapter(reviewAdapter);
         loadDataFromFirebase();
     }
-
     private void hienthi() {
         DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference().child("reviews");
 
@@ -87,7 +85,6 @@ public class OrderActivity extends AppCompatActivity {
                 Log.d("=====", "onDataChange: "+reviewsList+"    vs    "+idProduct);
                 reviewAdapter.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 // Xử lý lỗi nếu cần
@@ -114,7 +111,6 @@ public class OrderActivity extends AppCompatActivity {
                 if (productImageUrl != null && !productImageUrl.isEmpty()) {
                     dialogToBuy(productName, productPrice, productImageUrl,0);
                 } else {
-                    // Xử lý khi không có URL hình ảnh
                     Toast.makeText(OrderActivity.this, "Không tìm thấy hình ảnh sản phẩm", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -128,12 +124,10 @@ public class OrderActivity extends AppCompatActivity {
                 if (productImageUrl != null && !productImageUrl.isEmpty()) {
                     dialogToBuy(productName, productPrice, productImageUrl,1);
                 } else {
-                    // Xử lý khi không có URL hình ảnh
                     Toast.makeText(OrderActivity.this, "Không tìm thấy hình ảnh sản phẩm", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
     }
     private void loadDataFromFirebase() {
         idProduct = getIntent().getStringExtra("idPro");
@@ -141,7 +135,6 @@ public class OrderActivity extends AppCompatActivity {
         productRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // Xử lý dữ liệu khi có sự thay đổi trên Firebase
                 String name = snapshot.child("name").getValue(String.class);
                 Double price = snapshot.child("price").getValue(Double.class);
                 String description = snapshot.child("description").getValue(String.class);
@@ -165,7 +158,6 @@ public class OrderActivity extends AppCompatActivity {
                     picasso.load(imgUrl).into(imgProduct);
                     imgProduct.setTag(imgUrl);
                 }
-
                 colors = new ArrayList<>();
                 DataSnapshot colorsSnapshot = snapshot.child("color");
                 for (DataSnapshot colorSnapshot : colorsSnapshot.getChildren()) {
@@ -174,7 +166,6 @@ public class OrderActivity extends AppCompatActivity {
                         colors.add(color);
                     }
                 }
-
                 DataSnapshot sizeSnapshot = snapshot.child("size");
                 sizeList = new ArrayList<>();
                 for (DataSnapshot sizeItemSnapshot : sizeSnapshot.getChildren()) {
@@ -292,5 +283,4 @@ public class OrderActivity extends AppCompatActivity {
         }
         dialog.show();
     }
-    
 }

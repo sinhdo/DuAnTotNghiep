@@ -89,7 +89,7 @@ public class OrderDetailsAdapter extends RecyclerView.Adapter<OrderDetailsAdapte
                 tvColor.setBackgroundColor(color);
             }
 
-            tvPrice.setText("$ " + product.getPrice());
+            tvPrice.setText(product.getPrice() + " VND");
 
             tvCum.setText(String.format("Số lượng %s", product.getQuantity()));
 

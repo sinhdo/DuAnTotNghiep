@@ -68,13 +68,13 @@
                         android:id="@+id/tv_priceProductCart"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="300"
+                        android:text="10000"
                         android:textSize="17sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=" $"
+                        android:text=" VND"
                         android:textSize="17sp" />
                 </LinearLayout>
 

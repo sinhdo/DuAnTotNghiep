@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DiscountActivity extends AppCompatActivity {
-
     private EditText edtNameDiscount, edtValueDiscount;
     private RecyclerView recyclerView;
     private Button btnAddDiscount;
@@ -42,15 +41,12 @@ public class DiscountActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discount);
 
-
         discountRef = FirebaseDatabase.getInstance().getReference("discounts");
-
 
         edtNameDiscount = findViewById(R.id.NameDiscount);
         edtValueDiscount = findViewById(R.id.ValueDiscount);
         btnAddDiscount = findViewById(R.id.btnAddDiscount);
         recyclerView = findViewById(R.id.rv_discount);
-
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         discountList = new ArrayList<>();
@@ -68,7 +64,6 @@ public class DiscountActivity extends AppCompatActivity {
     private void addDiscount() {
         String name = edtNameDiscount.getText().toString().trim();
         String valueString = edtValueDiscount.getText().toString().trim();
-
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             String sellerId = currentUser.getUid();
@@ -76,12 +71,10 @@ public class DiscountActivity extends AppCompatActivity {
                 Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             if (name.length() > 20) {
                 Toast.makeText(this, "Name Discount không được vượt quá 20 kí tự", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             double value;
             try {
                 value = Double.parseDouble(valueString);
@@ -89,12 +82,10 @@ public class DiscountActivity extends AppCompatActivity {
                 Toast.makeText(this, "Value Discount không hợp lệ", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             if (value < 1 || value > 100) {
                 Toast.makeText(this, "Value Discount phải nằm trong khoảng từ 1 đến 100", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             Discount discount = new Discount();
             discount.setCode(name);
             discount.setAmount(value);
@@ -105,9 +96,7 @@ public class DiscountActivity extends AppCompatActivity {
                 discount.setId(discountId);
                 Log.d("DiscountActivity", "Discount ID: " + discountId);
                 discountRef.child(discountId).setValue(discount);
-
                 Toast.makeText(this, "Thêm Discount thành công", Toast.LENGTH_SHORT).show();
-
                 edtNameDiscount.setText("");
                 edtValueDiscount.setText("");
             } else {

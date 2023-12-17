@@ -28,26 +28,21 @@ float v=0;
         tabLayout.addTab(tabLayout.newTab().setText("Login"));
         tabLayout.addTab(tabLayout.newTab().setText("Register"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-    @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-        // Lấy vị trí của tab được chọn
-        int position = tab.getPosition();
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                viewPager.setCurrentItem(position);
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
 
-        // Chuyển đến trang tương ứng dựa trên vị trí của tab
-        viewPager.setCurrentItem(position);
-    }
+            }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
 
-    @Override
-    public void onTabUnselected(TabLayout.Tab tab) {
-
-    }
-
-    @Override
-    public void onTabReselected(TabLayout.Tab tab) {
-
-    }
-});
+            }
+        });
         final LoginAdapter adapter = new LoginAdapter(getSupportFragmentManager(),this,tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
 

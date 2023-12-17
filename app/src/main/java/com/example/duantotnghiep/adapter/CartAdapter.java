@@ -72,8 +72,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
         holder.tvNameProductCart.setText(products.getName_product());
         holder.tvNumProductCart.setText(products.getQuantity_product()+"");
+        holder.tvPriceProductCart.setText(String.format(Locale.getDefault(), "%.0f", products.getPricetotal_product()));
         double totalPrice = products.getQuantity_product() * products.getPricetotal_product();
-        String totalPriceFormatted = String.format(Locale.getDefault(), "Thành tiền: %.2f", totalPrice);
+        String totalPriceFormatted = String.format(Locale.getDefault(), "Thành tiền: %.0f", totalPrice);
         holder.priceAllQuantity.setText(totalPriceFormatted);
         holder.tvColor.setBackgroundColor(products.getColor_product());
         holder.tvSize.setText(products.getSize_product());

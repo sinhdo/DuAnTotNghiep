@@ -92,9 +92,5 @@ public class XacNhanCardActivity extends AppCompatActivity {
                 // Nếu không có mục nào được chọn
             }
         });
-
-
-
-
     }
 }

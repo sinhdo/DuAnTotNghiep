@@ -79,21 +79,18 @@ public class LocationActivity extends AppCompatActivity implements LocationAdapt
                 if (list != null){
                     list.clear();
                 }
-
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Location location = dataSnapshot.getValue(Location.class);
                     list.add(location);
                 }
                 adapter.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.d("LISTCART", "onCancelled: " + error.getMessage());
             }
         });
     }
-
     @Override
     public void editAddress(Location address) {
         Dialog dialog = new Dialog(this);
@@ -105,7 +102,6 @@ public class LocationActivity extends AppCompatActivity implements LocationAdapt
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
         dialog.show();
-
         lnl = (LinearLayout) dialog.findViewById(R.id.lnl);
         imgBack = (ImageButton) dialog.findViewById(R.id.img_back);
         edName = (EditText) dialog.findViewById(R.id.ed_name);
@@ -134,12 +130,10 @@ public class LocationActivity extends AppCompatActivity implements LocationAdapt
                 dialog.dismiss();
             }
         });
-
         imgBack.setOnClickListener(view -> {
             dialog.dismiss();
         });
     }
-
     @Override
     public void deleteAddress(Location address) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -150,7 +144,6 @@ public class LocationActivity extends AppCompatActivity implements LocationAdapt
         builder.setTitle("Xóa sản phẩm");
         builder.setMessage("Bạn có chắc chắn muốn xóa địa chỉ này ?");
         builder.setPositiveButton("Xóa", (dialog, which) -> {
-
             myRef.child(address.getId()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -170,7 +163,6 @@ public class LocationActivity extends AppCompatActivity implements LocationAdapt
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.img_back){
@@ -179,13 +171,11 @@ public class LocationActivity extends AppCompatActivity implements LocationAdapt
             startActivity(new Intent(LocationActivity.this, AddLocationActivity.class));
         }
     }
-
     private boolean checkValidate(String name, String phone, String location){
         if (name.isEmpty() || phone.isEmpty() || location.isEmpty()){
             Toast.makeText(this, "Name, Phone, Location không được để trống!", Toast.LENGTH_SHORT).show();
             return false;
         }
-
         String phoneForm = "^0\\d{9}$";
         String nameForm1 = "[a-zA-Z\\s]+";
 
@@ -200,12 +190,9 @@ public class LocationActivity extends AppCompatActivity implements LocationAdapt
 
         return true;
     }
-
     @Override
     protected void onResume() {
         super.onResume();
         showList();
     }
 }
-
-
