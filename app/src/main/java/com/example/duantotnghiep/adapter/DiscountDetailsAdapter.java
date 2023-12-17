@@ -21,6 +21,7 @@ public class DiscountDetailsAdapter extends RecyclerView.Adapter<DiscountDetails
     public DiscountDetailsAdapter(List<Discount> discountList) {
         this.discountList = discountList;
     }
+
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.onItemClickListener = listener;
     }
@@ -40,8 +41,9 @@ public class DiscountDetailsAdapter extends RecyclerView.Adapter<DiscountDetails
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (onItemClickListener != null) {
-                    onItemClickListener.onItemClick(discount);
+                int adapterPosition = holder.getAdapterPosition();
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    onItemClick(holder, adapterPosition);
                 }
             }
         });
@@ -52,6 +54,16 @@ public class DiscountDetailsAdapter extends RecyclerView.Adapter<DiscountDetails
         return discountList.size();
     }
 
+    public Discount getItem(int position) {
+        return discountList.get(position);
+    }
+
+    private void onItemClick(ViewHolder holder, int position) {
+        Discount selectedDiscount = getItem(position);
+        if (onItemClickListener != null) {
+            onItemClickListener.onItemClick(selectedDiscount);
+        }
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView txtDiscountCode, txtDiscountAmount;
@@ -67,6 +79,7 @@ public class DiscountDetailsAdapter extends RecyclerView.Adapter<DiscountDetails
             txtDiscountAmount.setText(String.valueOf(discount.getAmount()));
         }
     }
+
     public interface OnItemClickListener {
         void onItemClick(Discount discount);
     }

@@ -345,10 +345,6 @@ public class AddProductFragment extends Fragment {
 
                     if (imageUrls.size() == selectedImageUris.size()) {
                         String userId = firebaseAuth.getCurrentUser().getUid();
-
-//                        List<Product> selectedDiscounts = discountSelectionAdapter.getSelectedDiscountIds();
-
-
                         Product product = new Product(
                                 productId, userId, Title, productType,
                                 "categoryID", Brand, Des, imageUrls, selectedColors, 0, "ngon", Quantity, (double) Price, selectedSize, (Discount) selectedDiscounts

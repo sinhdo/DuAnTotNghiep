@@ -101,7 +101,7 @@ public class orderDetailsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         idProduct = intent.getStringExtra("idPro");
-        discountRef = FirebaseDatabase.getInstance().getReference("discounts");
+        discountRef = FirebaseDatabase.getInstance().getReference().child("products").child(idProduct).child("selectedDiscounts");
         productRef = FirebaseDatabase.getInstance().getReference().child("products").child(idProduct);
         String buyerID = firebaseUser.getUid();
         buyerRef = userRef.child("user").child(buyerID).child("wallet");
@@ -250,12 +250,9 @@ public class orderDetailsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 discountList.clear();
-                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Discount discount = snapshot.getValue(Discount.class);
-                    if (currentUser != null && discount != null && currentUser.getUid().equals(discount.getSellerId())) {
-                        discountList.add(discount);
-                    }
+                    discountList.add(discount);
                 }
                 Detailsadapter.notifyDataSetChanged();
                 if (discountList.isEmpty()) {
@@ -276,11 +273,10 @@ public class orderDetailsActivity extends AppCompatActivity {
             public void onItemClick(Discount discount) {
                 if (discount != null) {
                     if (selectedDiscount != null && discount.getCode().equals(selectedDiscount.getCode())) {
-                        // Hủy bỏ việc sử dụng voucher nếu voucher đã được chọn trước đó
-                        selectedDiscount = null; // Đặt selectedDiscount về null
+                        selectedDiscount = null;
                         discountedPrice = price * quantity;
                         txtSubtotal.setText(String.format("%.0f VND", discountedPrice));
-                        txtVoucher.setText("Chosse Voucher"); // Xóa nội dung voucher
+                        txtVoucher.setText("Chosse Voucher");
 
                         Toast.makeText(orderDetailsActivity.this, "Đã hủy bỏ sử dụng voucher", Toast.LENGTH_SHORT).show();
                     } else {
