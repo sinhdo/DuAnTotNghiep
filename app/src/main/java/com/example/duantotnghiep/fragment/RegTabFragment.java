@@ -75,10 +75,7 @@ public class RegTabFragment extends Fragment {
                                         user.setEmail(email);
                                         user.setPhone(phone);
                                         user.setUser_type(false);
-
                                         user.setWallet(0.0);
-
-                                        user.setImg("");
                                         usersRef = firebaseHelper.getUsersRef();
                                         usersRef.child(id).setValue(user);
                                         Toast.makeText(getContext(), "Đăng kí thành công", Toast.LENGTH_SHORT).show();
