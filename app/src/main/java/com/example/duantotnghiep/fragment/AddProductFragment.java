@@ -1,6 +1,9 @@
 package com.example.duantotnghiep.fragment;
 
+import static com.gun0912.tedpermission.provider.TedPermissionProvider.context;
+
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -314,6 +317,10 @@ public class AddProductFragment extends Fragment {
     }
 
     private void saveProductToRealtimeDatabase() {
+        ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Vui lòng đợi...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference productsRef = database.getReference("products");
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -352,6 +359,8 @@ public class AddProductFragment extends Fragment {
                         product.setUserProduct(true);
 
                         productsRef.child(productId).setValue(product);
+
+                        progressDialog.dismiss();
                         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
                         fragmentManager.popBackStack();
 
@@ -361,6 +370,7 @@ public class AddProductFragment extends Fragment {
                 });
             });
         }
+        Toast.makeText(context, "Thêm sản phẩm thành công!!", Toast.LENGTH_SHORT).show();
     }
 
     private boolean validateInput() {

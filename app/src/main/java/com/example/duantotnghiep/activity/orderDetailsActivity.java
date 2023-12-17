@@ -282,13 +282,11 @@ public class orderDetailsActivity extends AppCompatActivity {
                     } else {
                         // Sử dụng voucher
                         selectedDiscount = discount;
-                        double discountPercentage = discount.getAmount() / 100.0;
                         double originalPrice = price * quantity;
-                        discountedPrice = originalPrice - (originalPrice * discountPercentage);
-
+                        discountedPrice = originalPrice - discount.getAmount();
                         txtSubtotal.setText(String.format("%.0f VND", discountedPrice));
 
-                        double discountValue = originalPrice * discountPercentage;
+                        double discountValue = discount.getAmount();
                         String discountMessage = String.format("Sản phẩm đã được giảm: %.0f VND", discountValue);
                         Toast.makeText(orderDetailsActivity.this, discountMessage, Toast.LENGTH_SHORT).show();
 
@@ -301,7 +299,7 @@ public class orderDetailsActivity extends AppCompatActivity {
                         if (discount.getCode() != null) {
                             String voucherCode = discount.getCode();
                             double voucherAmount = discount.getAmount();
-                            String voucherText = String.format("Mã voucher: %s\nDiscount: %.0f%%\nĐã giảm: %.0f VND", voucherCode, voucherAmount, discountValue);
+                            String voucherText = String.format("Mã voucher: %s\nĐã giảm: %.0f VND", voucherCode, discountValue);
                             txtVoucher.setText(voucherText);
                         } else {
                             Toast.makeText(orderDetailsActivity.this, "Mã voucher không tồn tại", Toast.LENGTH_SHORT).show();

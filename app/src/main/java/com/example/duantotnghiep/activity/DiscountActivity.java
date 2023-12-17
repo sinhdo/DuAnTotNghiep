@@ -82,8 +82,8 @@ public class DiscountActivity extends AppCompatActivity {
                 Toast.makeText(this, "Value Discount không hợp lệ", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (value < 1 || value > 100) {
-                Toast.makeText(this, "Value Discount phải nằm trong khoảng từ 1 đến 100", Toast.LENGTH_SHORT).show();
+            if (value < 1000) {
+                Toast.makeText(this, "Value Discount phải lớn hơn 1000", Toast.LENGTH_SHORT).show();
                 return;
             }
             Discount discount = new Discount();
