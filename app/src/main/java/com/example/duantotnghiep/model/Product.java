@@ -41,7 +41,7 @@ public class Product {
     }
 
 
-    public Product(String id, String sellerId, String name, ProductType productType, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int sold, String reviewId, int quantity, double price, List<String> size, Discount discount) {
+    public Product(String id, String sellerId, String name, ProductType productType, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int sold, String reviewId, int quantity, double price, List<String> size, List<Discount> discounts) {
         this.id = id;
         this.sellerId = sellerId;
         this.name = name;
@@ -56,7 +56,7 @@ public class Product {
         this.quantity = quantity;
         this.price = price;
         this.size = size;
-        this.selectedDiscounts = Collections.singletonList(discount);
+        this.selectedDiscounts = discounts;
     }
 
     public List<Discount> getSelectedDiscounts() {

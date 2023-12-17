@@ -347,7 +347,7 @@ public class AddProductFragment extends Fragment {
                         String userId = firebaseAuth.getCurrentUser().getUid();
                         Product product = new Product(
                                 productId, userId, Title, productType,
-                                "categoryID", Brand, Des, imageUrls, selectedColors, 0, "ngon", Quantity, (double) Price, selectedSize, (Discount) selectedDiscounts
+                                "categoryID", Brand, Des, imageUrls, selectedColors, 0, "ngon", Quantity, (double) Price, selectedSize,  selectedDiscounts
                         );
                         product.setUserProduct(true);
 
