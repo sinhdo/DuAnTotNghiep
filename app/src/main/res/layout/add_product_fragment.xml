@@ -219,8 +219,10 @@
                 android:text="Discount"
                 android:textColor="@color/black"
                 android:textSize="19sp"
+                android:visibility="gone"
                 android:textStyle="bold" />
             <LinearLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -254,6 +256,8 @@
                 app:boxStrokeColor="#E91E63"
                 app:boxStrokeWidth="2dp">
                 <com.google.android.material.textfield.TextInputEditText
+                    android:inputType="text|textMultiLine"
+                    android:gravity="start|top"
                     android:id="@+id/descriptionProduct"
                     android:layout_width="match_parent"
                     android:layout_height="150dp">
