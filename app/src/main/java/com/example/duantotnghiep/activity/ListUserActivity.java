@@ -229,6 +229,8 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                         user.setEmail(email);
                         user.setPhone(phone);
                         user.setAddress(address);
+                        boolean isAdmin = (spinnerRole.getSelectedItemPosition() == 0);
+                        user.setUser_type(isAdmin);
                         UpDateUser(user);
                         dialogUser.dismiss();
                     }
