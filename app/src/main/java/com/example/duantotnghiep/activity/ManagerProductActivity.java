@@ -38,6 +38,7 @@ public class ManagerProductActivity extends AppCompatActivity {
     private TextView IsYourName, rateStart, allProduct;
     private CircleImageView imgUser;
     private Picasso picasso = Picasso.get();
+    private ValueEventListener productsValueEventListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +89,17 @@ public class ManagerProductActivity extends AppCompatActivity {
                 transaction.commit();
             }
         });
+        productsValueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // Xử lý khi dữ liệu trên Firebase thay đổi
+                setInfoProfile();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("Loi", "onCancelled: " + error.getMessage());
+            }
+        };
     }
     private void setInfoProfile() {
         String id = firebaseUser.getUid();
@@ -131,7 +143,7 @@ public class ManagerProductActivity extends AppCompatActivity {
                     float averageRating = totalRating / numRatings;
                     rateStart.setText(String.valueOf(averageRating));
                 } else {
-                    rateStart.setText("0.0");
+                    rateStart.setText("5.0");
                 }
             }
             @Override
@@ -167,5 +179,14 @@ public class ManagerProductActivity extends AppCompatActivity {
         if (!isInAddProductFragment) {
             showFloatingActionButton();
         }
+        DatabaseReference productsRef = mReference.child("products");
+        productsRef.addValueEventListener(productsValueEventListener);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        DatabaseReference productsRef = mReference.child("products");
+        productsRef.removeEventListener(productsValueEventListener);
     }
 }

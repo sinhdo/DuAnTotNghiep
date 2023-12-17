@@ -26,7 +26,6 @@ public class AddLocationActivity extends AppCompatActivity implements View.OnCli
         binding.imgBack.setOnClickListener(this);
         binding.btnAddLocation.setOnClickListener(this);
     }
-
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.img_back){
