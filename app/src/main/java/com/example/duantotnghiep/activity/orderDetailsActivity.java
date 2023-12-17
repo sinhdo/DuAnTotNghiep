@@ -1,18 +1,6 @@
 package com.example.duantotnghiep.activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -26,19 +14,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.duantotnghiep.MainActivity;
 import com.example.duantotnghiep.R;
-import com.example.duantotnghiep.adapter.DiscountAdapter;
 import com.example.duantotnghiep.adapter.DiscountDetailsAdapter;
 import com.example.duantotnghiep.adapter.OrderDetailsAdapter;
-import com.example.duantotnghiep.fragment.CartFragment;
-import com.example.duantotnghiep.fragment.ConfirmFragment;
 import com.example.duantotnghiep.model.Discount;
 import com.example.duantotnghiep.model.Order;
 import com.example.duantotnghiep.model.Product;
@@ -51,8 +43,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
@@ -389,7 +379,7 @@ public class orderDetailsActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             int currentQuantity = dataSnapshot.child("quantity").getValue(Integer.class);
-                            int remainingQuantity = currentQuantity - receivedQuantity;
+                            int remainingQuantity = currentQuantity;
 
                             if (remainingQuantity >= 0) {
                                 productsRef.child(product.getId()).child("quantity").setValue(remainingQuantity);
