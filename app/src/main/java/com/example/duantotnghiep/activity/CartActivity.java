@@ -125,43 +125,6 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.Callb
             }
         });
     }
-//    private void sumPriceProduct() {
-//        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-//        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-//        String id_user = firebaseUser.getUid();
-//        DatabaseReference myReference = firebaseDatabase.getReference("cart").child(id_user);
-//        myReference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                List<AddProductToCart> list = new ArrayList<>();
-//                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-//                    AddProductToCart product = dataSnapshot.getValue(AddProductToCart.class);
-//                    list.add(product);
-//                }
-//
-//                if (list.size() == 0) {
-//                    return;
-//                } else {
-//                    double totalCart = caculatorTotalPrice(list);
-//                    total_item.setText(" " + list.size());
-//                    totalPriceCart.setText(String.valueOf(totalCart));
-//
-//                }
-//            }
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                Log.d("Loi", "onCancelled: " + error.getMessage());
-//            }
-//        });
-//    }
-//    private double caculatorTotalPrice(List<AddProductToCart> productList) {
-//        double totalPrice = 0;
-//        for (AddProductToCart product : productList) {
-//            totalPrice += product.getPricetotal_product() * product.getQuantity_product();
-//        }
-//        return totalPrice;
-//    }
-
     @Override
     public void deleteItemCart(AddProductToCart products) {
         AlertDialog.Builder aBuilder = new AlertDialog.Builder(CartActivity.this);
@@ -205,6 +168,5 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.Callb
     @Override
     protected void onResume() {
         super.onResume();
-//        sumPriceProduct();
     }
 }

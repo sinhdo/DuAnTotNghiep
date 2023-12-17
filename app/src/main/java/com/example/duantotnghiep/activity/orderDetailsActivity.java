@@ -77,7 +77,6 @@ public class orderDetailsActivity extends AppCompatActivity {
     private int quantity = 0;
     private double delivery;
     private double tax;
-    private double discountAmount;
     private double subtotal;
     private double discountedPrice;
     private double price;
@@ -201,7 +200,6 @@ public class orderDetailsActivity extends AppCompatActivity {
                         double total = subtotal + delivery + tax;
                         discountedPrice = total - discountAmount;
 
-                        // Hiển thị thông tin đơn hàng
                         txtSubtotal.setText(String.format("%.0f VND", subtotal));
                         txtDelivery.setText(String.format("%.0f VND", delivery));
                         txtTax.setText(String.format("%.0f VND", tax));
@@ -253,6 +251,8 @@ public class orderDetailsActivity extends AppCompatActivity {
         RecyclerView rcvVoucher = dialog.findViewById(R.id.rcvVoucher);
         rcvVoucher.setLayoutManager(new LinearLayoutManager(this));
 
+        TextView noResultsTextView = dialog.findViewById(R.id.noResultsTextView);
+
         discountList = new ArrayList<>();
         DiscountDetailsAdapter Detailsadapter = new DiscountDetailsAdapter(discountList);
         rcvVoucher.setAdapter(Detailsadapter);
@@ -268,14 +268,19 @@ public class orderDetailsActivity extends AppCompatActivity {
                     }
                 }
                 Detailsadapter.notifyDataSetChanged();
+                if (discountList.isEmpty()) {
+                    rcvVoucher.setVisibility(View.GONE);
+                    noResultsTextView.setVisibility(View.VISIBLE);
+                } else {
+                    rcvVoucher.setVisibility(View.VISIBLE);
+                    noResultsTextView.setVisibility(View.GONE);
+                }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(orderDetailsActivity.this, "Lỗi khi đọc dữ liệu từ Firebase", Toast.LENGTH_SHORT).show();
             }
         });
-
         Detailsadapter.setOnItemClickListener(new DiscountDetailsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Discount discount) {
@@ -307,7 +312,6 @@ public class orderDetailsActivity extends AppCompatActivity {
                         intent.putExtra("productData", bundle);
                         setResult(Activity.RESULT_OK, intent);
 
-                        // Hiển thị thông tin voucher
                         if (discount.getCode() != null) {
                             String voucherCode = discount.getCode();
                             double voucherAmount = discount.getAmount();
@@ -327,7 +331,6 @@ public class orderDetailsActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
-
         dialog.show();
     }
     @Override
@@ -424,7 +427,6 @@ public class orderDetailsActivity extends AppCompatActivity {
                                 Toast.makeText(orderDetailsActivity.this, "Số lượng sản phẩm không đủ", Toast.LENGTH_SHORT).show();
                             }
                         }
-
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
                             // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
@@ -484,7 +486,6 @@ public class orderDetailsActivity extends AppCompatActivity {
                     Toast.makeText(orderDetailsActivity.this, "Số tiền trong ví không đủ", Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
@@ -519,7 +520,6 @@ public class orderDetailsActivity extends AppCompatActivity {
             }
         }, 1000);
     }
-
     private String getCurrentTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
         Date currentDate = new Date();

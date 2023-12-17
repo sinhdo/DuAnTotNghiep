@@ -59,13 +59,13 @@
           android:id="@+id/btnToggleStatus"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="Nạp thẻ thành công" />
+          android:text="Xác nhận thẻ" />
       <Button
           android:layout_weight="1"
           android:id="@+id/btnToggleFailedStatus"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="Nạp thẻ thất bại" />
+          android:text="Từ chối thẻ" />
   </LinearLayout>
 
 

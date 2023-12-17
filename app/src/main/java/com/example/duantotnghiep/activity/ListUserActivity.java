@@ -65,7 +65,6 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
     private ImageButton btnAddUser;
     private String role;
     private ImageView imgUser;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,14 +121,12 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                 }
                 adapter.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(ListUserActivity.this, "Get Fail !!!", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
     @Override
     public void itemUserInfo(User user) {
             OpenDialogUser(ListUserActivity.this,1,user);
@@ -146,7 +143,7 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         WindowManager.LayoutParams windowAttributes = window.getAttributes();
         window.setAttributes(windowAttributes);
-        //ánh xạ
+
         imgUser = dialogUser.findViewById(R.id.imgUser);
         edName = dialogUser.findViewById(R.id.edNameUser);
         edEmail = dialogUser.findViewById(R.id.edEmailUser);
@@ -170,13 +167,11 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 role = arrayAdapterRole.getItem(i).toString();
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
 
             }
         });
-
         btnCancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -192,8 +187,6 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                 String address = edAddress.getText().toString().trim();
                 String password = edPass.getText().toString().trim();
                 String repassword = edRepass.getText().toString().trim();
-
-
                 if (validateRegistration(name, email, phone, password, repassword,address)) {
                     if (type == 0) {
                         firebaseAuth.createUserWithEmailAndPassword(email, password)
@@ -232,7 +225,6 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                                     }
                                 });
                     } else {
-
                         user.setUsername(name);
                         user.setEmail(email);
                         user.setPhone(phone);
@@ -242,7 +234,6 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                     }
                     dialogUser.dismiss();
                 }
-
             }
         });
         if (type == 1) {
@@ -307,19 +298,15 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
             edEmail.setError("Vui lòng nhập email");
             return false;
         }
-
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         if (!email.matches(emailRegex)) {
             edEmail.setError("Email không hợp lệ");
             return false;
         }
-
-
         if (TextUtils.isEmpty(phone)) {
             edPhone.setError("Vui lòng nhập số điện thoại");
             return false;
         }
-
         String phoneRegex = "^[0-9]{10}$";
         if (!phone.matches(phoneRegex)) {
             edPhone.setError("Số điện thoại không hợp lệ");
@@ -341,14 +328,12 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
             edRepass.setError("Mật khẩu nhập lại không trùng");
             return false;
         }
-
         return true;
     }
     private void performSearch(String query) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference myRef = firebaseDatabase.getReference("user");
         Query searchQuery = myRef.orderByChild("email").startAt(query).endAt(query + "\uf8ff");
-
         searchQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -356,13 +341,12 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
                     if (user != null) {
-                        list.add(user); // Thêm kết quả tìm kiếm vào danh sách
+                        list.add(user);
                     }
                 }
                 adapter.setData(list);
                 adapter.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d("loi", "onCancelled: " + databaseError.getMessage());

@@ -115,13 +115,11 @@ public class ReviewsActivity extends AppCompatActivity {
                 Reviews reviews = new Reviews(id,idUser,name,img,idOrder,idProduct,start,cmt,date);
                 AddReviews(reviews);
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
-
     }
     private void AddReviews(Reviews reviews) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -168,7 +166,6 @@ public class ReviewsActivity extends AppCompatActivity {
                     }
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e("===", "onCancelled: Error retrieving order data", error.toException());

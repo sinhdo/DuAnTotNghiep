@@ -135,13 +135,8 @@
             android:paddingBottom="10dp" />
 
     </com.google.android.material.textfield.TextInputLayout>
-
-
-
 </LinearLayout>
-
     </ScrollView>
-
     <Button
         android:id="@+id/btn_reg"
         android:layout_width="match_parent"

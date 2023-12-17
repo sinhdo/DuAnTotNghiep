@@ -58,22 +58,16 @@ public class ManagerProductActivity extends AppCompatActivity {
         binding.tabLayoutSeller.setTabTextColors(Color.parseColor("#D3D3D3"), Color.parseColor("#E91E63"));
         binding.tabLayoutSeller.setSelectedTabIndicatorColor(Color.parseColor("#E91E63"));
         binding.tabLayoutSeller.setTabGravity(TabLayout.GRAVITY_FILL);
-
         binding.tabLayoutSeller.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-
                 int position = tab.getPosition();
-
-
                 binding.viewPaperSeller.setCurrentItem(position);
             }
-
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
 
             }
-
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
 
@@ -81,7 +75,6 @@ public class ManagerProductActivity extends AppCompatActivity {
         });
         binding.viewPaperSeller.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(binding.tabLayoutSeller));
         binding.viewPaperSeller.setAdapter(new ManagerSellerAdapter(getSupportFragmentManager(), this, binding.tabLayoutSeller.getTabCount()));
-
         binding.floatAddProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,13 +104,11 @@ public class ManagerProductActivity extends AppCompatActivity {
                     picasso.load(img).into(imgUser);
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.d("Loi", "onCancelled: " + error.getMessage());
             }
         });
-
         DatabaseReference productsRef = mReference.child("products");
         Query query = productsRef.orderByChild("sellerId").equalTo(id);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -136,7 +127,6 @@ public class ManagerProductActivity extends AppCompatActivity {
                         numRatings++;
                     }
                 }
-
                 if (numRatings > 0) {
                     float averageRating = totalRating / numRatings;
                     rateStart.setText(String.valueOf(averageRating));
@@ -144,28 +134,23 @@ public class ManagerProductActivity extends AppCompatActivity {
                     rateStart.setText("0.0");
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.d("Loi", "onCancelled: " + error.getMessage());
             }
         });
     }
-
     public void hideFloatingActionButton() {
         binding.floatAddProduct.hide();
     }
-
     public void showFloatingActionButton() {
         binding.floatAddProduct.show();
     }
-
     @Override
     public void onBackPressed() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         int backStackEntryCount = fragmentManager.getBackStackEntryCount();
         if (backStackEntryCount > 0) {
-
             fragmentManager.popBackStack();
             isInAddProductFragment = false;
             if (backStackEntryCount == 1) {

@@ -29,8 +29,6 @@ public class InforOrderActivity extends AppCompatActivity {
     private TextView nameSeller, phoneSeller, emailSeller;
     private TextView nameOrder, quantityOrder, totalOrder;
     private Button done;
-    private DatabaseReference orderRef;
-
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +102,6 @@ public class InforOrderActivity extends AppCompatActivity {
                                     Log.d("===", "onDataChange: User not found");
                                 }
                             }
-
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
                                 Log.e("===", "onCancelled: Error retrieving user data", error.toException());
@@ -115,7 +112,6 @@ public class InforOrderActivity extends AppCompatActivity {
                     }
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e("===", "onCancelled: Error retrieving order data", error.toException());
@@ -210,15 +206,10 @@ public class InforOrderActivity extends AppCompatActivity {
                     }
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e("===", "onCancelled: Error retrieving order data", error.toException());
             }
         });
     }
-
-
-
-
 }

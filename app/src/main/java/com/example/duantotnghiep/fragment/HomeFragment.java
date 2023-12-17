@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -52,7 +53,7 @@ public class HomeFragment extends Fragment {
     private Timer timer;
     private ViewPager slideImage;
     private CircleIndicator circleIndicator;
-    private TextView textViewName,totalCart;
+    private TextView textViewName,totalCart, textSee1, textSee2;
     private ImageView imgCart;
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
@@ -82,6 +83,8 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         totalCart = view.findViewById(R.id.totalCart);
         textViewName = view.findViewById(R.id.txtName);
+        textSee1 = view.findViewById(R.id.textSee1);
+        textSee2 = view.findViewById(R.id.textSee2);
         imgCart = view.findViewById(R.id.imageView4);
         imgCart = view.findViewById(R.id.imageView3);
         slideImage = view.findViewById(R.id.silde_image);
@@ -93,6 +96,38 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
                Intent intent = new Intent(getContext(), CartActivity.class);
                startActivity(intent);
+            }
+        });
+        textSee1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Tạo instance của SearchProductFragment
+                SearchProductFragment searchProductFragment = new SearchProductFragment();
+
+                // Lấy FragmentManager
+                FragmentManager fragmentManager = getParentFragmentManager();
+
+                // Bắt đầu thay thế HomeFragment bằng SearchProductFragment
+                fragmentManager.beginTransaction()
+                        .replace(R.id.frame_layout, searchProductFragment)
+                        .addToBackStack(null) // Thêm vào back stack để quay trở lại HomeFragment khi cần
+                        .commit();
+            }
+        });
+        textSee2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Tạo instance của SearchProductFragment
+                SearchProductFragment searchProductFragment = new SearchProductFragment();
+
+                // Lấy FragmentManager
+                FragmentManager fragmentManager = getParentFragmentManager();
+
+                // Bắt đầu thay thế HomeFragment bằng SearchProductFragment
+                fragmentManager.beginTransaction()
+                        .replace(R.id.frame_layout, searchProductFragment)
+                        .addToBackStack(null) // Thêm vào back stack để quay trở lại HomeFragment khi cần
+                        .commit();
             }
         });
         TotalItemCart();
