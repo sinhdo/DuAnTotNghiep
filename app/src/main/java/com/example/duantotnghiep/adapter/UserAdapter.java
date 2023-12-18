@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,10 +68,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHoder> {
         if (user == null) {
             return;
         }
-        if (user.getImg() == null || user.getImg().isEmpty()) {
-            holder.img.setImageResource(R.drawable.baseline_person_24);
+        if (user.getImg() != null || !user.getImg().isEmpty()) {
+            Uri imageUri = Uri.parse(user.getImg());
+            Picasso.get()
+                    .load(imageUri)
+                    .placeholder(R.drawable.baseline_person_24)
+                    .error(R.drawable.baseline_person_24)
+                    .into(holder.img);
         } else {
-            Picasso.get().load(user.getImg()).into(holder.img);
+            holder.img.setImageResource(R.drawable.baseline_person_24);
         }
 
         holder.img.setOnClickListener(new View.OnClickListener() {
