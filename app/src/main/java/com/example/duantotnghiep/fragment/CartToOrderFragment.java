@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.duantotnghiep.MainActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.activity.ShowListLocationActivity;
+import com.example.duantotnghiep.activity.TopUpCardActivity;
 import com.example.duantotnghiep.adapter.CartOrderAdapter;
 import com.example.duantotnghiep.model.AddProductToCart;
 import com.example.duantotnghiep.model.Order;
@@ -362,7 +363,8 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         builder.setTitle("Thông báo");
         builder.setMessage("Số dư trong ví không đủ để thanh toán. Vui lòng nạp thêm tiền vào ví để tiếp tục.");
         builder.setPositiveButton("Nạp tiền", (dialog, which) -> {
-
+            Intent topUpIntent = new Intent(getContext(), TopUpCardActivity.class);
+            startActivity(topUpIntent);
         });
         builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
         builder.show();
