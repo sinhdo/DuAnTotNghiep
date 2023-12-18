@@ -116,8 +116,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHoder> {
     }
 
     public static class MyViewHoder extends RecyclerView.ViewHolder {
-        private ImageView img;
-        private ImageButton deleteUser;
+        private ImageView img, deleteUser;
         private TextView name, email, phonenumber, id;
 
 

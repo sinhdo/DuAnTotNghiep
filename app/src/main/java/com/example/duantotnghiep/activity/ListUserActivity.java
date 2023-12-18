@@ -56,7 +56,7 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
     private RecyclerView recyclerView;
     private List<User> list = new ArrayList<>();
     private User user;
-    private ImageButton imgBack,btnAdduser;
+    private ImageButton btnAdduser;
     private UserAdapter adapter;
     private AppCompatButton btnSave, btnCancle;
     private TextInputEditText edName, edEmail, edPhone, edAddress, edPass, edRepass;
@@ -64,7 +64,7 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
     private Dialog dialogUser;
     private ImageButton btnAddUser;
     private String role;
-    private ImageView imgUser;
+    private ImageView imgUser, imgBack;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -160,7 +160,9 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
         ArrayList<String> listRole = new ArrayList<>();
         listRole.add("ADMIN");
         listRole.add("USER");
-        ArrayAdapter arrayAdapterRole = new ArrayAdapter(getApplicationContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, listRole);
+
+        ArrayAdapter<String> arrayAdapterRole = new ArrayAdapter<>(this, R.layout.spinner_item, listRole);
+        arrayAdapterRole.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerRole.setAdapter(arrayAdapterRole);
         spinnerRole.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
