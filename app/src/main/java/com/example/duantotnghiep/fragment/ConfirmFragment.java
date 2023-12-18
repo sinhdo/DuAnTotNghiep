@@ -127,6 +127,7 @@ public class ConfirmFragment extends Fragment implements OrderAdapter.Callback{
         btnCancel.setOnClickListener(view -> {
             order.setStatus("canceled");
             UpdateStatus(order);
+            ReturnmoneyForBuyer(order);
             dialog.dismiss();
         });
         Button tt = dialog.findViewById(R.id.btn_propety);
@@ -157,6 +158,44 @@ public class ConfirmFragment extends Fragment implements OrderAdapter.Callback{
                     Toast.makeText(getContext(), "Update status", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getContext(), "Update fall", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+    private void ReturnmoneyForBuyer(Order order) {
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference orderRef = firebaseDatabase.getReference("list_order");
+        DatabaseReference buyerRef = firebaseDatabase.getReference("user").child(order.getIdBuyer()).child("wallet");
+        DatabaseReference sellerRef = firebaseDatabase.getReference("user").child(order.getIdSeller()).child("wallet");
+        String id = order.getId();
+        boolean checkPaid = order.getPaid();
+        order.setPaid(checkPaid);
+        orderRef.child(id).setValue(order, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if (error == null) {
+                    if (checkPaid) {
+                        buyerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    double buyerBalance = snapshot.getValue(Double.class);
+                                    double newBuyerBalance = buyerBalance + order.getTotal();
+                                    buyerRef.setValue(newBuyerBalance);
+                                    Toast.makeText(getContext(), "Bạn đã được hoàn "+order.getTotal()+ " VND", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getContext(), "Update status", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show();
                 }
             }
         });

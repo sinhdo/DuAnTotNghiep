@@ -148,6 +148,7 @@ public class WaitForShopFragment extends Fragment implements OrderAdapter.Callba
                 public void onClick(DialogInterface dialog, int which) {
                     order.setStatus("canceledbyshop");
                     UpdateStatus(order);
+                    ReturnmoneyForBuyer(order);
                     dialog.dismiss();
                 }
             });
@@ -193,5 +194,43 @@ public class WaitForShopFragment extends Fragment implements OrderAdapter.Callba
     @Override
     public void logic(Order order) {
         dialogForShop(order);
+    }
+    private void ReturnmoneyForBuyer(Order order) {
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference orderRef = firebaseDatabase.getReference("list_order");
+        DatabaseReference buyerRef = firebaseDatabase.getReference("user").child(order.getIdBuyer()).child("wallet");
+        DatabaseReference sellerRef = firebaseDatabase.getReference("user").child(order.getIdSeller()).child("wallet");
+        String id = order.getId();
+        boolean checkPaid = order.getPaid();
+        order.setPaid(checkPaid);
+        orderRef.child(id).setValue(order, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if (error == null) {
+                    if (checkPaid) {
+                        buyerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    double buyerBalance = snapshot.getValue(Double.class);
+                                    double newBuyerBalance = buyerBalance + order.getTotal();
+                                    buyerRef.setValue(newBuyerBalance);
+                                    Toast.makeText(getContext(), "Bạn đã được hoàn tiền lại cho người bán", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getContext(), "Update status", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
