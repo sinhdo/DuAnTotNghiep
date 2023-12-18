@@ -127,17 +127,15 @@
                     android:weightSum="6">
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="290dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="3"
-                        android:text="Tổng số lương sản phẩm:"
+                        android:text="Tổng số lương sản phẩm bán được:"
                         android:textColor="#373b54"
                         android:textSize="18dp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:id="@+id/total_quantity"
-                        android:layout_width="0dp"
+                        android:layout_width="100dp"
                         android:layout_height="match_parent"
                         android:layout_weight="3"
                         android:text=" 0 "

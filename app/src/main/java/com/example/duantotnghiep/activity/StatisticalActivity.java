@@ -183,7 +183,7 @@ public class StatisticalActivity extends AppCompatActivity {
             mYear = calendar.get(Calendar.YEAR);
             mMonth = calendar.get(Calendar.MONTH);
             mDate = calendar.get(Calendar.DAY_OF_MONTH);
-            DatePickerDialog dialog_start = new DatePickerDialog(this,android.R.style.Theme_Holo_Light_Dialog_NoActionBar,FromDate,mYear, mMonth, mDate);
+            DatePickerDialog dialog_start = new DatePickerDialog(this,android.R.style.Theme_Holo_Light_Dialog_NoActionBar,FromDate, mYear, mMonth, mDate);
             dialog_start.show();
         });
         imgEndDate.setOnClickListener(view -> {
