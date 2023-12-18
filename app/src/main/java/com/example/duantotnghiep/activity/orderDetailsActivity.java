@@ -463,8 +463,10 @@ public class orderDetailsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 double walletAmount = snapshot.getValue(Double.class);
-                boolean isWalletEnough = walletAmount >= amount;
+                    boolean isWalletEnough = walletAmount >= amount;
                 if (isWalletEnough) {
+                    double newWallet = walletAmount-amount;
+                    buyerRef.setValue(newWallet);
                     performNextSteps(newKey, idBuyer, date);
                 } else {
                     Toast.makeText(orderDetailsActivity.this, "Số tiền trong ví không đủ", Toast.LENGTH_SHORT).show();
