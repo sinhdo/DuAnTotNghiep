@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.ProductHomeViewHolder> {
@@ -47,8 +48,9 @@ public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.
     @Override
     public void onBindViewHolder(@NonNull ProductHomeViewHolder holder, int position) {
         Product product = productList.get(position);
-
-        holder.binding.tvPriceHome.setText(String.valueOf(product.getPrice()) + " VND");
+        DecimalFormat decimalFormat = new DecimalFormat("#,###");
+        holder.binding.tvPriceHome.setText(decimalFormat.format(product.getPrice()) + " VND");
+//        holder.binding.tvPriceHome.setText(String.valueOf(product.getPrice()) + " VND");
         holder.binding.tvTitleHome.setText(product.getName());
         holder.binding.tvSoldHome.setText(String.valueOf("Đã bán " + product.getSold()));
         if (product.getImgProduct() != null && !product.getImgProduct().isEmpty()) {
