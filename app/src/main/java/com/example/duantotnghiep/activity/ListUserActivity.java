@@ -288,7 +288,7 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
     }
     private boolean validateRegistration(String username, String email, String phone, String password, String repass,String address) {
         String nameForm1 = "^[a-zA-Z]+$";
-        String nameForm2 = "^[a-zA-Z]+( [a-zA-Z]+)*$";
+        String nameForm2 = "^[\\p{L}\\s]+$";
 
         if (username.isEmpty() || username == null) {
             edName.setError("Vui lòng nhập tên");

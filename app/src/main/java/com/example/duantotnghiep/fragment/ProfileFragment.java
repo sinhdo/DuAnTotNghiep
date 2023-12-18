@@ -68,7 +68,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private DatabaseReference mReference;
     private FirebaseUser firebaseUser;
     private ImageView imgUser;
-
   private   CardView cvOut,cvOder,cvPayment,cvReview,cvTK,cvPromotion,cvQLUser,cvQLProduct,cvChangePass,cvAdddiachi,cvXacNhanCard;
     private TextView textViewName,textSDT,textViewEmail,textFixInfor,textWallet;
 
@@ -76,29 +75,24 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private TextInputEditText edImg;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Picasso picasso = Picasso.get();
-
     public ProfileFragment() {
 
     }
-
     public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
         return fragment;
     }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         return view;
     }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -132,7 +126,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         float walletFloat = sharedPreferences.getFloat("wallet", 0);
         double wallet = (double) walletFloat;
         String img = sharedPreferences.getString("img", "");
-
 
         if (name.isEmpty()) {
             setInfoProfile();
@@ -209,7 +202,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     editor.apply();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.d("Loi", "onCancelled: " + error.getMessage());
@@ -341,7 +333,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             edImg.setText(imageUrl);
         }
     }
-
     private void showDialogOut() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = getLayoutInflater();
@@ -368,11 +359,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         alertDialog.show();
     }
-
     public void setRoleListUser() {
         String id = firebaseUser.getUid();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(id);
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 boolean isAdmin = FireBaseType.isAdmin(dataSnapshot);
@@ -385,7 +375,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     cvTK.setVisibility(View.GONE);
                     cvPayment.setVisibility(View.GONE);
                     cvPromotion.setVisibility(View.GONE);
-
                 } else {
                     cvQLUser.setVisibility(View.GONE);
                     cvXacNhanCard.setVisibility(View.GONE);
@@ -404,13 +393,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
         });
     }
-
     @Override
     public void onResume() {
         super.onResume();
         setInfoProfile();
     }
-
     @Override
     public void onClick(View view) {
 
