@@ -38,7 +38,7 @@ public class AdminActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         fragmentManager = getSupportFragmentManager();
         HomeFragment homeFragment = new HomeFragment();
-        fragmentManager.beginTransaction().replace(R.id.frame_layout, homeFragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.frame_layout_admin, homeFragment).commit();
         binding.bottomNavigationViewAdmin.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
@@ -61,7 +61,7 @@ public class AdminActivity extends AppCompatActivity {
     private void replaceFragment(Fragment fragment) {
         fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.frame_layout, fragment);
+        fragmentTransaction.replace(R.id.frame_layout_admin, fragment);
         fragmentTransaction.commit();
     }
 

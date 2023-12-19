@@ -16,7 +16,10 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
+import android.view.View;
 
+import com.example.duantotnghiep.database.FireBaseType;
 import com.example.duantotnghiep.databinding.ActivityMainBinding;
 import com.example.duantotnghiep.fragment.CartFragment;
 import com.example.duantotnghiep.fragment.HomeFragment;
@@ -24,21 +27,36 @@ import com.example.duantotnghiep.fragment.NotificationFragment;
 import com.example.duantotnghiep.fragment.ProfileFragment;
 
 import com.example.duantotnghiep.fragment.SearchProductFragment;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 1;
 
     private ActivityMainBinding binding;
     private FragmentManager fragmentManager;
+    private FirebaseAuth firebaseAuth;
+    private DatabaseReference mReference;
+    private FirebaseUser firebaseUser;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+        mReference = FirebaseDatabase.getInstance().getReference();
         fragmentManager = getSupportFragmentManager();
         HomeFragment homeFragment = new HomeFragment();
         fragmentManager.beginTransaction().replace(R.id.frame_layout, homeFragment).commit();
+        setRoleListUser();
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
@@ -57,7 +75,42 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
-//        requestPermissions();
+        binding.bottomNavigationViewAdmin.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.home) {
+                replaceFragment(new HomeFragment());
+            }else if (id == R.id.profile) {
+                replaceFragment(new ProfileFragment());
+            } else if (id == R.id.search) {
+                replaceFragment(new SearchProductFragment());
+            } else if (id==R.id.notification) {
+                replaceFragment(new NotificationFragment());
+            } else {
+                replaceFragment(new HomeFragment());
+            }
+            return true;
+        });
+    }
+    public void setRoleListUser() {
+        String id = firebaseUser.getUid();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(id);
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                boolean isAdmin = FireBaseType.isAdmin(dataSnapshot);
+                if (isAdmin) {
+                    binding.bottomNavigationViewAdmin.setVisibility(View.VISIBLE);
+                } else {
+                    binding.bottomNavigationView.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("Loi", "onCancelled: " + databaseError.getMessage());
+            }
+        });
     }
 
     private void replaceFragment(Fragment fragment) {
