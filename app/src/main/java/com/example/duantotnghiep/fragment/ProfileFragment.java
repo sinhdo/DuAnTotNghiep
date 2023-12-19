@@ -102,6 +102,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         cvPayment = view.findViewById(R.id.cvPayment);
         cvReview = view.findViewById(R.id.cvReView);
         cvTK = view.findViewById(R.id.cvTK);
+        cvReview.setVisibility(View.GONE);
         cvPromotion = view.findViewById(R.id.cvPromotion);
         cvQLUser = view.findViewById(R.id.cvQLUser);
         cvQLProduct = view.findViewById(R.id.cvQLProduct);
@@ -367,23 +368,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 boolean isAdmin = FireBaseType.isAdmin(dataSnapshot);
                 if (isAdmin) {
-                    cvQLUser.setVisibility(View.VISIBLE);
-                    cvXacNhanCard.setVisibility(View.VISIBLE);
-                    cvQLProduct.setVisibility(View.GONE);
-                    cvOder.setVisibility(View.GONE);
-                    cvReview.setVisibility(View.GONE);
-                    cvTK.setVisibility(View.GONE);
                     cvPayment.setVisibility(View.GONE);
-                    cvPromotion.setVisibility(View.GONE);
+                    cvAdddiachi.setVisibility(View.GONE);
                 } else {
                     cvQLUser.setVisibility(View.GONE);
                     cvXacNhanCard.setVisibility(View.GONE);
-                    cvPayment.setVisibility(View.VISIBLE);
-                    cvOder.setVisibility(View.VISIBLE);
-                    cvReview.setVisibility(View.GONE);
-                    cvPromotion.setVisibility(View.VISIBLE);
-                    cvQLProduct.setVisibility(View.VISIBLE);
-                    cvTK.setVisibility(View.VISIBLE);
+                    cvQLProduct.setVisibility(View.GONE);
+                    cvOder.setVisibility(View.GONE);
+                    cvTK.setVisibility(View.GONE);
+                    cvPromotion.setVisibility(View.GONE);
                 }
             }
 

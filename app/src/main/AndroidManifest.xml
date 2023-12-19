@@ -23,6 +23,18 @@
         android:theme="@style/Theme.DuAnTotNghiep"
         tools:targetApi="31">
         <activity
+            android:name=".AdminActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ForgetPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.SignUpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminMainActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.ReviewsActivity"
             android:exported="false" />
         <activity

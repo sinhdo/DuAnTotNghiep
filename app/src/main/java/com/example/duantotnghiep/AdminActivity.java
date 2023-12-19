@@ -17,36 +17,34 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 
+import com.example.duantotnghiep.databinding.ActivityAdminBinding;
 import com.example.duantotnghiep.databinding.ActivityMainBinding;
 import com.example.duantotnghiep.fragment.CartFragment;
 import com.example.duantotnghiep.fragment.HomeFragment;
 import com.example.duantotnghiep.fragment.NotificationFragment;
 import com.example.duantotnghiep.fragment.ProfileFragment;
-
 import com.example.duantotnghiep.fragment.SearchProductFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class AdminActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 1;
 
-    private ActivityMainBinding binding;
+    private ActivityAdminBinding binding;
     private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding = ActivityAdminBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         fragmentManager = getSupportFragmentManager();
         HomeFragment homeFragment = new HomeFragment();
         fragmentManager.beginTransaction().replace(R.id.frame_layout, homeFragment).commit();
-        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
+        binding.bottomNavigationViewAdmin.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
             if (id == R.id.home) {
                 replaceFragment(new HomeFragment());
-            } else if (id == R.id.cart) {
-                replaceFragment(new CartFragment());
-            } else if (id == R.id.profile) {
+            }else if (id == R.id.profile) {
                 replaceFragment(new ProfileFragment());
             } else if (id == R.id.search) {
                 replaceFragment(new SearchProductFragment());
@@ -68,11 +66,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestPermissions() {
-        boolean cameraPermissionGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
-        boolean storagePermissionGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        boolean cameraPermissionGranted = ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+        boolean storagePermissionGranted = ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 
         if (!cameraPermissionGranted || !storagePermissionGranted) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(AdminActivity.this, new String[]{android.Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
         } else {
             // Quyền đã được cấp, tiếp tục xử lý
         }
@@ -94,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showPermissionDeniedDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(AdminActivity.this);
         builder.setTitle("Quyền truy cập bị từ chối");
         builder.setMessage("Ứng dụng không thể hoạt động mà không có quyền truy cập. Vui lòng cấp quyền trong cài đặt.");
         builder.setPositiveButton("Đi đến cài đặt", new DialogInterface.OnClickListener() {

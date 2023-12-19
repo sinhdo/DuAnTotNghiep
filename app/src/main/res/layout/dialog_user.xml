@@ -90,19 +90,6 @@
                     android:textColor="#000000" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilAddress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Address">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edAddress"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_edittext_product"
-                    android:textColor="#000000" />
-            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilPass"

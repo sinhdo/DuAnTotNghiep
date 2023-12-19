@@ -59,7 +59,7 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
     private ImageButton btnAdduser;
     private UserAdapter adapter;
     private AppCompatButton btnSave, btnCancle;
-    private TextInputEditText edName, edEmail, edPhone, edAddress, edPass, edRepass;
+    private TextInputEditText edName, edEmail, edPhone, edPass, edRepass;
     private Spinner spinnerRole;
     private Dialog dialogUser;
     private ImageButton btnAddUser;
@@ -148,7 +148,6 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
         edName = dialogUser.findViewById(R.id.edNameUser);
         edEmail = dialogUser.findViewById(R.id.edEmailUser);
         edPhone = dialogUser.findViewById(R.id.edPhoneNumber);
-        edAddress = dialogUser.findViewById(R.id.edAddress);
         edPass = dialogUser.findViewById(R.id.edPassword);
         edRepass = dialogUser.findViewById(R.id.edtRePassword);
         btnAddUser = dialogUser.findViewById(R.id.btn_add_user);
@@ -158,8 +157,8 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
 
 
         ArrayList<String> listRole = new ArrayList<>();
-        listRole.add("ADMIN");
-        listRole.add("USER");
+        listRole.add("Lock");
+        listRole.add("Unlock");
 
         ArrayAdapter<String> arrayAdapterRole = new ArrayAdapter<>(this, R.layout.spinner_item, listRole);
         arrayAdapterRole.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -186,10 +185,9 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                 String name = edName.getText().toString().trim();
                 String email = edEmail.getText().toString().trim();
                 String phone = edPhone.getText().toString().trim();
-                String address = edAddress.getText().toString().trim();
                 String password = edPass.getText().toString().trim();
                 String repassword = edRepass.getText().toString().trim();
-                if (validateRegistration(name, email, phone, password, repassword,address)) {
+                if (validateRegistration(name, email, phone, password, repassword)) {
                     if (type == 0) {
                         firebaseAuth.createUserWithEmailAndPassword(email, password)
                                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -205,12 +203,12 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                                             user.setEmail(email);
                                             user.setPhone(phone);
                                             user.setPassword(password);
-                                            user.setAddress(address);
+                                            user.setUser_type(false);
                                             user.setWallet(0.0);
-                                            if (role == "ADMIN") {
-                                                user.setUser_type(true);
+                                            if (role == "Unlock") {
+                                                user.setLock(false);
                                             } else {
-                                                user.setUser_type(false);
+                                                user.setLock(true);
                                             }
                                             usersRef = firebaseHelper.getUsersRef();
                                             usersRef.child(id).setValue(user);
@@ -230,9 +228,11 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                         user.setUsername(name);
                         user.setEmail(email);
                         user.setPhone(phone);
-                        user.setAddress(address);
-                        boolean isAdmin = (spinnerRole.getSelectedItemPosition() == 0);
-                        user.setUser_type(isAdmin);
+                        user.setUser_type(false);
+                        user.setImg("https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=");
+                        user.setWallet(0.0);
+                        boolean idLock = (spinnerRole.getSelectedItemPosition() == 0);
+                        user.setLock(idLock);
                         UpDateUser(user);
                         dialogUser.dismiss();
                     }
@@ -250,16 +250,16 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
             edEmail.setText(user.getEmail());
             edEmail.setEnabled(false);
             edPhone.setText(user.getPhone());
-            edAddress.setText(user.getAddress());
+//            edAddress.setText(user.getAddress());
             edPass.setText(user.getPassword());
             edRepass.setText(user.getPassword());
             edPass.setVisibility(View.GONE);
             edRepass.setVisibility(View.GONE);
             btnSave.setText("UPDATE");
-            if (user.getUser_type() == true) {
-                spinnerRole.setSelection(0);
-            } else {
+            if (user.getLock() == true) {
                 spinnerRole.setSelection(1);
+            } else {
+                spinnerRole.setSelection(0);
             }
         }
         if (!isFinishing()) {
@@ -286,7 +286,7 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
             Toast.makeText(this, "ID NULL", Toast.LENGTH_SHORT).show();
         }
     }
-    private boolean validateRegistration(String username, String email, String phone, String password, String repass,String address) {
+    private boolean validateRegistration(String username, String email, String phone, String password, String repass) {
         String nameForm1 = "^[a-zA-Z]+$";
         String nameForm2 = "^[\\p{L}\\s]+$";
 
@@ -314,10 +314,6 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
         String phoneRegex = "^[0-9]{10}$";
         if (!phone.matches(phoneRegex)) {
             edPhone.setError("Số điện thoại không hợp lệ");
-            return false;
-        }
-        if (TextUtils.isEmpty(address)){
-            edAddress.setError("Vui lòng nhập địa chỉ");
             return false;
         }
         if (password.isEmpty()) {
