@@ -31,6 +31,7 @@ import com.example.duantotnghiep.MainActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.DiscountDetailsAdapter;
 import com.example.duantotnghiep.adapter.OrderDetailsAdapter;
+import com.example.duantotnghiep.model.ColorProduct;
 import com.example.duantotnghiep.model.Discount;
 import com.example.duantotnghiep.model.Order;
 import com.example.duantotnghiep.model.Product;
@@ -59,7 +60,7 @@ public class orderDetailsActivity extends AppCompatActivity {
     private LinearLayout linearLayouAddress, idlr, lrlVC;
     private EditText notes;
     private List<Product> productList;
-    private List<Integer> colorList;
+    private List<ColorProduct> colorProductList;
     private OrderDetailsAdapter adapter;
     private String idProduct;
     private DatabaseReference productRef, userRef, discountRef, buyerRef;
@@ -153,7 +154,7 @@ public class orderDetailsActivity extends AppCompatActivity {
                     if (bundle != null) {
                         double discountAmount = bundle.getDouble("discountAmount", 0.0);
 
-                        colorList = bundle.getIntegerArrayList("Color");
+//                        colorList = bundle.getIntegerArrayList("Color");
                         String size = bundle.getString("Size");
                         quantity = bundle.getInt("Quantity");
                         List<String> sizeList = new ArrayList<>();
@@ -162,14 +163,14 @@ public class orderDetailsActivity extends AppCompatActivity {
                         Discount discount = new Discount(discountAmount);
 
                         Product product = new Product(idProduct, idseller, name,null, categoryID, brand,
-                                description, imgProduct, colorList, sold, reviewId, quantity, price, Collections.singletonList(size), null);
+                                description, imgProduct, colorProductList, sold, reviewId, quantity, price, Collections.singletonList(size), null);
 
                         product.setSelectedQuantity(quantity);
                         productList = new ArrayList<>();
                         productList.add(product);
 
                         adapter.setProductList(productList);
-                        adapter.setColorList(colorList);
+//                        adapter.setColorList(colorList);
 
                         rcvOrderDetail.setLayoutManager(new LinearLayoutManager(orderDetailsActivity.this));
                         rcvOrderDetail.setAdapter(adapter);
@@ -362,8 +363,8 @@ public class orderDetailsActivity extends AppCompatActivity {
         for (int i = 0; i < adapter.getItemCount(); i++) {
             Product product = adapter.getProduct(i);
             if (product != null) {
-                List<Integer> listColor = product.getColor();
-                int color = listColor.get(i);
+                List<ColorProduct> listColorProduct = product.getListColor();
+                int color = listColorProduct.get(i).getColor();
 
                 Bundle bundle = getIntent().getBundleExtra("productData");
                 if (bundle != null) {
@@ -463,7 +464,7 @@ public class orderDetailsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 double walletAmount = snapshot.getValue(Double.class);
-                    boolean isWalletEnough = walletAmount >= amount;
+                boolean isWalletEnough = walletAmount >= amount;
                 if (isWalletEnough) {
                     double newWallet = walletAmount-amount;
                     buyerRef.setValue(newWallet);

@@ -146,6 +146,7 @@ public class OrderActivity extends AppCompatActivity {
                 ArrayList<String> imgProductUrls = snapshot.child("imgProduct").getValue(new GenericTypeIndicator<ArrayList<String>>() {});
 
                 tvNameProduct.setText(name);
+                
                 tvPriceProduct.setText(price + " VND");
                 tvDescriptionPro.setText("Mô tả sản phẩm: " + description);
                 if (quantity != null) {

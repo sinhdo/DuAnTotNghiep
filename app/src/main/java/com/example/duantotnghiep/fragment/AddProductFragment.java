@@ -41,6 +41,7 @@ import com.example.duantotnghiep.adapter.DiscountAdapter;
 import com.example.duantotnghiep.adapter.DiscountSelectionAdapter;
 import com.example.duantotnghiep.adapter.MutilpleColorAdapter;
 import com.example.duantotnghiep.adapter.MutilpleImgAdapter;
+import com.example.duantotnghiep.model.ColorProduct;
 import com.example.duantotnghiep.model.Discount;
 import com.example.duantotnghiep.model.Product;
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,7 +64,7 @@ public class AddProductFragment extends Fragment {
     ImageView btnColor, btnDiscount;
     private FirebaseAuth firebaseAuth;
     private List<Uri> selectedImageUris = new ArrayList<>();
-    private List<Integer> selectedColors = new ArrayList<>();
+    private List<ColorProduct> selectedColorProducts = new ArrayList<>();
     private MutilpleColorAdapter mAdapter = new MutilpleColorAdapter();
     private ImageView chooseImg;
     List<String> selectedSize;
@@ -101,7 +102,6 @@ public class AddProductFragment extends Fragment {
         multipleImg = root.findViewById(R.id.mutilpeImg);
         RecyclerView rvMutilpeColor = root.findViewById(R.id.rvMutilpeColor);
         rvMutilpeColor.setAdapter(mAdapter);
-
         btnColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,6 +146,9 @@ public class AddProductFragment extends Fragment {
                 }
             }
         });
+        // default
+        selectedSize = new ArrayList<>();
+        selectedSize.addAll(Arrays.asList("S", "M", "L", "XL", "XXL"));
 
         ArrayAdapter<String> sizeAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
         sizeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -160,10 +163,11 @@ public class AddProductFragment extends Fragment {
                 String selectedProductType = (String) sizeSpinner.getSelectedItem();
                 selectedSize = new ArrayList<>();
                 if ("CLOTHING".equals(selectedProductType)) {
-                    selectedSize.addAll(Arrays.asList("XS", "S", "M", "L", "XL", "XXL"));
+                    selectedSize.addAll(Arrays.asList("S", "M", "L", "XL", "XXL"));
                 } else if ("FOOTWEAR".equals(selectedProductType)) {
-                    selectedSize.addAll(Arrays.asList("36", "37", "38", "39", "40", "41", "42", "43", "44"));
+                    selectedSize.addAll(Arrays.asList("38", "39", "40", "41", "42"));
                 }
+                mAdapter.updateSelectedColors(selectedColorProducts, selectedSize);
             }
 
             @Override
@@ -189,7 +193,7 @@ public class AddProductFragment extends Fragment {
         discountsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                 allDiscounts = new ArrayList<>();
+                allDiscounts = new ArrayList<>();
                 FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -282,7 +286,7 @@ public class AddProductFragment extends Fragment {
         alertDialog.show();
 
         GridLayout gridLayout = view.findViewById(R.id.grid);
-
+        updateRecyclerView(view, getColor(selectedColorProducts));
 
         for (int i = 0; i < gridLayout.getChildCount(); i++) {
             final ImageButton button = (ImageButton) gridLayout.getChildAt(i);
@@ -290,12 +294,17 @@ public class AddProductFragment extends Fragment {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (selectedColors.contains(color)) {
-                        selectedColors.remove(selectedColors.indexOf(color));
+                    if (!checkColorExist(color)) {
+                        selectedColorProducts.add(new ColorProduct(color));
                     } else {
-                        selectedColors.add(color);
+                        removeColor(color);
                     }
-                    updateRecyclerView(view, selectedColors);
+//                    if (selectedColors.contains(color)) {
+//                        selectedColors.remove(selectedColors.indexOf(color));
+//                    } else {
+//                        selectedColors.add(color);
+//                    }
+                    updateRecyclerView(view, getColor(selectedColorProducts));
                 }
             });
         }
@@ -303,10 +312,36 @@ public class AddProductFragment extends Fragment {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAdapter.updateSelectedColors(selectedColors);
+                mAdapter.updateSelectedColors(selectedColorProducts, selectedSize);
                 alertDialog.dismiss();
             }
         });
+    }
+
+    private void removeColor(int color) {
+        for (ColorProduct cl: selectedColorProducts) {
+            if (cl.getColor() == color) {
+                selectedColorProducts.remove(cl);
+                break;
+            }
+        }
+    }
+
+    private List<Integer> getColor(List<ColorProduct> selectedColorProducts) {
+        ArrayList<Integer> listColor = new ArrayList<>();
+        for (ColorProduct cl : selectedColorProducts) {
+            listColor.add(cl.getColor());
+        }
+        return listColor;
+    }
+
+    private boolean checkColorExist(int color) {
+        for (ColorProduct cl : selectedColorProducts) {
+            if (cl.getColor() == color) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void updateRecyclerView(View view, List<Integer> selectedColors) {
@@ -354,7 +389,7 @@ public class AddProductFragment extends Fragment {
                         String userId = firebaseAuth.getCurrentUser().getUid();
                         Product product = new Product(
                                 productId, userId, Title, productType,
-                                "categoryID", Brand, Des, imageUrls, selectedColors, 0, "ngon", Quantity, (double) Price, selectedSize,  selectedDiscounts
+                                "categoryID", Brand, Des, imageUrls, selectedColorProducts, 0, "ngon", Quantity, (double) Price, selectedSize,  selectedDiscounts
                         );
                         product.setUserProduct(true);
 
@@ -407,7 +442,7 @@ public class AddProductFragment extends Fragment {
             return false;
         }
 
-        if (selectedColors.isEmpty()) {
+        if (selectedColorProducts.isEmpty()) {
             showToast("Bạn cần chọn ít nhất một màu");
             return false;
         }
