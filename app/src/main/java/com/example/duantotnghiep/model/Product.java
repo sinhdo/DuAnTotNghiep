@@ -1,9 +1,32 @@
 package com.example.duantotnghiep.model;
 
-import java.util.Collections;
 import java.util.List;
 
 public class Product {
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id='" + id + '\'' +
+                ", sellerId='" + sellerId + '\'' +
+                ", name='" + name + '\'' +
+                ", productType=" + productType +
+                ", categoryID='" + categoryID + '\'' +
+                ", brand='" + brand + '\'' +
+                ", description='" + description + '\'' +
+                ", imgProduct=" + imgProduct +
+                ", listColorProduct=" + listColorProduct +
+                ", sold=" + sold +
+                ", reviewId='" + reviewId + '\'' +
+                ", quantity=" + quantity +
+                ", price=" + price +
+                ", size=" + size +
+                ", selectedDiscounts=" + selectedDiscounts +
+                ", isUserProduct=" + isUserProduct +
+                ", selectedQuantity=" + selectedQuantity +
+                '}';
+    }
+
     private String id;
     private String sellerId;
     private String name;
@@ -12,7 +35,7 @@ public class Product {
     private String brand;
     private String description;
     private List<String> imgProduct;
-    private List<Integer> color;
+    private List<ColorProduct> listColorProduct;
     private int sold;
     private String reviewId;
     private int quantity;
@@ -41,7 +64,7 @@ public class Product {
     }
 
 
-    public Product(String id, String sellerId, String name, ProductType productType, String categoryID, String brand, String description, List<String> imgProduct, List<Integer> color, int sold, String reviewId, int quantity, double price, List<String> size, List<Discount> discounts) {
+    public Product(String id, String sellerId, String name, ProductType productType, String categoryID, String brand, String description, List<String> imgProduct, List<ColorProduct> colorProduct, int sold, String reviewId, int quantity, double price, List<String> size, List<Discount> discounts) {
         this.id = id;
         this.sellerId = sellerId;
         this.name = name;
@@ -50,7 +73,7 @@ public class Product {
         this.brand = brand;
         this.description = description;
         this.imgProduct = imgProduct;
-        this.color = color;
+        this.listColorProduct = colorProduct;
         this.sold = sold;
         this.reviewId = reviewId;
         this.quantity = quantity;
@@ -154,12 +177,12 @@ public class Product {
         this.imgProduct = imgProduct;
     }
 
-    public List<Integer> getColor() {
-        return color;
+    public List<ColorProduct> getListColor() {
+        return listColorProduct;
     }
 
-    public void setColor(List<Integer> color) {
-        this.color = color;
+    public void setListColor(List<ColorProduct> listColorProduct) {
+        this.listColorProduct = listColorProduct;
     }
 
     public int getSold() {
