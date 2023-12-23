@@ -34,6 +34,10 @@ public class NotificationItem implements Comparable<NotificationItem> {
 
     @Override
     public int compareTo(NotificationItem other) {
+        if (this.getDateTime() == null || other.getDateTime() == null) {
+            return 0;
+        }
         return other.getDateTime().compareTo(this.getDateTime());
     }
+
 }
