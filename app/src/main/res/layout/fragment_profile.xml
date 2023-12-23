@@ -20,7 +20,7 @@
     <LinearLayout
         android:id="@+id/topUS"
         android:layout_width="match_parent"
-        android:layout_height="172dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/tlt"
         android:background="#DDA95B"
         android:orientation="horizontal"

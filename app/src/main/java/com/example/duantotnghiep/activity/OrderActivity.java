@@ -100,6 +100,7 @@ public class OrderActivity extends AppCompatActivity {
         tvSold = findViewById(R.id.tvSold);
         btnAddToCart =findViewById(R.id.btnAddToCart);
         btnBuyProduct =findViewById(R.id.btnBuyProduct);
+        checkAndHideButton();
         idProduct = getIntent().getStringExtra("idPro");
         recyclerView = findViewById(R.id.rcv_review);
         btnBuyProduct.setOnClickListener(new View.OnClickListener() {
@@ -283,5 +284,11 @@ public class OrderActivity extends AppCompatActivity {
             });
         }
         dialog.show();
+    }
+    private void checkAndHideButton() {
+        if (firebaseUser != null && firebaseUser.getUid().equals("ZYA1yQdRAYSzh1K24ZVYIYvHIc92")) {
+            btnAddToCart.setVisibility(View.GONE);
+            btnBuyProduct.setVisibility(View.GONE);
+        }
     }
 }

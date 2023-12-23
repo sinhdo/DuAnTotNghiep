@@ -1,5 +1,6 @@
 package com.example.duantotnghiep.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,15 +15,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.activity.CartActivity;
 import com.example.duantotnghiep.adapter.ProductAdapter;
 import com.example.duantotnghiep.adapter.ProductHomeAdapter;
 import com.example.duantotnghiep.adapter.ProductHomeAdapter2;
 import com.example.duantotnghiep.adapter.UserAdapter;
+import com.example.duantotnghiep.model.AddProductToCart;
 import com.example.duantotnghiep.model.Product;
 import com.example.duantotnghiep.model.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -46,8 +50,9 @@ public class SearchProductFragment extends Fragment {
     private List<Product> list = new ArrayList<>();
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
-    private TextView textViewNull;
+    private TextView textViewNull, totalCart;
     ProductHomeAdapter2 productHomeAdapter2;
+    private ImageView imgCart, imgCart1;
 
     public SearchProductFragment() {
         // Required empty public constructor
@@ -61,6 +66,7 @@ public class SearchProductFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @Override
@@ -69,7 +75,27 @@ public class SearchProductFragment extends Fragment {
         if (view == null) {
             // Inflate the layout for this fragment
             view = inflater.inflate(R.layout.fragment_search_product, container, false);
+            imgCart = view.findViewById(R.id.imageView4);
+            imgCart1 = view.findViewById(R.id.imageView3);
+            totalCart = view.findViewById(R.id.totalCart);
+            checkAndHideImageViews();
+
+            imgCart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(getContext(), CartActivity.class);
+                    startActivity(intent);
+                }
+            });
+            imgCart1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(getContext(), CartActivity.class);
+                    startActivity(intent);
+                }
+            });
         }
+        TotalItemCart();
         return view;
     }
 
@@ -115,7 +141,7 @@ public class SearchProductFragment extends Fragment {
                 List<Product> productList = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Product product = snapshot.getValue(Product.class);
-                    if (product != null && !product.getSellerId().equals(firebaseUser.getUid())) {
+                    if (product != null) {
                         productList.add(product);
                     }
                 }
@@ -128,7 +154,13 @@ public class SearchProductFragment extends Fragment {
             }
         });
     }
-
+    private void checkAndHideImageViews() {
+        if (firebaseUser != null && firebaseUser.getUid().equals("ZYA1yQdRAYSzh1K24ZVYIYvHIc92")) {
+            imgCart.setVisibility(View.GONE);
+            imgCart1.setVisibility(View.GONE);
+            totalCart.setVisibility(View.GONE);
+        }
+    }
     private void searchProducts(String query) {
         DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("products");
 
@@ -168,5 +200,30 @@ public class SearchProductFragment extends Fragment {
             textViewNull.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
+    }
+    private void TotalItemCart() {
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        String id_user = firebaseUser.getUid();
+        DatabaseReference myReference = firebaseDatabase.getReference("cart").child(id_user);
+        myReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<AddProductToCart> list = new ArrayList<>();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    AddProductToCart product = dataSnapshot.getValue(AddProductToCart.class);
+                    list.add(product);
+                }
+                if (list.size() == 0) {
+                    return;
+                } else {
+                    totalCart.setText(" " + list.size());
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("Loi", "onCancelled: " + error.getMessage());
+            }
+        });
     }
 }

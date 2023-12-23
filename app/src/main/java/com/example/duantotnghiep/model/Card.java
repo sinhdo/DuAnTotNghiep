@@ -22,8 +22,8 @@ public class Card {
     private String time;
     private String username;
     private String userId;
-    private String status; // Trường trạng thái
-    private boolean statusChanged; // Trường để kiểm tra xem trạng thái đã thay đổi chưa
+    private String status;
+    private boolean statusChanged;
 
     public Card() {
         // Constructor mặc định không có đối số để đáp ứng yêu cầu của Firebase
