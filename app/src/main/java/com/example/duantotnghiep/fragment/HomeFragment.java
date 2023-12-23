@@ -54,7 +54,7 @@ public class HomeFragment extends Fragment {
     private ViewPager slideImage;
     private CircleIndicator circleIndicator;
     private TextView textViewName,totalCart, textSee1, textSee2;
-    private ImageView imgCart;
+    private ImageView imgCart, imgCart1;
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
     List<Product> productList;
@@ -86,7 +86,8 @@ public class HomeFragment extends Fragment {
         textSee1 = view.findViewById(R.id.textSee1);
         textSee2 = view.findViewById(R.id.textSee2);
         imgCart = view.findViewById(R.id.imageView4);
-        imgCart = view.findViewById(R.id.imageView3);
+        imgCart1 = view.findViewById(R.id.imageView3);
+        checkAndHideImageViews();
         slideImage = view.findViewById(R.id.silde_image);
         circleIndicator = view.findViewById(R.id.circle_indicator);
         RecyclerView recyclerView = view.findViewById(R.id.view1);
@@ -96,6 +97,13 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
                Intent intent = new Intent(getContext(), CartActivity.class);
                startActivity(intent);
+            }
+        });
+        imgCart1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), CartActivity.class);
+                startActivity(intent);
             }
         });
         textSee1.setOnClickListener(new View.OnClickListener() {
@@ -210,13 +218,9 @@ public class HomeFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 productList.clear();
                 productList2.clear();
-                String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Product product = snapshot.getValue(Product.class);
                     if (product.getQuantity() > 0) {
-                        if (product.getSellerId().equals(currentUserId)) {
-                            continue;
-                        }
                         productList.add(product);
                         productList2.add(product);
                     }
@@ -224,6 +228,7 @@ public class HomeFragment extends Fragment {
                 productHomeAdapter.setData(productList);
                 productHomeAdapter2.setData(productList2);
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -255,7 +260,13 @@ public class HomeFragment extends Fragment {
             }
         });
     }
-
+    private void checkAndHideImageViews() {
+        if (firebaseUser != null && firebaseUser.getUid().equals("ZYA1yQdRAYSzh1K24ZVYIYvHIc92")) {
+            imgCart.setVisibility(View.GONE);
+            imgCart1.setVisibility(View.GONE);
+            totalCart.setVisibility(View.GONE);
+        }
+    }
     private void setInfoProfile() {
         String id = firebaseUser.getUid();
         DatabaseReference userRef = mReference.child("user").child(id);

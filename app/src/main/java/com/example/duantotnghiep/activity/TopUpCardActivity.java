@@ -47,8 +47,9 @@ public class TopUpCardActivity extends AppCompatActivity {
     private List<Card> cardList;
     private CardAdapter cardAdapter;
     private String currentUserId;
+    private String currentUserUsername;
     private FirebaseAuth mAuth;
-    private DatabaseReference userRef, buyerRef;
+    private DatabaseReference userRef, buyerRef, cardRef, notificationRef;
     private FirebaseUser firebaseUser;
 
     @Override
@@ -105,7 +106,8 @@ public class TopUpCardActivity extends AppCompatActivity {
                             if (dataSnapshot.exists()) {
                                 String username = dataSnapshot.child("username").getValue(String.class);
 
-                                DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference("cards");
+                                currentUserUsername = dataSnapshot.child("username").getValue(String.class);
+                                cardRef = FirebaseDatabase.getInstance().getReference("cards");
                                 String cardId = cardRef.push().getKey();
 
                                 Card card = new Card(cardId, cardSerial, cardPin, cardProvider, cardValue, time, username, userId, "pending", false);
@@ -117,6 +119,7 @@ public class TopUpCardActivity extends AppCompatActivity {
                                 cardList.add(card);
                                 cardAdapter.notifyDataSetChanged();
                                 Toast.makeText(TopUpCardActivity.this, "Gửi thẻ thành công, vui lòng chờ trong giây lát", Toast.LENGTH_SHORT).show();
+                                handleTopUpSuccess();
 
                                 Handler handler = new Handler();
                                 handler.postDelayed(new Runnable() {
@@ -144,10 +147,47 @@ public class TopUpCardActivity extends AppCompatActivity {
         Date currentDate = new Date();
         return sdf.format(currentDate);
     }
+    private void handleTopUpSuccess() {
+        // Xử lý khi người dùng nạp thẻ thành công
+        String title = "Nạp thẻ";
+        String cardProvider = spinnerCardProvider.getSelectedItem().toString();
+        String cardValue = spinnerCardValue.getSelectedItem().toString();
+        String content = String.format("Bạn đã gửi thành công thẻ %s trị giá %s, vui lòng chờ Admin duyệt trong ít phút.", cardProvider, cardValue);
+        String currentTime = getCurrentTime();
+        String userId = mAuth.getUid();
+        notificationRef = FirebaseDatabase.getInstance().getReference("notifications").child(firebaseUser.getUid());
+        String notificationId = notificationRef.push().getKey();
 
+        handleTopUpSuccessToAdmin();
+
+        // Gửi thông báo lên Firebase Realtime Database
+        notificationRef.child(notificationId).child("title").setValue(title);
+        notificationRef.child(notificationId).child("content").setValue(content);
+        notificationRef.child(notificationId).child("dateTime").setValue(currentTime);
+        notificationRef.child(notificationId).child("userId").setValue(userId);
+    }
+    private void handleTopUpSuccessToAdmin() {
+        String adminId = "ZYA1yQdRAYSzh1K24ZVYIYvHIc92"; // ID của admin
+
+        // Tạo thông báo
+        String username = currentUserUsername;
+        String title = "Nạp thẻ";
+        String cardProvider = spinnerCardProvider.getSelectedItem().toString();
+        String cardValue = spinnerCardValue.getSelectedItem().toString();
+        String content = String.format("Người dùng %s vừa nạp thẻ %s trị giá %s, vui lòng kiểm tra và duyệt.", username, cardProvider, cardValue);
+        String currentTime = getCurrentTime();
+
+        // Lưu thông báo vào Firebase Realtime Database
+        DatabaseReference adminNotificationRef = FirebaseDatabase.getInstance().getReference("notifications").child(adminId);
+        String notificationId = adminNotificationRef.push().getKey();
+        adminNotificationRef.child(notificationId).child("title").setValue(title);
+        adminNotificationRef.child(notificationId).child("content").setValue(content);
+        adminNotificationRef.child(notificationId).child("dateTime").setValue(currentTime);
+        adminNotificationRef.child(notificationId).child("userId").setValue(firebaseUser.getUid());
+    }
     private void loadCardDataFromFirebase() {
 
-        DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference("cards");
+        cardRef = FirebaseDatabase.getInstance().getReference("cards");
         String currentUserId = mAuth.getUid();
         Query query = cardRef.orderByChild("userId").equalTo(currentUserId);
 
