@@ -2,6 +2,7 @@ package com.example.duantotnghiep.activity;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -25,6 +26,8 @@ import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.duantotnghiep.AdminActivity;
+import com.example.duantotnghiep.MainActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.UserAdapter;
 import com.example.duantotnghiep.database.FireBaseUserHelper;
@@ -130,6 +133,7 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
     @Override
     public void itemUserInfo(User user) {
             OpenDialogUser(ListUserActivity.this,1,user);
+
     }
     void OpenDialogUser(Context context, int type, User user) {
 
@@ -159,6 +163,8 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
         ArrayList<String> listRole = new ArrayList<>();
         listRole.add("Lock");
         listRole.add("Unlock");
+
+
 
         ArrayAdapter<String> arrayAdapterRole = new ArrayAdapter<>(this, R.layout.spinner_item, listRole);
         arrayAdapterRole.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -205,14 +211,36 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                                             user.setPassword(password);
                                             user.setUser_type(false);
                                             user.setWallet(0.0);
+                                            boolean isUserLocked = role.equals("Lock");
+                                            user.setLock(isUserLocked);
+                                            usersRef = firebaseHelper.getUsersRef();
+
+
                                             if (role == "Unlock") {
                                                 user.setLock(false);
                                             } else {
                                                 user.setLock(true);
                                             }
                                             usersRef = firebaseHelper.getUsersRef();
-                                            usersRef.child(id).setValue(user);
-                                            Toast.makeText(context, "Thêm thành công", Toast.LENGTH_SHORT).show();
+
+                                            usersRef.child(id).setValue(user)
+                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            if (task.isSuccessful()) {
+                                                                Toast.makeText(context, "Thêm thành công", Toast.LENGTH_SHORT).show();
+                                                            } else {
+                                                                Toast.makeText(context, "Thêm thất bại!", Toast.LENGTH_SHORT).show();
+                                                                Log.d("===TAG", "onComplete: ");
+                                                            }
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
                                         } else {
                                             Toast.makeText(context, "Thêm thất bại!", Toast.LENGTH_SHORT).show();
                                             Log.d("===TAG", "onComplete: ");
@@ -285,7 +313,12 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
         } else {
             Toast.makeText(this, "ID NULL", Toast.LENGTH_SHORT).show();
         }
+
     }
+
+
+
+
     private boolean validateRegistration(String username, String email, String phone, String password, String repass) {
         String nameForm1 = "^[a-zA-Z]+$";
         String nameForm2 = "^[\\p{L}\\s]+$";
