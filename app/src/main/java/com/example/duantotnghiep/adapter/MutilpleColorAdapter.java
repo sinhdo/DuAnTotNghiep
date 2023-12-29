@@ -8,8 +8,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.databinding.CircleColorBinding;
 import com.example.duantotnghiep.model.ColorProduct;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,203 +98,63 @@ public class MutilpleColorAdapter extends RecyclerView.Adapter<MutilpleColorAdap
             circle.setColor(colorProduct.getColor());
 
             LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{context.getResources().getDrawable(R.drawable.circle_background), circle});
-            binding.price1.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            final TextInputEditText[] quantityEdit = {
+                    binding.quantity1, binding.quantity2, binding.quantity3, binding.quantity4, binding.quantity5,
+                    binding.quantity6, binding.quantity7, binding.quantity8, binding.quantity9
+            };
+            final TextView[] titleText = {
+                    binding.title1, binding.title2, binding.title3, binding.title4, binding.title5, binding.title6,
+                    binding.title7, binding.title8, binding.title9
+            };
+
+            colorProductList.get(getAdapterPosition()).setQuantity(new ArrayList<>());
+            for(int i = 0; i < quantityEdit.length; i++) {
+                if(i >= selectedSize.size()) {
+                    titleText[i].setVisibility(View.INVISIBLE);
+                    quantityEdit[i].setVisibility(View.INVISIBLE);
+                    continue;
                 }
+                titleText[i].setVisibility(View.VISIBLE);
+                quantityEdit[i].setVisibility(View.VISIBLE);
 
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                final int _i = i;
+                colorProductList.get(getAdapterPosition()).getQuantity().add(0);
+                TextInputEditText edit = quantityEdit[i];
+                edit.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (!editable.toString().isEmpty()) {
-                        colorProductList.get(getAdapterPosition()).setPrice1(Integer.parseInt(editable.toString()));
                     }
-                }
-            });
-            binding.quantity1.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
 
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (!editable.toString().isEmpty()) {
-                        colorProductList.get(getAdapterPosition()).setPrice1(Integer.parseInt(editable.toString()));
                     }
-                }
-            });
-            binding.price2.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (!editable.toString().isEmpty()) {
-                        colorProductList.get(getAdapterPosition()).setPrice2(Integer.parseInt(editable.toString()));
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                        if (!editable.toString().isEmpty()) {
+                            Integer n = Integer.parseInt(editable.toString());
+                            if(n == null)
+                                n = 0;
+                            colorProductList.get(getAdapterPosition()).getQuantity().set(_i, n);
+                        }
                     }
-                }
-            });
-            binding.quantity2.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (!editable.toString().isEmpty()) {
-                        colorProductList.get(getAdapterPosition()).setQuantity2(Integer.parseInt(editable.toString()));
-                    }
-                }
-            });
-            binding.price3.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (!editable.toString().isEmpty()) {
-                        colorProductList.get(getAdapterPosition()).setPrice3(Integer.parseInt(editable.toString()));
-                    }
-                }
-            });
-            binding.quantity3.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (!editable.toString().isEmpty()) {
-                        colorProductList.get(getAdapterPosition()).setQuantity3(Integer.parseInt(editable.toString()));
-                    }
-                }
-            });
-
-            binding.price4.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (!editable.toString().isEmpty()) {
-                        colorProductList.get(getAdapterPosition()).setPrice4(Integer.parseInt(editable.toString()));
-                    }
-                }
-            });
-            binding.quantity4.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (!editable.toString().isEmpty()) {
-                        colorProductList.get(getAdapterPosition()).setQuantity4(Integer.parseInt(editable.toString()));
-                    }
-                }
-            });
-
-            binding.price5.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (!editable.toString().isEmpty()) {
-                        colorProductList.get(getAdapterPosition()).setPrice5(Integer.parseInt(editable.toString()));
-                    }
-                }
-            });
-            binding.quantity5.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (!editable.toString().isEmpty()) {
-                        colorProductList.get(getAdapterPosition()).setQuantity5(Integer.parseInt(editable.toString()));
-                    }
-                }
-            });
-
-            binding.price1.setText(String.valueOf(colorProduct.getPrice1()));
-            binding.price2.setText(String.valueOf(colorProduct.getPrice2()));
-            binding.price3.setText(String.valueOf(colorProduct.getPrice3()));
-            binding.price4.setText(String.valueOf(colorProduct.getPrice4()));
-            binding.price5.setText(String.valueOf(colorProduct.getPrice5()));
-            binding.quantity1.setText(String.valueOf(colorProduct.getQuantity1()));
-            binding.quantity2.setText(String.valueOf(colorProduct.getQuantity2()));
-            binding.quantity3.setText(String.valueOf(colorProduct.getQuantity3()));
-            binding.quantity4.setText(String.valueOf(colorProduct.getQuantity4()));
-            binding.quantity5.setText(String.valueOf(colorProduct.getQuantity5()));
-            if (!selectedSize.isEmpty()) {
-                binding.title1.setText(selectedSize.get(0));
-                binding.title2.setText(selectedSize.get(1));
-                binding.title3.setText(selectedSize.get(2));
-                binding.title4.setText(selectedSize.get(3));
-                binding.title5.setText(selectedSize.get(4));
+                });
             }
+
+            for(int i = 0; i < selectedSize.size(); i++) {
+                quantityEdit[i].setText(String.valueOf(colorProduct.getQuantity().get(i)));
+                titleText[i].setText(selectedSize.get(i));
+            }
+
             colorImageView.setBackground(layerDrawable);
         }
 
     }
     public void updateSelectedColors(List<ColorProduct> selectedColorProducts, List<String> selectedSize) {
+        Log.d("_LVMINH_", "updateSelectedColors " + selectedColorProducts.size() + " " + selectedSize.size());
         if (selectedColorProducts != null) {
             colorProductList.clear();
             colorProductList.addAll(selectedColorProducts);
