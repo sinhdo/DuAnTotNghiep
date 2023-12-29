@@ -24,6 +24,7 @@ import com.example.duantotnghiep.adapter.OrderAdapter;
 import com.example.duantotnghiep.adapter.ReviewAdapter;
 import com.example.duantotnghiep.adapter.SizeAdapter;
 import com.example.duantotnghiep.model.AddProductToCart;
+import com.example.duantotnghiep.model.ColorProduct;
 import com.example.duantotnghiep.model.Order;
 import com.example.duantotnghiep.model.Reviews;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,16 +42,18 @@ import java.util.List;
 
 public class OrderActivity extends AppCompatActivity {
     private ImageView imgProduct;
-    private TextView tvNameProduct,tvPriceProduct,tvDescriptionPro, tvQuantity, tvSold;
+    private TextView tvNameProduct,tvPriceProduct,tvDescriptionPro, tvQuantity, tvSold, tvQuantityRemain, tvNum;
     private Button btnAddToCart,btnBuyProduct;
-    private int productQuantity;
+    private int productQuantity, selectedProductQuantity;
     private ColorAdapter selectedColorAdapter;
     private int num;
+    private int selectedColorPos = -1, selectedSizePos = -1;
     private RecyclerView recyclerView;
     private ArrayList<Order> orderList = new ArrayList<>();
     private String idProduct;
     List<String> sizeList;
     ArrayList<Integer> colors;
+    ArrayList<ColorProduct> colorsInfo;
     private Picasso picasso = Picasso.get();
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
@@ -140,14 +143,14 @@ public class OrderActivity extends AppCompatActivity {
                 Double price = snapshot.child("price").getValue(Double.class);
                 String description = snapshot.child("description").getValue(String.class);
                 Integer quantity = snapshot.child("quantity").getValue(Integer.class);
-                Integer sold = snapshot.child("sold").getValue(Integer.class);
                 if (quantity != null) {
                     productQuantity = quantity;
                 }
+                Integer sold = snapshot.child("sold").getValue(Integer.class);
                 ArrayList<String> imgProductUrls = snapshot.child("imgProduct").getValue(new GenericTypeIndicator<ArrayList<String>>() {});
 
                 tvNameProduct.setText(name);
-                
+
                 tvPriceProduct.setText(price + " VND");
                 tvDescriptionPro.setText("Mô tả sản phẩm: " + description);
                 if (quantity != null) {
@@ -161,11 +164,16 @@ public class OrderActivity extends AppCompatActivity {
                     imgProduct.setTag(imgUrl);
                 }
                 colors = new ArrayList<>();
-                DataSnapshot colorsSnapshot = snapshot.child("color");
+                colorsInfo = new ArrayList<>();
+                DataSnapshot colorsSnapshot = snapshot.child("listColor");
                 for (DataSnapshot colorSnapshot : colorsSnapshot.getChildren()) {
-                    Integer color = colorSnapshot.getValue(Integer.class);
-                    if (color != null) {
-                        colors.add(color);
+                    ColorProduct colorInfo = new ColorProduct();
+                    if(colorSnapshot.child("color").getValue(Integer.class) != null) {
+                        colorInfo.setColor(colorSnapshot.child("color").getValue(Integer.class));
+                        ArrayList<Integer> quantityOfColor = colorSnapshot.child("quantity").getValue(new GenericTypeIndicator<ArrayList<Integer>>() {});
+                        colorInfo.setQuantity(quantityOfColor);
+                        colorsInfo.add(colorInfo);
+                        colors.add(colorInfo.getColor());
                     }
                 }
                 DataSnapshot sizeSnapshot = snapshot.child("size");
@@ -197,10 +205,11 @@ public class OrderActivity extends AppCompatActivity {
         ImageView imgOrder = dialog.findViewById(R.id.imgOrder);
         TextView priceOrder = dialog.findViewById(R.id.priceOrder);
         TextView nameProduct = dialog.findViewById(R.id.NameProduct);
+        tvQuantityRemain = dialog.findViewById(R.id.quantityRemain);
         ImageView  imgMinus = (ImageView) dialog.findViewById(R.id.img_minus);
         ImageView  imgPlus = (ImageView) dialog.findViewById(R.id.img_plus);
         Button btnBuy = dialog.findViewById(R.id.btnBuy);
-        TextView tvNum = (TextView) dialog.findViewById(R.id.tv_num);
+        tvNum = (TextView) dialog.findViewById(R.id.tv_num);
         RecyclerView rvMutilpeColor = dialog.findViewById(R.id.rvOpsionColor);
         RecyclerView rvMutilpeSize = dialog.findViewById(R.id.rvOpsionSize);
 
@@ -210,24 +219,37 @@ public class OrderActivity extends AppCompatActivity {
 
         rvMutilpeSize.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         SizeAdapter sizeAdapter = new SizeAdapter(sizeList);
+        sizeAdapter.setListener(new SizeAdapter.SizeAdapterListener() {
+            @Override
+            public void onSelect(int i) {
+                selectedSizePos = i;
+                updateQuantityRemain();
+            }
+        });
         rvMutilpeSize.setAdapter(sizeAdapter);
 
         selectedColorAdapter = colorAdapter;
+        selectedColorAdapter.setListener(new ColorAdapter.ColorAdapterListener() {
+            @Override
+            public void onSelect(int i) {
+                selectedColorPos = i;
+                updateQuantityRemain();
+            }
+        });
 
-        num=1;
+        num = 1;
         imgMinus.setOnClickListener(view -> {
             if (num > 1){
                 num--;
                 tvNum.setText(num+"");
-
             }
         });
         imgPlus.setOnClickListener(view -> {
-            if (num < productQuantity){
+            if (num < selectedProductQuantity){
                 num++;
                 tvNum.setText(num+"");
             }else {
-                Toast.makeText(OrderActivity.this, "Sản phẩm chỉ có " + productQuantity + " cái", Toast.LENGTH_SHORT).show();
+                Toast.makeText(OrderActivity.this, "Sản phẩm chỉ có " + selectedProductQuantity + " cái", Toast.LENGTH_SHORT).show();
             }
         });
         nameProduct.setText(productName);
@@ -246,14 +268,19 @@ public class OrderActivity extends AppCompatActivity {
                     String selectedSize = sizeAdapter.getSelectedSize();
                     ArrayList<Integer> selectedColors = new ArrayList<>(selectedColorAdapter.getSelectedColorList());
 
-                    if (selectedColors.isEmpty()) {
+                    if (selectedColorPos == -1) {
                         Toast.makeText(OrderActivity.this, "Vui lòng chọn ít nhất một màu sắc", Toast.LENGTH_SHORT).show();
-                    } else if (selectedSize == null ) {
+                    }
+                    else if (selectedSizePos == -1) {
                         Toast.makeText(OrderActivity.this, "Vui lòng chọn kích cỡ", Toast.LENGTH_SHORT).show();
-                    } else {
+                    }
+                    else if(tvQuantityRemain.getText().toString().equals("Còn: 0")) {
+                        Toast.makeText(OrderActivity.this, "Màu và kích cỡ hiện tại đang hết hàng. Vui lòng chọn màu và kích cỡ khác", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
                         Bundle bundle = new Bundle();
                         bundle.putString("Size", selectedSize);
-                        bundle.putIntegerArrayList("Color", selectedColors);
+                        bundle.putInt("Color", selectedColors.get(0));
                         bundle.putInt("Quantity", num);
 
                         Intent intent = new Intent(OrderActivity.this, orderDetailsActivity.class);
@@ -270,9 +297,13 @@ public class OrderActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     String selectedColor = selectedColorAdapter.getSelectedColor();
-                    if (selectedColor == null || sizeAdapter.getSelectedSize() == null) {
+                    if (selectedColorPos == - 1 || selectedSizePos == -1) {
                         Toast.makeText(OrderActivity.this, "Vui lòng chọn đủ màu và kích cỡ", Toast.LENGTH_SHORT).show();
-                    } else {
+                    }
+                    else if(tvQuantityRemain.getText().toString().equals("Còn: 0")) {
+                        Toast.makeText(OrderActivity.this, "Màu và kích cỡ hiện tại đang hết hàng. Vui lòng chọn màu và kích cỡ khác", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
                         mReference = FirebaseDatabase.getInstance().getReference().child("cart");
                         String newKey = idProduct; // Sử dụng ID sản phẩm làm khóa
                         AddProductToCart product1 = new AddProductToCart(newKey, id_user, idProduct, productName, Integer.parseInt(selectedColor), sizeAdapter.getSelectedSize(), productImageUrl, num, productPrice);
@@ -287,8 +318,18 @@ public class OrderActivity extends AppCompatActivity {
     }
     private void checkAndHideButton() {
         if (firebaseUser != null && firebaseUser.getUid().equals("ZYA1yQdRAYSzh1K24ZVYIYvHIc92")) {
-            btnAddToCart.setVisibility(View.GONE);
-            btnBuyProduct.setVisibility(View.GONE);
+//            btnAddToCart.setVisibility(View.GONE);
+//            btnBuyProduct.setVisibility(View.GONE);
+        }
+    }
+
+    private void updateQuantityRemain() {
+        if(selectedColorPos != - 1 && selectedSizePos != -1) {
+            ColorProduct colorProduct = colorsInfo.get(selectedColorPos);
+            selectedProductQuantity = colorProduct.getQuantity().get(selectedSizePos);
+            tvQuantityRemain.setText("Còn: " + selectedProductQuantity);
+            num = selectedProductQuantity == 0 ? 0 : 1;
+            tvNum.setText("" + num);
         }
     }
 }
