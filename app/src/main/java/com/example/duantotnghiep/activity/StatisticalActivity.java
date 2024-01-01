@@ -121,22 +121,22 @@ public class StatisticalActivity extends AppCompatActivity {
                if (snapshot.exists()){
                    for (DataSnapshot transactionSnapshot : snapshot.getChildren()) {
                        Order order = transactionSnapshot.getValue(Order.class);
-                       if (order.getStatus().equals("done")&&order.getIdSeller().equals(id_user)){
-                           Statistical statistical = statisticalMap.get(order.getIdProduct());
-                           if (statistical == null) {
-
-                               statistical = new Statistical(order.getIdProduct(),order.getImgProduct(), order.getNameProduct(), order.getQuantity(),order.getTotal());
-                               statisticalMap.put(order.getIdProduct(), statistical);
-                           } else {
-
-                               statistical.setTotalQuantity(statistical.getTotalQuantity() + order.getQuantity());
-                               statistical.setTotalAmount(statistical.getTotalAmount() + order.getTotal());
-                           }
-                           totalQuantitySum += order.getQuantity();
-                           totalAmountSum += order.getTotal();
-                       }else {
-                           Log.d("=======", "onDataChange: Không có");
-                       }
+//                       if (order.getStatus().equals("done")&&order.getIdSeller().equals(id_user)){
+////                           Statistical statistical = statisticalMap.get(order.getIdProduct());
+////                           if (statistical == null) {
+////
+////                               statistical = new Statistical(order.getIdProduct(),order.getImgProduct(), order.getNameProduct(), order.getQuantity(),order.getTotal());
+////                               statisticalMap.put(order.getIdProduct(), statistical);
+////                           } else {
+////
+////                               statistical.setTotalQuantity(statistical.getTotalQuantity() + order.getQuantity());
+////                               statistical.setTotalAmount(statistical.getTotalAmount() + order.getTotal());
+////                           }
+////                           totalQuantitySum += order.getQuantity();
+////                           totalAmountSum += order.getTotal();
+//                       }else {
+//                           Log.d("=======", "onDataChange: Không có");
+//                       }
                    }
                }
                 if (statisticalMap.isEmpty()) {

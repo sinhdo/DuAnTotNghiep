@@ -3,6 +3,7 @@ package com.example.duantotnghiep.adapter;
 import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.model.InfoProductOrder;
 import com.example.duantotnghiep.model.Order;
 import com.example.duantotnghiep.model.Reviews;
 import com.google.firebase.database.DataSnapshot;
@@ -32,27 +34,19 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     private Context context;
     private List<Order> list;
     private Callback callback;
-
-    private List<String> userIds;
-
+    private List<InfoProductOrder> infoProductOrderList;
 
     public OrderAdapter(Context context, List<Order> list, Callback callback) {
         this.context = context;
         this.list = list;
+        this.infoProductOrderList=new ArrayList<>();
         this.callback = callback;
-
     }
 
-    public void updateReviewsForProduct(String productId, List<Reviews> reviewList) {
-        // Tìm đơn hàng có productId tương ứng trong danh sách đơn hàng
-        for (Order order : list) {
-            if (order.getId().equals(productId)) {
-                order.setReviewList(reviewList); // Đặt danh sách đánh giá cho đơn hàng này
-                notifyDataSetChanged(); // Thông báo sự thay đổi để cập nhật giao diện
-                return;
-            }
-        }
+    public List<InfoProductOrder> getInfoProductOrderList() {
+        return infoProductOrderList;
     }
+
 
     @NonNull
     @Override
@@ -63,46 +57,66 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-        Order oder = list.get(position);
-        if (oder == null) {
+        Order order = list.get(position);
+        if (order == null) {
             return;
         }
-        if (oder.getImgProduct() != null && !oder.getImgProduct().isEmpty()) {
-            Uri imageUri = Uri.parse(oder.getImgProduct());
-            Picasso.get()
-                    .load(imageUri)
-                    .placeholder(R.drawable.tnf)
-                    .error(R.drawable.tnf)
-                    .into(holder.imgProduct);
-        } else {
-            holder.imgProduct.setImageResource(R.drawable.tnf);
-        }
-        holder.tvNameProduct.setText("Sản phẩm: " + oder.getNameProduct());
-        holder.tvQuantity.setText(String.valueOf(oder.getQuantity()));
-        holder.tvTotal.setText(String.valueOf(oder.getTotal()));
-        holder.colorProduct.setBackgroundColor(oder.getColor());
 
-        //
-        String productId = list.get(position).getId(); // Lấy productId từ Order tại vị trí position
-       // Gọi phương thức để lấy dữ liệu đánh giá từ Firebase và hiển thị lên RecyclerView
-        fetchReviewsForProduct(productId, holder);
-        //
-        if (TextUtils.isEmpty(oder.getNotes()) || oder.getNotes().equals("")) {
-            holder.tvnote.setVisibility(View.GONE);
-        } else {
-            holder.tvnote.setText("Note : " + oder.getNotes());
-        }
-        if (oder.getStatus().equals("deliver")||oder.getStatus().equals("done")){
-            holder.tv_paid.setVisibility(View.VISIBLE);
-            if (oder.getPaid()==true){
-                holder.tv_paid.setText("Đã thanh toán bằng ví");
-            }else {
-                holder.tv_paid.setText("Thanh toán khi nhận hàng");
-            }
-        }
         holder.imgMenu.setOnClickListener(view -> {
-            callback.logic(oder);
+            callback.logic(order);
         });
+
+        if (list != null && list.size() > position) {
+            List<InfoProductOrder> productList = order.getListProduct();
+            if (infoProductOrderList == null) {
+                infoProductOrderList = new ArrayList<>();
+            }
+            if (productList != null) {
+                infoProductOrderList.clear();
+                infoProductOrderList.addAll(productList);
+                int index = Math.min(position, infoProductOrderList.size() - 1);
+                InfoProductOrder product = infoProductOrderList.get(index);
+                holder.tvTotal.setText(String.valueOf(product.getPrice()));
+                holder.tvNameProduct.setText(product.getNamePr());
+                holder.colorProduct.setBackgroundColor(product.getColorPr());
+                holder.tv_size.setText("Size : " + product.getSize());
+                holder.tvQuantity.setText(String.valueOf(product.getQuantityPr()));
+
+                if (product.getNote() == null || product.getNote().equals("") || TextUtils.isEmpty(product.getNote()) || product.getNote().isEmpty()) {
+                    holder.tvnote.setVisibility(View.GONE);
+                } else {
+                    holder.tvnote.setVisibility(View.VISIBLE);
+                    holder.tvnote.setText("Note: " + product.getNote());
+                }
+
+
+                if (product.getImgPr() != null && !product.getImgPr().isEmpty()) {
+                    Uri imageUri = Uri.parse(product.getImgPr());
+                    Picasso.get()
+                            .load(imageUri)
+                            .placeholder(R.drawable.pant)
+                            .error(R.drawable.pant)
+                            .into(holder.imgProduct);
+                } else {
+                    holder.imgProduct.setImageResource(R.drawable.pant);
+                }
+
+                if (product.getStatus().equals("done") || product.getStatus().equals("deliver")) {
+                    holder.tv_paid.setVisibility(View.VISIBLE);
+                    if (order.getPaid()) {
+                        holder.tv_paid.setText("Đã thanh toán bằng ví");
+                    } else {
+                        holder.tv_paid.setText("Thanh toán khi nhận hàng");
+                    }
+                } else {
+                    holder.tv_paid.setVisibility(View.GONE);
+                }
+            } else {
+                Log.d("productList null", "onBindViewHolder: " + productList);
+            }
+        } else {
+            Log.d("list null", "onBindViewHolder: " + list);
+        }
 
     }
 
@@ -114,38 +128,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         return list.size();
     }
 
-    private void fetchReviewsForProduct(String productId, OrderViewHolder holder) {
-        DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference().child("reviews");
 
-        reviewsRef.orderByChild("product_id").equalTo(productId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<Reviews> reviewList = new ArrayList<>();
-
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Reviews review = dataSnapshot.getValue(Reviews.class);
-                    if (review != null) {
-                        reviewList.add(review);
-                    }
-                }
-
-                if (!reviewList.isEmpty()) {
-                    // Hiển thị RecyclerView cho đánh giá
-                    ReviewAdapter reviewAdapter = new ReviewAdapter(context, reviewList );
-                    holder.recyclerView.setLayoutManager(new LinearLayoutManager(context));
-                    holder.recyclerView.setAdapter(reviewAdapter);
-                    holder.recyclerView.setVisibility(View.VISIBLE);
-                } else {
-//                    holder.recyclerView.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                 Toast.makeText(context, "Lỗi khi tải dữ liệu đánh giá", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     public class OrderViewHolder extends RecyclerView.ViewHolder {
         private ImageView imgProduct, colorProduct;
@@ -155,6 +138,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         private TextView tvTotal;
         private TextView tvnote;
         private TextView tv_paid;
+        private TextView tv_size;
         private ImageView imgMenu;
 
         public OrderViewHolder(@NonNull View itemView) {
@@ -167,8 +151,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             imgMenu = (ImageView) itemView.findViewById(R.id.img_menu);
             tvnote = (TextView) itemView.findViewById(R.id.tvNoteOrder);
             tv_paid = (TextView) itemView.findViewById(R.id.tv_paid);
-//            recyclerView = (RecyclerView) itemView.findViewById(R.id.rcv_review);
-
+            tv_size = (TextView) itemView.findViewById(R.id.tv_size);
         }
     }
 

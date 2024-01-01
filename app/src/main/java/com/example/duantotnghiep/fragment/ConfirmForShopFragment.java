@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.activity.InforOrderActivity;
 import com.example.duantotnghiep.adapter.OrderAdapter;
+import com.example.duantotnghiep.model.InfoProductOrder;
 import com.example.duantotnghiep.model.Order;
 import com.example.duantotnghiep.model.Product;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,6 +38,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ConfirmForShopFragment extends Fragment implements OrderAdapter.Callback{
     private RecyclerView recyclerView;
@@ -81,30 +83,39 @@ public class ConfirmForShopFragment extends Fragment implements OrderAdapter.Cal
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         String id_user = firebaseUser.getUid();
         DatabaseReference myReference = firebaseDatabase.getReference("list_order");
-
-        myReference.orderByChild("status").equalTo("confirmed").addValueEventListener(new ValueEventListener() {
+        myReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (list != null) {
                     list.clear();
                 }
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Order order = dataSnapshot.getValue(Order.class);
-                    if (order.getIdSeller().equals(id_user)) {
-                        list.add(order);
+                for (DataSnapshot orderSnapshot : snapshot.getChildren()) {
+                    Order order = orderSnapshot.getValue(Order.class);
+                    if (order != null && order.getIdSeller().equals(id_user)) {
+                        List<InfoProductOrder> productList = order.getListProduct();
+                        if (productList != null) {
+                            List<InfoProductOrder> waitingProducts = new ArrayList<>();
+                            for (InfoProductOrder product : productList) {
+                                if (product.getStatus().equals("confirmed")) {
+                                    list.add(order);
+                                }
+                            }
+                        }
+                        Log.d("=== order", "onDataChange: "+order);
+                    }else {
+                        Toast.makeText(getContext(), "NULL", Toast.LENGTH_SHORT).show();
                     }
                 }
-                if (list.isEmpty()){
+
+                if (list.isEmpty()) {
                     recyclerView.setVisibility(View.GONE);
                     noResultsTextView.setVisibility(View.VISIBLE);
-
-                }else {
+                } else {
                     recyclerView.setVisibility(View.VISIBLE);
                     noResultsTextView.setVisibility(View.GONE);
                 }
                 oderAdapter.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(getContext(), "Get list order failed", Toast.LENGTH_SHORT).show();
@@ -129,7 +140,7 @@ public class ConfirmForShopFragment extends Fragment implements OrderAdapter.Cal
         });
         btnCancel.setText("Tiến hành giao");
         btnCancel.setOnClickListener(view -> {
-            order.setStatus("deliver");
+//            order.setStatus("deliver");
             UpdateStatus(order);
             AddSoldMinusQuantity(order.getId());
             dialog.dismiss();

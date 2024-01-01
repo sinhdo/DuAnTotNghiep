@@ -30,6 +30,7 @@ import com.example.duantotnghiep.activity.ShowListLocationActivity;
 import com.example.duantotnghiep.activity.TopUpCardActivity;
 import com.example.duantotnghiep.adapter.CartOrderAdapter;
 import com.example.duantotnghiep.model.AddProductToCart;
+import com.example.duantotnghiep.model.InfoProductOrder;
 import com.example.duantotnghiep.model.Order;
 import com.example.duantotnghiep.model.Product;
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,6 +45,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -139,41 +141,49 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
             Toast.makeText(getContext(), "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (txtPayment_Cart.getText().toString().equals("Pay with wallet")) {
+            updateWalletAfterOrder();
+        }
 
         if (TextUtils.isEmpty(txtAddress.getText().toString()) || TextUtils.isEmpty(txtPhone.getText().toString())) {
 
             Toast.makeText(getContext(), "Vui lòng chọn địa chỉ", Toast.LENGTH_SHORT).show();
             return;
         }
-
+        List<InfoProductOrder> list = new ArrayList<>();
         for (AddProductToCart product : selectedProducts) {
             Map<String, String> productNotes = orderAdapter.getProductNotes();
-
             String productId = product.getId();
             String note = productNotes.get(productId);
-
-
             DatabaseReference productRef = FirebaseDatabase.getInstance().getReference("products").child(productId);
             productRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         Product associatedProduct = dataSnapshot.getValue(Product.class);
+                        String date = getCurrentDate();
+                        String status = "waitting";
                         if (product.getQuantity_product() <= associatedProduct.getQuantity()) {
-
+                            InfoProductOrder infoPr = new InfoProductOrder(product.getId(),
+                                    product.getImage_product(),
+                                    product.getName_product(),
+                                    product.getColor_product(),
+                                    note,
+                                    date,
+                                    0.0,
+                                    status,
+                                    product.getSize_product(),
+                                    product.getQuantity_product());
+                            list.add(infoPr);
                         String idBuyer = firebaseUser.getUid();
-                        String idProduct = product.getId_product();
-                        String nameProduct = product.getName_product();
-                        String imgProduct = product.getImage_product();
-                        int color = product.getColor_product();
                         double discountedPrice = orderAdapter.getDiscountedPrice(productId);
                         Double total = discountedPrice;
-                        String date = getCurrentDate();
+
                         String address = txtAddress.getText().toString();
                         String numberPhone = txtPhone.getText().toString();
                         int quantity = product.getQuantity_product();
                         Boolean paid = false;
-                        String status = "waiting";
+
 
                         String idSeller = associatedProduct.getSellerId();
                             String orderId = userRef.child("list_order").push().getKey();
@@ -181,20 +191,13 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                                 orderId,
                                 idBuyer,
                                 idSeller,
-                                idProduct,
-                                nameProduct,
-                                imgProduct,
-                                color,
                                 total,
-                                date,
                                 address,
                                 numberPhone,
-                                quantity,
-                                note,
-                                paid,
-                                status
+                                paid
+                                ,list
                         );
-
+                            Log.d("list pr", "onDataChange: "+list);
                             DatabaseReference orderRef = userRef.child("list_order").child(orderId);
                         orderRef.setValue(order);
                         DatabaseReference cartItemRef = userRef.child("cart").child(firebaseUser.getUid()).child(product.getCartItemId());
@@ -215,13 +218,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
             });
         }
 
-        if (txtPayment_Cart.getText().toString().equals("Pay with wallet")) {
-            updateWalletAfterOrder();
-        }
-
-
             showDialogOrder();
-
     }
     private void showOutOfStockDialog() {
 
@@ -411,10 +408,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
     private void showSelectedProducts(List<AddProductToCart> selectedProducts) {
         if (orderAdapter != null) {
             orderAdapter.updateSelectedProducts(selectedProducts);
-
-
             totalPrice = orderAdapter.calculateTotalPrice();
-            Toast.makeText(getContext(), String.valueOf(totalDiscount), Toast.LENGTH_SHORT).show();
         }
     }
 

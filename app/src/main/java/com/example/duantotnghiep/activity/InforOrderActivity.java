@@ -55,7 +55,7 @@ public class InforOrderActivity extends AppCompatActivity {
         String id_Order = intent.getStringExtra("idOrder");
         getDataBuyer(id_Order);
         getDataSeller(id_Order);
-        getDataOrder(id_Order);
+//        getDataOrder(id_Order);
         done = findViewById(R.id.btn_done);
         done.setOnClickListener(new View.OnClickListener() {
             @Override
