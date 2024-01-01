@@ -51,9 +51,9 @@ public class OrderActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private ArrayList<Order> orderList = new ArrayList<>();
     private String idProduct;
-    List<String> sizeList;
+    List<String> sizeList = new ArrayList<>();
     ArrayList<Integer> colors;
-    ArrayList<ColorProduct> colorsInfo;
+    ArrayList<ColorProduct> colorsInfo = new ArrayList<>();
     private Picasso picasso = Picasso.get();
     private FirebaseUser firebaseUser;
     private DatabaseReference mReference;
@@ -318,8 +318,8 @@ public class OrderActivity extends AppCompatActivity {
     }
     private void checkAndHideButton() {
         if (firebaseUser != null && firebaseUser.getUid().equals("ZYA1yQdRAYSzh1K24ZVYIYvHIc92")) {
-//            btnAddToCart.setVisibility(View.GONE);
-//            btnBuyProduct.setVisibility(View.GONE);
+            btnAddToCart.setVisibility(View.GONE);
+            btnBuyProduct.setVisibility(View.GONE);
         }
     }
 
