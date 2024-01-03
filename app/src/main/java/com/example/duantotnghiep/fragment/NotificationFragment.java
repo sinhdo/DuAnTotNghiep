@@ -165,7 +165,6 @@ public class NotificationFragment extends Fragment {
             noResultsTextView.setVisibility(View.GONE);
         }
     }
-
     private ValueEventListener notificationValueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
