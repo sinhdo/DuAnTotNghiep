@@ -52,12 +52,12 @@ public class AddLocationActivity extends AppCompatActivity implements View.OnCli
         }
 
         String phoneForm = "^0\\d{9}$";
-        String nameForm1 = "[a-zA-Z\\s]+";
-
-        if (!name.matches(nameForm1)){
-            Toast.makeText(this, "Tên không đúng định dạng!", Toast.LENGTH_SHORT).show();
-            return false;
-        }
+//        String nameForm1 = "[a-zA-Z\\s]+";
+//
+//        if (!name.matches(nameForm1)){
+//            Toast.makeText(this, "Tên không đúng định dạng!", Toast.LENGTH_SHORT).show();
+//            return false;
+//        }
         if (!phone.matches(phoneForm)){
             Toast.makeText(this, "Số điện thoại không đúng định dạng!", Toast.LENGTH_SHORT).show();
             return false;

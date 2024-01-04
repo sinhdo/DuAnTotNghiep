@@ -36,8 +36,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class TopUpCardActivity extends AppCompatActivity {
     private EditText etCardSerial, etCardPin;
@@ -167,9 +169,8 @@ public class TopUpCardActivity extends AppCompatActivity {
         notificationRef.child(notificationId).child("userId").setValue(userId);
     }
     private void handleTopUpSuccessToAdmin() {
-        String adminId = "ZYA1yQdRAYSzh1K24ZVYIYvHIc92"; // ID của admin
+        String adminId = "ZYA1yQdRAYSzh1K24ZVYIYvHIc92";
 
-        // Tạo thông báo
         String username = currentUserUsername;
         String title = "Nạp thẻ";
         String cardProvider = spinnerCardProvider.getSelectedItem().toString();
@@ -177,13 +178,17 @@ public class TopUpCardActivity extends AppCompatActivity {
         String content = String.format("Người dùng %s vừa nạp thẻ %s trị giá %s, vui lòng kiểm tra và duyệt.", username, cardProvider, cardValue);
         String currentTime = getCurrentTime();
 
-        // Lưu thông báo vào Firebase Realtime Database
         DatabaseReference adminNotificationRef = FirebaseDatabase.getInstance().getReference("notifications").child(adminId);
         String notificationId = adminNotificationRef.push().getKey();
-        adminNotificationRef.child(notificationId).child("title").setValue(title);
-        adminNotificationRef.child(notificationId).child("content").setValue(content);
-        adminNotificationRef.child(notificationId).child("dateTime").setValue(currentTime);
-        adminNotificationRef.child(notificationId).child("userId").setValue(firebaseUser.getUid());
+
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("title", title);
+        notificationData.put("content", content);
+        notificationData.put("dateTime", currentTime);
+        notificationData.put("userId", firebaseUser.getUid());
+        notificationData.put("isRead", false);
+
+        adminNotificationRef.child(notificationId).setValue(notificationData);
     }
     private void loadCardDataFromFirebase() {
 

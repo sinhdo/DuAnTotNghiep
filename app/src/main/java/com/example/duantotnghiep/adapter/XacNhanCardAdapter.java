@@ -22,8 +22,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.XacNhanCardViewHolder> {
     private List<Card> cardList;
@@ -98,11 +100,16 @@ public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.
         notificationRef = FirebaseDatabase.getInstance().getReference("notifications").child(userId);
         String notificationId = notificationRef.push().getKey();
 
-        notificationRef.child(notificationId).child("title").setValue(title);
-        notificationRef.child(notificationId).child("content").setValue(content);
-        notificationRef.child(notificationId).child("dateTime").setValue(currentTime);
-        notificationRef.child(notificationId).child("userId").setValue(userId);
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("title", title);
+        notificationData.put("content", content);
+        notificationData.put("dateTime", currentTime);
+        notificationData.put("userId", userId);
+        notificationData.put("isRead", false); // Thêm trường "isRead" với giá trị mặc định là false
+
+        notificationRef.child(notificationId).setValue(notificationData);
     }
+
     private void handleTopUpSuccess1(String cardProvider, String cardValue, String userId) {
         String title = "Nạp thẻ không thành công";
         String content = String.format("Thẻ %s trị giá %s có mã thẻ hoặc số seri không đúng, Admin đã hủy yêu cầu.", cardProvider, cardValue);
@@ -110,10 +117,14 @@ public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.
         notificationRef = FirebaseDatabase.getInstance().getReference("notifications").child(userId);
         String notificationId = notificationRef.push().getKey();
 
-        notificationRef.child(notificationId).child("title").setValue(title);
-        notificationRef.child(notificationId).child("content").setValue(content);
-        notificationRef.child(notificationId).child("dateTime").setValue(currentTime);
-        notificationRef.child(notificationId).child("userId").setValue(userId);
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("title", title);
+        notificationData.put("content", content);
+        notificationData.put("dateTime", currentTime);
+        notificationData.put("userId", userId);
+        notificationData.put("isRead", false); // Thêm trường "isRead" với giá trị mặc định là false
+
+        notificationRef.child(notificationId).setValue(notificationData);
     }
     public void setCardLists(List<Card> pendingCards) {
         this.cardList.clear();
