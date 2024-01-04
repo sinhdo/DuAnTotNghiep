@@ -190,7 +190,9 @@ public class NotificationFragment extends Fragment {
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
             NotificationItem notificationItem = dataSnapshot.getValue(NotificationItem.class);
-            notificationItems.add(0, notificationItem);
+            if (notificationItem != null) {
+                notificationItems.add(0, notificationItem);
+            }
             Collections.sort(notificationItems);
             notificationAdapter.notifyDataSetChanged();
             updateUI();

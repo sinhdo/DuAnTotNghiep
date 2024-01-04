@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.activity.InforOrderActivity;
 import com.example.duantotnghiep.adapter.OrderAdapter;
+import com.example.duantotnghiep.model.InfoProductOrder;
 import com.example.duantotnghiep.model.Order;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,6 +35,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WaitFragment extends Fragment implements OrderAdapter.Callback{
     private RecyclerView recyclerView;
@@ -76,6 +81,53 @@ public class WaitFragment extends Fragment implements OrderAdapter.Callback{
         GetDataWaitListForBuyer();
     }
 
+
+
+    private void GetDataWaitListForBuyer() {
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        String id_user = firebaseUser.getUid();
+        DatabaseReference myReference = firebaseDatabase.getReference("list_order");
+        myReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (list != null) {
+                    list.clear();
+                }
+                for (DataSnapshot orderSnapshot : snapshot.getChildren()) {
+                    Order order = orderSnapshot.getValue(Order.class);
+                    if (order != null && order.getIdBuyer().equals(id_user)) {
+                        List<InfoProductOrder> productList = order.getListProduct();
+                        if (productList != null) {
+                            List<InfoProductOrder> waitingProducts = new ArrayList<>();
+                            for (InfoProductOrder product : productList) {
+                                if (product.getStatus().equals("waitting")) {
+                                    list.add(order);
+                                }
+                            }
+                        }
+                        Log.d("=== order", "onDataChange: "+order);
+                    }else {
+                        Toast.makeText(getContext(), "NULL", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                if (list.isEmpty()) {
+                    recyclerView.setVisibility(View.GONE);
+                    noResultsTextView.setVisibility(View.VISIBLE);
+                } else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    noResultsTextView.setVisibility(View.GONE);
+                }
+                oderAdapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Get list order failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
     private void dialogForUser(Order order) {
         Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.dialog_menu_order);
@@ -93,9 +145,9 @@ public class WaitFragment extends Fragment implements OrderAdapter.Callback{
             dialog.cancel();
         });
         btnCancel.setOnClickListener(view -> {
-            order.setStatus("canceled");
+//            order.setStatus("canceled");
             UpdateStatus(order);
-            ReturnmoneyForBuyer(order);
+//            ReturnmoneyForBuyer(order);
             dialog.dismiss();
         });
         Button tt = dialog.findViewById(R.id.btn_propety);
@@ -113,53 +165,35 @@ public class WaitFragment extends Fragment implements OrderAdapter.Callback{
     private void UpdateStatus(Order order) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference myRef = firebaseDatabase.getReference("list_order");
-        String id = order.getId();
-        myRef.child(id).setValue(order, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                if (error == null) {
-                    Toast.makeText(getContext(), "Update status", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), "Update fall", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
+        String orderId = order.getId();
+        DatabaseReference orderRef = myRef.child(orderId).child("listProduct");
 
-    private void GetDataWaitListForBuyer() {
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        String id_user = firebaseUser.getUid();
-        DatabaseReference myReference = firebaseDatabase.getReference("list_order");
-
-        myReference.orderByChild("status").equalTo("waiting").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (list != null) {
-                    list.clear();
-                }
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Order order = dataSnapshot.getValue(Order.class);
-                    if (order.getIdBuyer().equals(id_user)) {
-                        list.add(order);
+        List<InfoProductOrder> productList = order.getListProduct();
+        if (productList != null) {
+            for (int index = 0; index < productList.size(); index++) {
+                // Cập nhật trạng thái của sản phẩm tại vị trí index
+                orderRef.child(String.valueOf(index)).child("status").setValue("cancled", new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                        if (error == null) {
+                            Toast.makeText(getContext(), "Update status", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }
-                if (list.isEmpty()){
-                    recyclerView.setVisibility(View.GONE);
-                    noResultsTextView.setVisibility(View.VISIBLE);
-
-                }else {
-                    recyclerView.setVisibility(View.VISIBLE);
-                    noResultsTextView.setVisibility(View.GONE);
-                }
-                oderAdapter.notifyDataSetChanged();
+                });
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Get list order failed", Toast.LENGTH_SHORT).show();
-            }
-        });
+        }
     }
+
+
+
+
+
+
+
+
+
 
 
     @Override

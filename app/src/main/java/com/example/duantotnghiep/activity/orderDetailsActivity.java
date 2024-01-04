@@ -33,6 +33,7 @@ import com.example.duantotnghiep.adapter.DiscountDetailsAdapter;
 import com.example.duantotnghiep.adapter.OrderDetailsAdapter;
 import com.example.duantotnghiep.model.ColorProduct;
 import com.example.duantotnghiep.model.Discount;
+import com.example.duantotnghiep.model.InfoProductOrder;
 import com.example.duantotnghiep.model.Order;
 import com.example.duantotnghiep.model.Product;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -61,6 +62,7 @@ public class orderDetailsActivity extends AppCompatActivity {
     private EditText notes;
     private List<Product> productList;
     private List<ColorProduct> colorProductList;
+     List<InfoProductOrder> infoProductOrders = new ArrayList<>();
     private OrderDetailsAdapter adapter;
     private String idProduct;
     private DatabaseReference productRef, userRef, discountRef, buyerRef;
@@ -154,18 +156,23 @@ public class orderDetailsActivity extends AppCompatActivity {
                     if (bundle != null) {
                         double discountAmount = bundle.getDouble("discountAmount", 0.0);
 
-//                        colorList = bundle.getIntegerArrayList("Color");
+                        int color = bundle.getInt("Color");
+                        List<ColorProduct> colorProducts = new ArrayList<>();
+                        colorProducts.add(new ColorProduct(color, new int[]{}));
+
+
                         String size = bundle.getString("Size");
                         quantity = bundle.getInt("Quantity");
                         List<String> sizeList = new ArrayList<>();
                         sizeList.add(size);
 
                         Discount discount = new Discount(discountAmount);
+                        Log.d("color ne", "onDataChange: "+color+" colorProduct "+" colorProducts "+colorProducts);
 
                         Product product = new Product(idProduct, idseller, name,null, categoryID, brand,
-                                description, imgProduct, colorProductList, sold, reviewId, quantity, price, Collections.singletonList(size), null);
+                                description, imgProduct, colorProducts, sold, reviewId, quantity, price, Collections.singletonList(size), null);
 
-                        product.setSelectedQuantity(quantity);
+//                        product.setSelectedQuantity(quantity);
                         productList = new ArrayList<>();
                         productList.add(product);
 
@@ -376,13 +383,29 @@ public class orderDetailsActivity extends AppCompatActivity {
                             int currentQuantity = dataSnapshot.child("quantity").getValue(Integer.class);
                             int remainingQuantity = currentQuantity;
 
+
                             if (remainingQuantity >= 0) {
                                 productsRef.child(product.getId()).child("quantity").setValue(remainingQuantity);
-
-                                Order order = new Order(newKey, idBuyer, product.getSellerId(), product.getId(), product.getName(),
-                                        product.getImgProduct().get(0), color, Double.parseDouble(txtTotal.getText().toString()),
-                                        date, txtAddress.getText().toString(), txtPhone.getText().toString(),
-                                        receivedQuantity, notes.getText().toString(), finalPaid, "waiting");
+                                List<InfoProductOrder> list = new ArrayList<>();
+                                InfoProductOrder infoPr = new InfoProductOrder(product.getId(),
+                                        product.getImgProduct().get(0),
+                                        product.getName(),
+                                        color,
+                                        notes.getText().toString(),
+                                        date,
+                                        subtotal,
+                                        "waitting",
+                                        TextUtils.join(null,product.getSize()),
+                                        product.getQuantity());
+                                list.add(infoPr);
+                                Order order = new Order(newKey,
+                                        idBuyer,
+                                        product.getSellerId(),
+                                        Double.parseDouble(txtTotal.getText().toString()),
+                                        txtAddress.getText().toString(),
+                                        txtPhone.getText().toString(),
+                                        finalPaid,
+                                        list);
 
                                 On_Create_Bill(order);
                                 Log.d("=====", "onClick: sl" + product.getSellerId() + " pr " + product.getId());

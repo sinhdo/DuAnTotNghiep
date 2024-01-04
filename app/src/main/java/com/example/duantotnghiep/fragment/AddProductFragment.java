@@ -163,11 +163,12 @@ public class AddProductFragment extends Fragment {
                 String selectedProductType = (String) sizeSpinner.getSelectedItem();
                 selectedSize = new ArrayList<>();
                 if ("CLOTHING".equals(selectedProductType)) {
-                    selectedSize.addAll(Arrays.asList("S", "M", "L", "XL", "XXL"));
+                    selectedSize.addAll(Arrays.asList("XS", "S", "M", "L", "XL", "XXL"));
                 } else if ("FOOTWEAR".equals(selectedProductType)) {
-                    selectedSize.addAll(Arrays.asList("38", "39", "40", "41", "42"));
+                    selectedSize.addAll(Arrays.asList("36", "37", "38", "39", "40", "41", "42", "43", "44"));
                 }
                 mAdapter.updateSelectedColors(selectedColorProducts, selectedSize);
+                rvMutilpeColor.setAdapter(mAdapter);
             }
 
             @Override
@@ -299,11 +300,6 @@ public class AddProductFragment extends Fragment {
                     } else {
                         removeColor(color);
                     }
-//                    if (selectedColors.contains(color)) {
-//                        selectedColors.remove(selectedColors.indexOf(color));
-//                    } else {
-//                        selectedColors.add(color);
-//                    }
                     updateRecyclerView(view, getColor(selectedColorProducts));
                 }
             });

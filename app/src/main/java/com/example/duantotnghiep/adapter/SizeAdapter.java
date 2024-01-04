@@ -17,6 +17,7 @@ import java.util.List;
 public class SizeAdapter extends RecyclerView.Adapter<SizeAdapter.SizeViewHolder> {
     private List<String> selectedSizes;
     private int selectedItemPosition = -1; // Vị trí mục đã được chọn
+    private SizeAdapterListener listener;
 
     public SizeAdapter(List<String> selectedSizes) {
         this.selectedSizes = selectedSizes;
@@ -29,6 +30,15 @@ public class SizeAdapter extends RecyclerView.Adapter<SizeAdapter.SizeViewHolder
             return null; // Trả về null nếu không có kích thước nào được chọn
         }
     }
+
+    public SizeAdapterListener getListener() {
+        return listener;
+    }
+
+    public void setListener(SizeAdapterListener listener) {
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     public SizeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -70,6 +80,7 @@ public class SizeAdapter extends RecyclerView.Adapter<SizeAdapter.SizeViewHolder
                         // Cập nhật giao diện người dùng
                         notifyDataSetChanged();
                     }
+                    listener.onSelect(position);
                 }
             });
         }
@@ -81,5 +92,9 @@ public class SizeAdapter extends RecyclerView.Adapter<SizeAdapter.SizeViewHolder
                 sizeTextView.setBackgroundResource(R.drawable.btn_shop);
             }
         }
+    }
+
+    public interface SizeAdapterListener {
+        void onSelect(int i);
     }
 }

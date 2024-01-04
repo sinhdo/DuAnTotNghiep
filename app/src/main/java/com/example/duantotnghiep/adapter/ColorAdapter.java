@@ -17,9 +17,18 @@ import java.util.List;
 public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ColorViewHolder> {
     private List<Integer> colors;
     private int selectedItem = RecyclerView.NO_POSITION;
+    private ColorAdapterListener listener;
 
     public ColorAdapter(List<Integer> colors) {
         this.colors = colors;
+    }
+
+    public ColorAdapterListener getListener() {
+        return listener;
+    }
+
+    public void setListener(ColorAdapterListener listener) {
+        this.listener = listener;
     }
 
     public String getSelectedColor() {
@@ -83,6 +92,7 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ColorViewHol
                             selectedItem = position;
                         }
                     }
+                    listener.onSelect(position);
                 }
             });
 
@@ -100,5 +110,9 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ColorViewHol
                 notifyItemChanged(previousSelectedItem);
             }
         }
+    }
+
+    public interface ColorAdapterListener {
+        void onSelect(int i);
     }
 }
