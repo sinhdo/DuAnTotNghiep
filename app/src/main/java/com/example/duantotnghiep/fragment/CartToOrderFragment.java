@@ -59,7 +59,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
     FirebaseUser firebaseUser;
     DatabaseReference userRef, productRef;
     private Map<String, String> productNotes = new HashMap<>();
-    double TotalPlusShip = 0;
+    private double TotalPlusShip = 0;
     double TotalPay = 0;
     LinearLayout btn_addLocation_Cart, PaymentMethods;
     TextView total_price_cart, txtPhone, txtAddress, txtName, lineCart, txtPayment_Cart, txtAllVoucherCart, txtMoneyCart, txtSubtotalCart, txtTotalCart;
@@ -134,10 +134,9 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
 
         return root;
     }
-
-    private void  CreateOrder() {
+//    String idSeller = "ZYA1yQdRAYSzh1K24ZVYIYvHIc92";
+    private void CreateOrder() {
         if (txtPayment_Cart.getText().toString().equalsIgnoreCase("Payment methods")) {
-
             Toast.makeText(getContext(), "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -146,11 +145,19 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         }
 
         if (TextUtils.isEmpty(txtAddress.getText().toString()) || TextUtils.isEmpty(txtPhone.getText().toString())) {
-
             Toast.makeText(getContext(), "Vui lòng chọn địa chỉ", Toast.LENGTH_SHORT).show();
             return;
         }
-        List<InfoProductOrder> list = new ArrayList<>();
+
+        String idBuyer = firebaseUser.getUid();
+        String address = txtAddress.getText().toString();
+        String numberPhone = txtPhone.getText().toString();
+        Boolean paid = false;
+
+        String idSeller = "ZYA1yQdRAYSzh1K24ZVYIYvHIc92";
+
+        List<InfoProductOrder> productList = new ArrayList<>();
+
         for (AddProductToCart product : selectedProducts) {
             Map<String, String> productNotes = orderAdapter.getProductNotes();
             String productId = product.getId();
@@ -162,7 +169,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                     if (dataSnapshot.exists()) {
                         Product associatedProduct = dataSnapshot.getValue(Product.class);
                         String date = getCurrentDate();
-                        String status = "waitting";
+                        String status = "waiting";
                         if (product.getQuantity_product() <= associatedProduct.getQuantity()) {
                             InfoProductOrder infoPr = new InfoProductOrder(product.getId(),
                                     product.getImage_product(),
@@ -170,43 +177,39 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                                     product.getColor_product(),
                                     note,
                                     date,
-                                    0.0,
+                                    product.getPricetotal_product(),
                                     status,
                                     product.getSize_product(),
                                     product.getQuantity_product());
-                            list.add(infoPr);
-                        String idBuyer = firebaseUser.getUid();
-                        double discountedPrice = orderAdapter.getDiscountedPrice(productId);
-                        Double total = discountedPrice;
+                            productList.add(infoPr);
 
-                        String address = txtAddress.getText().toString();
-                        String numberPhone = txtPhone.getText().toString();
-                        int quantity = product.getQuantity_product();
-                        Boolean paid = false;
+//                            double discountedPrice = orderAdapter.getDiscountedPrice(productId);
+//                            Double total = discountedPrice;
 
+                            if (productList.size() == selectedProducts.size()) {
+                                String orderId = userRef.child("list_order").push().getKey();
+                                Order order = new Order(
+                                        orderId,
+                                        idBuyer,
+                                        idSeller,
+                                        TotalPlusShip,
+                                        address,
+                                        numberPhone,
+                                        paid,
+                                        productList
+                                );
 
-                        String idSeller = associatedProduct.getSellerId();
-                            String orderId = userRef.child("list_order").push().getKey();
-                        Order order = new Order(
-                                orderId,
-                                idBuyer,
-                                idSeller,
-                                total,
-                                address,
-                                numberPhone,
-                                paid
-                                ,list
-                        );
-                            Log.d("list pr", "onDataChange: "+list);
-                            DatabaseReference orderRef = userRef.child("list_order").child(orderId);
-                        orderRef.setValue(order);
-                        DatabaseReference cartItemRef = userRef.child("cart").child(firebaseUser.getUid()).child(product.getCartItemId());
-                        cartItemRef.removeValue();
-                        updateProductQuantity(product.getId_product(), product.getQuantity_product());
-                    } else {
-
+                                DatabaseReference orderRef = userRef.child("list_order").child(orderId);
+                                orderRef.setValue(order);
+                                for (AddProductToCart product : selectedProducts) {
+                                    DatabaseReference cartItemRef = userRef.child("cart").child(firebaseUser.getUid()).child(product.getCartItemId());
+                                    cartItemRef.removeValue();
+                                    updateProductQuantity(product.getId_product(), product.getQuantity_product());
+                                }
+                                showDialogOrder();
+                            }
+                        } else {
                             showOutOfStockDialog();
-
                         }
                     }
                 }
@@ -217,18 +220,14 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                 }
             });
         }
-
-            showDialogOrder();
     }
     private void showOutOfStockDialog() {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Thông báo");
         builder.setMessage("Một số sản phẩm đã hết hàng. Vui lòng kiểm tra lại giỏ hàng của bạn.");
         builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
         builder.show();
     }
-
     @Override
     public void onDiscountUpdated(double totalSelectedDiscounts) {
         totalDiscount = totalSelectedDiscounts;
@@ -236,21 +235,15 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
             TotalPay = TotalPlusShip - totalDiscount;
             txtAllVoucherCart.setText(String.format("-" + formatPrice(totalSelectedDiscounts)));
         } else {
-
             TotalPay = TotalPlusShip;
             Log.d("hhhh", "TotalPlusShip" + TotalPlusShip);
             txtAllVoucherCart.setText(String.format("-" + formatPrice(totalSelectedDiscounts)));
         }
-
-
         txtTotalCart.setText(String.format(formatPrice(TotalPay)));
         total_price_cart.setText(String.format(formatPrice(TotalPay)) + "VND");
     }
-
     private void updateWalletAfterOrder() {
-
         DatabaseReference buyerWalletRef = userRef.child("user").child(firebaseUser.getUid()).child("wallet");
-
         buyerWalletRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -260,37 +253,28 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                         TotalPay = TotalPlusShip - totalDiscount;
 //                        txtAllVoucherCart.setText(String.format("-" + formatPrice(totalSelectedDiscounts)));
                     } else {
-
                         TotalPay = TotalPlusShip;
                         Log.d("hhhh", "TotalPlusShip" + TotalPlusShip);
 //                        txtAllVoucherCart.setText(String.format("-" + formatPrice(totalSelectedDiscounts)));
                     }
-
                     double newWalletAmount = currentWalletAmount - TotalPay;
                     Log.d("Debug", "TotalPay: " + TotalPay);
-
-
                     buyerWalletRef.setValue(newWalletAmount);
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
     }
-
-
     private String getCurrentDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
         return sdf.format(new Date());
     }
-
     private void showWallet() {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         userRef = FirebaseDatabase.getInstance().getReference();
-
         if (firebaseUser != null) {
             String buyerID = firebaseUser.getUid();
             DatabaseReference buyerRef = userRef.child("user").child(buyerID).child("wallet");
@@ -300,61 +284,46 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                     if (dataSnapshot.exists()) {
                         double walletAmount = dataSnapshot.getValue(Double.class);
                         txtMoneyCart.setText(String.format(formatPrice(walletAmount)));
-
                     }
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
             });
-
-
             if (getActivity() != null) {
                 Intent intent = getActivity().getIntent();
                 if (intent != null) {
                     String idProduct = intent.getStringExtra("idPro");
-
-
                     if (idProduct != null) {
                         productRef = userRef.child("products").child(idProduct);
                     } else {
-
                         Log.e("CartToOrderFragment", "idProduct is null");
                     }
                 }
             }
         } else {
-
             Log.e("CartToOrderFragment", "Firebase user is null");
         }
     }
-
     private void checkWalletBalanceBeforeOrder() {
         if (txtPayment_Cart.getText().toString().equals("Pay with wallet")) {
             String walletAmountString = txtMoneyCart.getText().toString().replaceAll("[^\\d.]", "");
             double currentWalletAmount = Double.parseDouble(walletAmountString);
-
             if (totalDiscount > 0) {
                 TotalPay = TotalPlusShip - totalDiscount;
             } else {
                 TotalPay = TotalPlusShip;
             }
-
             if (TotalPay > currentWalletAmount) {
                 showInsufficientBalanceDialog();
             } else {
                 CreateOrder();
             }
         } else {
-
             CreateOrder();
         }
     }
-
-
-
     private void showInsufficientBalanceDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Thông báo");
@@ -366,34 +335,24 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
         builder.show();
     }
-
     private void updateProductQuantity(String productId, int purchasedQuantity) {
         DatabaseReference productRef = FirebaseDatabase.getInstance().getReference("products").child(productId);
-
         productRef.runTransaction(new Transaction.Handler() {
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
                 Product product = mutableData.getValue(Product.class);
-
                 if (product != null) {
-
                     int currentQuantity = product.getQuantity();
                     int newQuantity = currentQuantity - purchasedQuantity;
-
-
                     if (newQuantity < 0) {
                         newQuantity = 0;
                     }
-
                     product.setQuantity(newQuantity);
-
                     mutableData.setValue(product);
                 }
-
                 return Transaction.success(mutableData);
             }
-
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, boolean committed, @Nullable DataSnapshot dataSnapshot) {
                 if (committed) {
@@ -404,27 +363,20 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
             }
         });
     }
-
     private void showSelectedProducts(List<AddProductToCart> selectedProducts) {
         if (orderAdapter != null) {
             orderAdapter.updateSelectedProducts(selectedProducts);
             totalPrice = orderAdapter.calculateTotalPrice();
         }
     }
-
-
     private String formatPrice(double price) {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.US);
         String formattedPrice = format.format(price);
-
-
         if (formattedPrice.endsWith(".00")) {
             formattedPrice = formattedPrice.substring(0, formattedPrice.length() - 3);
         }
-
         return formattedPrice;
     }
-
     private void showDiaLogAddress() {
         Intent intent = new Intent(getContext(), ShowListLocationActivity.class);
         Bundle bundle = new Bundle();
@@ -432,7 +384,6 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         intent.putExtras(bundle);
         startActivityForResult(intent, Activity.RESULT_CANCELED);
     }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -459,7 +410,6 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
             }
         }
     }
-
     private void poppuGetListPayment() {
         String[] listPayment = {"Payment on delivery", "Pay with wallet"};
         PaymentMethods.setOnClickListener(view -> {
@@ -478,7 +428,6 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
             popupMenu.show();
         });
     }
-
     private void showDialogOrder() {
         ConstraintLayout successDialog = getActivity().findViewById(R.id.successDialog);
         View view = LayoutInflater.from(getContext()).inflate(R.layout.success_dialog_order, successDialog);
@@ -499,13 +448,9 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         }
         alertDialog.show();
     }
-
     private void navigateToNewScreen() {
-
         Intent intent = new Intent(getContext(), MainActivity.class);
         startActivity(intent);
         getActivity().finish();
     }
-
-
 }

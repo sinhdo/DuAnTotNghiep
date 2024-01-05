@@ -71,6 +71,7 @@ public class orderDetailsActivity extends AppCompatActivity {
     private double delivery;
     private double tax;
     private double subtotal;
+    private double total;
     private double discountedPrice;
     private double price;
     private List<Discount> discountList;
@@ -172,12 +173,10 @@ public class orderDetailsActivity extends AppCompatActivity {
                         Product product = new Product(idProduct, idseller, name,null, categoryID, brand,
                                 description, imgProduct, colorProducts, sold, reviewId, quantity, price, Collections.singletonList(size), null);
 
-//                        product.setSelectedQuantity(quantity);
                         productList = new ArrayList<>();
                         productList.add(product);
 
                         adapter.setProductList(productList);
-//                        adapter.setColorList(colorList);
 
                         rcvOrderDetail.setLayoutManager(new LinearLayoutManager(orderDetailsActivity.this));
                         rcvOrderDetail.setAdapter(adapter);
@@ -195,13 +194,14 @@ public class orderDetailsActivity extends AppCompatActivity {
                         if (!TextUtils.isEmpty(taxText)) {
                             tax = Double.parseDouble(taxText);
                         }
-                        double total = subtotal + delivery + tax;
+                        total = subtotal + delivery + tax;
                         discountedPrice = total - discountAmount;
 
                         txtSubtotal.setText(String.format("%.0f VND", subtotal));
                         txtDelivery.setText(String.format("%.0f VND", delivery));
                         txtTax.setText(String.format("%.0f VND", tax));
                         txtTotal.setText(String.valueOf(discountedPrice));
+                        Log.d("discountedPrice", "Discounted Price: " + String.valueOf(discountedPrice));
                     }
                 }
             }
@@ -337,7 +337,7 @@ public class orderDetailsActivity extends AppCompatActivity {
                     txtSubtotal.setText(String.format("%.0f VND", subtotal));
                 }
 
-                double total = Double.parseDouble(txtSubtotal.getText().toString()) + delivery + tax;
+                total = Double.parseDouble(txtSubtotal.getText().toString()) + delivery + tax;
                 txtTotal.setText(String.valueOf(total));
             }
         }
@@ -359,13 +359,13 @@ public class orderDetailsActivity extends AppCompatActivity {
         }
     }
     private void updateTotal() {
-        double subtotal = Double.parseDouble(txtSubtotal.getText().toString().replaceAll("[^\\d.]", ""));
-        double total = subtotal + delivery + tax;
+        subtotal = Double.parseDouble(txtSubtotal.getText().toString().replaceAll("[^\\d.]", ""));
+        total = subtotal + delivery + tax;
         txtTotal.setText(String.valueOf(total));
     }
     private void performNextSteps(String newKey, String idBuyer, String date) {
         DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference("products");
-        DatabaseReference discountRef = FirebaseDatabase.getInstance().getReference("discounts"); // Thêm tham chiếu đến danh sách mã voucher trong Firebase
+        DatabaseReference discountRef = FirebaseDatabase.getInstance().getReference("discounts");
 
         for (int i = 0; i < adapter.getItemCount(); i++) {
             Product product = adapter.getProduct(i);
@@ -393,10 +393,11 @@ public class orderDetailsActivity extends AppCompatActivity {
                                         color,
                                         notes.getText().toString(),
                                         date,
-                                        subtotal,
+                                        total,
                                         "waitting",
                                         TextUtils.join(null,product.getSize()),
                                         product.getQuantity());
+                                Log.d("Total", String.valueOf(total));
                                 list.add(infoPr);
                                 Order order = new Order(newKey,
                                         idBuyer,
