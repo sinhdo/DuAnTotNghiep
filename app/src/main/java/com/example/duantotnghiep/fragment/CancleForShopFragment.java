@@ -37,7 +37,7 @@ import java.util.ArrayList;
 public class CancleForShopFragment extends Fragment implements OrderAdapter.Callback{
     private RecyclerView recyclerView;
     private OrderAdapter oderAdapter;
-    private ArrayList<Order> list = new ArrayList<>();
+    private final ArrayList<Order> list = new ArrayList<>();
     private FirebaseUser firebaseUser;
     private TextView noResultsTextView;
 
@@ -90,6 +90,8 @@ public class CancleForShopFragment extends Fragment implements OrderAdapter.Call
                         list.add(order);
                     }
                 }
+
+
                 if (list.isEmpty()){
                     recyclerView.setVisibility(View.GONE);
                     noResultsTextView.setVisibility(View.VISIBLE);
