@@ -91,19 +91,13 @@ public class NotificationFragment extends Fragment {
             noResultsTextView.setVisibility(View.GONE);
         }
 
-        imgCart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), CartActivity.class);
-                startActivity(intent);
-            }
+        imgCart.setOnClickListener(view1 -> {
+            Intent intent = new Intent(getContext(), CartActivity.class);
+            startActivity(intent);
         });
-        imgCart1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), CartActivity.class);
-                startActivity(intent);
-            }
+        imgCart1.setOnClickListener(view12 -> {
+            Intent intent = new Intent(getContext(), CartActivity.class);
+            startActivity(intent);
         });
 
         TotalItemCart();
@@ -165,6 +159,7 @@ public class NotificationFragment extends Fragment {
             noResultsTextView.setVisibility(View.GONE);
         }
     }
+
     private ValueEventListener notificationValueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
