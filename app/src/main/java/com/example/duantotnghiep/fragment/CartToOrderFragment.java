@@ -173,7 +173,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                             product.getColor_product(),
                             note,
                             date,
-                            0.0,
+                            product.getPricetotal_product(),
                             status,
                             product.getSize_product(),
                             product.getQuantity_product());
