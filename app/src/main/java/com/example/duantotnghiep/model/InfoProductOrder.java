@@ -15,8 +15,6 @@ public class InfoProductOrder {
     public InfoProductOrder() {
     }
 
-
-
     public InfoProductOrder(String idProduct, String imgPr, String namePr, int colorPr, String note, String date, Double price, String status, String size, int quantityPr) {
         this.idProduct = idProduct;
         this.imgPr = imgPr;

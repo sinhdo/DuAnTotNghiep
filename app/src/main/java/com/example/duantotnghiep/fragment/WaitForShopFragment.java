@@ -107,8 +107,11 @@ public class WaitForShopFragment extends Fragment implements OrderAdapter.Callba
                             List<InfoProductOrder> waitingProducts = new ArrayList<>();
                             for (InfoProductOrder product : productList) {
                                 if (product.getStatus().equals("waitting")) {
-                                    list.add(order);
+                                    waitingProducts.add(product);
                                 }
+                            }
+                            if (!waitingProducts.isEmpty()) {
+                                list.add(order);
                             }
                         }
                         Log.d("=== order", "onDataChange: "+order);
@@ -147,7 +150,10 @@ public class WaitForShopFragment extends Fragment implements OrderAdapter.Callba
         btn_review.setVisibility(View.INVISIBLE);
         btnExit.setText("Xác nhận đơn hàng");
         btnExit.setOnClickListener(view -> {
-//            order.setStatus("confirmed");
+            for (InfoProductOrder product : order.getListProduct()) {
+                product.setStatus("confirmed");
+                UpdateProductStatus(order.getId(), product.getIdProduct(), "confirmed");
+            }
             UpdateStatus(order);
             dialog.dismiss();
         });
@@ -158,7 +164,6 @@ public class WaitForShopFragment extends Fragment implements OrderAdapter.Callba
             builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-//                    order.setStatus("canceledbyshop");
                     UpdateStatus(order);
                     ReturnmoneyForBuyer(order);
                     dialog.dismiss();
@@ -184,25 +189,41 @@ public class WaitForShopFragment extends Fragment implements OrderAdapter.Callba
                 startActivity(intent);
             }
         });
-
         dialog.show();
+    }
+    private void UpdateProductStatus(String orderId, String productId, String status) {
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = firebaseDatabase.getReference("list_order")
+                .child(orderId)
+                .child("listProduct")
+                .child(productId)
+                .child("status");
+        myRef.setValue(status, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if (error == null) {
+                    Toast.makeText(getContext(), "Update product status", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Update product status failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
     private void UpdateStatus(Order order) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference myRef = firebaseDatabase.getReference("list_order");
         String id = order.getId();
-        myRef.child(id).setValue(order, new DatabaseReference.CompletionListener() {
+        myRef.child(id).child("status").setValue("confirmed", new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
                 if (error == null) {
                     Toast.makeText(getContext(), "Update status", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getContext(), "Update fall", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
-
     @Override
     public void logic(Order order) {
         dialogForShop(order);
@@ -230,7 +251,6 @@ public class WaitForShopFragment extends Fragment implements OrderAdapter.Callba
                                     Toast.makeText(getContext(), "Bạn đã được hoàn tiền lại cho người bán", Toast.LENGTH_SHORT).show();
                                 }
                             }
-
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
                                 Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show();
