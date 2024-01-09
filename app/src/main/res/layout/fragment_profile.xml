@@ -305,7 +305,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cvReView"
+                android:id="@+id/cvChatBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
@@ -328,14 +328,14 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_gravity="center_horizontal"
-                        android:src="@drawable/baseline_star_half_24" />
+                        android:src="@drawable/baseline_chat_24" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
                         android:gravity="center"
-                        android:text="Đánh giá của tôi"
+                        android:text="Nhắn tin"
                         android:textAlignment="center"
                         android:textSize="24sp"
                         android:textStyle="bold" />
