@@ -24,6 +24,7 @@ import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.activity.InforOrderActivity;
 import com.example.duantotnghiep.activity.ReviewsActivity;
 import com.example.duantotnghiep.adapter.OrderAdapter;
+import com.example.duantotnghiep.adapter.OrderAdapterUser;
 import com.example.duantotnghiep.model.InfoProductOrder;
 import com.example.duantotnghiep.model.Order;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -43,11 +44,11 @@ import java.util.Map;
 
 public class DoneFragment extends Fragment implements OrderAdapter.Callback{
     private RecyclerView recyclerView;
-    private OrderAdapter oderAdapter;
+    private OrderAdapterUser orderAdapter;
     private ArrayList<Order> list = new ArrayList<>();
     private FirebaseUser firebaseUser;
-
     private TextView noResultsTextView;
+    private String currentFragment = "DoneFragment";
 
 
     public DoneFragment() {
@@ -71,97 +72,48 @@ public class DoneFragment extends Fragment implements OrderAdapter.Callback{
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_done, container, false);
     }
-
-
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recyclerView = view.findViewById(R.id.rec_done);
+        recyclerView = view.findViewById(R.id.rec_wait);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        noResultsTextView = view.findViewById(R.id.noResultsTextView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        oderAdapter = new OrderAdapter(getContext(), list, this);
-        recyclerView.setAdapter(oderAdapter);
+//        orderAdapter = new OrderAdapterUser(getContext(), (List<Order>) list, (OrderAdapterUser.Callback) this);
+        orderAdapter.setCurrentFragment(currentFragment);
+        noResultsTextView = view.findViewById(R.id.noResultsTextView);
+        recyclerView.setAdapter(orderAdapter);
         GetDataDoneListForBuyer();
     }
-
-    private void dialogForUser(Order order) {
-        Dialog dialog = new Dialog(getActivity());
-        dialog.setContentView(R.layout.dialog_menu_order);
-        dialog.getWindow().setBackgroundDrawable(getActivity().getDrawable(R.drawable.bg_dialog_order));
-        Window window = dialog.getWindow();
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        WindowManager.LayoutParams windowAttributes = window.getAttributes();
-        window.setAttributes(windowAttributes);
-        windowAttributes.gravity = Gravity.BOTTOM;
-        Button btnCancel = dialog.findViewById(R.id.btn1);
-        btnCancel.setVisibility(View.GONE);
-        Button btnExit = dialog.findViewById(R.id.btn2);
-        Button btn_review = dialog.findViewById(R.id.btn_review);
-        btn_review.setVisibility(View.VISIBLE);
-        btnExit.setOnClickListener(view -> {
-            dialog.cancel();
-        });
-        Button tt = dialog.findViewById(R.id.btn_propety);
-        tt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), InforOrderActivity.class);
-                intent.putExtra("idOrder",order.getId());
-                startActivity(intent);
-            }
-        });
-
-
-        btn_review.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), ReviewsActivity.class);
-                intent.putExtra("idOrder",order.getId());
-                startActivity(intent);
-            }
-        });
-
-        dialog.show();
-    }
-
     private void GetDataDoneListForBuyer() {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         String id_user = firebaseUser.getUid();
         DatabaseReference myReference = firebaseDatabase.getReference("list_order");
         myReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (list != null) {
                     list.clear();
                 }
-                for (DataSnapshot orderSnapshot : snapshot.getChildren()) {
+                for (DataSnapshot orderSnapshot : dataSnapshot.getChildren()) {
                     Order order = orderSnapshot.getValue(Order.class);
-                    if (order != null && order.getIdBuyer().equals(id_user)) {
-                        List<InfoProductOrder> productList = order.getListProduct();
-                        if (productList != null) {
-                            List<InfoProductOrder> waitingProducts = new ArrayList<>();
-                            for (InfoProductOrder product : productList) {
-                                if (product.getStatus().equals("done")) {
-                                    list.add(order);
-                                }
-                            }
+                    if (order != null && order.getIdSeller().equals(id_user)) {
+                        if (order.getStatus().equals("Done")) {
+                            list.add(order);
                         }
-                        Log.d("=== order", "onDataChange: "+order);
-                    }else {
+                    } else {
                         Toast.makeText(getContext(), "NULL", Toast.LENGTH_SHORT).show();
                     }
                 }
-
+                orderAdapter.notifyDataSetChanged();
+                if (!list.isEmpty()) {
+                    orderAdapter.setProductList(list.get(0).getListProduct());
+                }
                 if (list.isEmpty()) {
-                    recyclerView.setVisibility(View.GONE);
                     noResultsTextView.setVisibility(View.VISIBLE);
                 } else {
-                    recyclerView.setVisibility(View.VISIBLE);
                     noResultsTextView.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
                 }
-                oderAdapter.notifyDataSetChanged();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -169,10 +121,8 @@ public class DoneFragment extends Fragment implements OrderAdapter.Callback{
             }
         });
     }
-
-
     @Override
     public void logic(Order order) {
-        dialogForUser(order);
+
     }
 }

@@ -26,13 +26,14 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
+public class OrderAdapterUser extends RecyclerView.Adapter<OrderAdapterUser.OrderViewHolder>{
     private Context context;
     private List<Order> list;
     private Callback callback;
     private List<InfoProductOrder> infoProductOrderList;
     private String currentFragment;
-    public OrderAdapter(Context context, List<Order> list, Callback callback) {
+
+    public OrderAdapterUser (Context context, List<Order> list, Callback callback) {
         this.context = context;
         this.list = list;
         this.infoProductOrderList = new ArrayList<>();
@@ -46,10 +47,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     @Override
     public OrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_order, parent, false);
-        return new OrderViewHolder(view);
+        return new OrderAdapterUser.OrderViewHolder(view);
     }
+
     @Override
-    public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull OrderAdapterUser.OrderViewHolder holder, int position) {
         Order order = list.get(position);
         if (order == null) {
             return;
@@ -97,34 +99,23 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         Button btnHuyDon = menuDialog.findViewById(R.id.btnHuyDon);
         Button btnOut = menuDialog.findViewById(R.id.btnOut);
 
-        if (currentFragment.equals("WaitForShopFragment")) {
-            btnReview.setText("Xác nhận đơn hàng");
-        } else if (currentFragment.equals("ConfirmForShopFragment")) {
-            btnReview.setText("Vận chuyển đơn hàng");
-        }else if (currentFragment.equals("DeliverForShopFragment")){
-            btnReview.setText("Hoàn thành đơn hàng");
-        }else if (currentFragment.equals("CancleForShopFragment")){
+        if (currentFragment.equals("CancleFragment")){
             btnReview.setText("Mua lại đơn hàng");
         }
-        if (currentFragment.equals("WaitForShopFragment")) {
+        if (currentFragment.equals("WaitFragment")) {
             btnHuyDon.setVisibility(View.VISIBLE);
         } else {
             btnHuyDon.setVisibility(View.GONE);
         }
+        if (currentFragment.equals("DoneFragment")) {
+            btnReview.setVisibility(View.VISIBLE);
+        } else {
+            btnReview.setVisibility(View.GONE);
+        }
         btnReview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentFragment.equals("WaitForShopFragment")) {
-                    updateOrderStatus(order.getId(), "Confirm");
-                    Toast.makeText(context, "Đã xác nhận đơn!!!", Toast.LENGTH_SHORT).show();
-                } else if (currentFragment.equals("ConfirmForShopFragment")) {
-                    updateOrderStatus(order.getId(), "Deliver");
-                    Toast.makeText(context, "Đơn đã được vận chuyển!!!", Toast.LENGTH_SHORT).show();
-                }else if (currentFragment.equals("DeliverForShopFragment")){
-                    updateOrderStatus(order.getId(), "Done");
-                    Toast.makeText(context, "Đơn đã hoàn thành!!!", Toast.LENGTH_SHORT).show();
-                }
-                menuDialog.dismiss();
+
             }
         });
         btnPropety.setOnClickListener(new View.OnClickListener() {
@@ -169,7 +160,6 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         productOrderAdapter.setProductList(productList);
         orderDetailDialog.show();
 
-        // Log danh sách sản phẩm
         for (InfoProductOrder product : productList) {
             Log.d("Product", "Name: " + product.getNamePr() + ", Price: " + product.getPrice());
         }
@@ -185,6 +175,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         }
         return list.size();
     }
+
     public class OrderViewHolder extends RecyclerView.ViewHolder {
         private ImageView img_byer;
         private TextView tv_nameByer, adresByer, phoneByer, soluong, tvNoteOrder, tvDate;

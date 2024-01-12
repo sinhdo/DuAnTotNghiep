@@ -9,7 +9,6 @@ import android.os.Bundle;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.ViewPager2_CartForShop_Adapter;
-import com.example.duantotnghiep.adapter.ViewPager2_Cart_Adapter;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
