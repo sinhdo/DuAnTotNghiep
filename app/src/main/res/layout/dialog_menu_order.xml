@@ -24,37 +24,37 @@
             android:layout_margin="10dp"
             android:textColor="@color/white"
             android:text="Đánh giá sản phẩm" />
-            <Button
-                android:id="@+id/btn_propety"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:backgroundTint="#403F3F"
-                android:padding="10dp"
-                android:textAllCaps="false"
-                android:layout_margin="10dp"
-                android:textColor="@color/white"
-                android:text="Chi tiết đơn hàng" />
         <Button
-                android:id="@+id/btn1"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:backgroundTint="#403F3F"
-                android:padding="10dp"
-                android:textAllCaps="false"
-                android:layout_margin="10dp"
-                android:textColor="@color/white"
-                android:text="Hủy đơn hàng" />
+            android:id="@+id/btn_propety"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:backgroundTint="#403F3F"
+            android:padding="10dp"
+            android:textAllCaps="false"
+            android:layout_margin="10dp"
+            android:textColor="@color/white"
+            android:text="Chi tiết đơn hàng" />
+        <Button
+            android:id="@+id/btnHuyDon"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:backgroundTint="#403F3F"
+            android:padding="10dp"
+            android:textAllCaps="false"
+            android:layout_margin="10dp"
+            android:textColor="@color/white"
+            android:text="Hủy đơn hàng" />
 
 
-            <Button
-                android:id="@+id/btn2"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:backgroundTint="#403F3F"
-                android:textColor="@color/white"
-                android:textAllCaps="false"
-                android:layout_margin="10dp"
-                android:padding="10dp"
-                android:text="Thoát" />
+        <Button
+            android:id="@+id/btnOut"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:backgroundTint="#403F3F"
+            android:textColor="@color/white"
+            android:textAllCaps="false"
+            android:layout_margin="10dp"
+            android:padding="10dp"
+            android:text="Thoát" />
     </LinearLayout>
 </RelativeLayout>

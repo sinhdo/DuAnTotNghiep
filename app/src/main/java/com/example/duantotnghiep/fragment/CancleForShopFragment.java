@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,11 +37,11 @@ import java.util.ArrayList;
 
 public class CancleForShopFragment extends Fragment implements OrderAdapter.Callback{
     private RecyclerView recyclerView;
-    private OrderAdapter oderAdapter;
-    private final ArrayList<Order> list = new ArrayList<>();
+    private OrderAdapter orderAdapter;
+    private ArrayList<Order> list = new ArrayList<>();
     private FirebaseUser firebaseUser;
     private TextView noResultsTextView;
-
+    private String currentFragment = "CancleForShopFragment";
 
     public CancleForShopFragment() {
         // Required empty public constructor
@@ -69,76 +70,53 @@ public class CancleForShopFragment extends Fragment implements OrderAdapter.Call
         recyclerView = view.findViewById(R.id.rec_cancleforshop);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        oderAdapter = new OrderAdapter(getContext(), list, this);
+        orderAdapter = new OrderAdapter(getContext(), list, this);
+        orderAdapter.setCurrentFragment(currentFragment);
         noResultsTextView = view.findViewById(R.id.noResultsTextView);
-        recyclerView.setAdapter(oderAdapter);
-        GetDataCancleListForBuyer();
-    }
-    private void GetDataCancleListForBuyer() {
+        recyclerView.setAdapter(orderAdapter);
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         String id_user = firebaseUser.getUid();
         DatabaseReference myReference = firebaseDatabase.getReference("list_order");
-        myReference.orderByChild("status").equalTo("canceledbyshop").addValueEventListener(new ValueEventListener() {
+        myReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (list != null) {
                     list.clear();
                 }
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Order order = dataSnapshot.getValue(Order.class);
-                    if (order.getIdSeller().equals(id_user)) {
-                        list.add(order);
+
+                for (DataSnapshot orderSnapshot : dataSnapshot.getChildren()) {
+                    Order order = orderSnapshot.getValue(Order.class);
+                    if (order != null && order.getIdSeller().equals(id_user)) {
+                        if (order.getStatus().equals("Cancle")) {
+                            list.add(order);
+                            Log.d("==abc 1", "onDataChange: " + order);
+                        }
+                        Log.d("=== order", "onDataChange: " + order);
+                    } else {
+                        Toast.makeText(getContext(), "NULL", Toast.LENGTH_SHORT).show();
                     }
                 }
 
-
-                if (list.isEmpty()){
-                    recyclerView.setVisibility(View.GONE);
+                orderAdapter.notifyDataSetChanged();
+                if (list.isEmpty()) {
                     noResultsTextView.setVisibility(View.VISIBLE);
-
-                }else {
-                    recyclerView.setVisibility(View.VISIBLE);
+                } else {
                     noResultsTextView.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
                 }
-                oderAdapter.notifyDataSetChanged();
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Get list order failed", Toast.LENGTH_SHORT).show();
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
-    private void dialogForUser(Order order) {
-        Dialog dialog = new Dialog(getActivity());
-        dialog.setContentView(R.layout.dialog_menu_order);
-        dialog.getWindow().setBackgroundDrawable(getActivity().getDrawable(R.drawable.bg_dialog_order));
-        Window window = dialog.getWindow();
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        WindowManager.LayoutParams windowAttributes = window.getAttributes();
-        window.setAttributes(windowAttributes);
-        windowAttributes.gravity = Gravity.BOTTOM;
-        Button btnCancel = dialog.findViewById(R.id.btn1);
-        Button btnExit = dialog.findViewById(R.id.btn2);
-        btnExit.setOnClickListener(view -> {
-            dialog.cancel();
-        });
-        btnCancel.setVisibility(View.GONE);
 
-        Button tt = dialog.findViewById(R.id.btn_propety);
-        tt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), InforOrderActivity.class);
-                intent.putExtra("idOrder",order.getId());
-                startActivity(intent);
-            }
-        });
 
-        dialog.show();
-    }
 
     @Override
     public void logic(Order order) {
-        dialogForUser(order);
+
     }
 }

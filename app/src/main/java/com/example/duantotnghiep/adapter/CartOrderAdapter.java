@@ -96,36 +96,28 @@ public class CartOrderAdapter extends RecyclerView.Adapter<CartOrderAdapter.View
         holder.bind(product, colorList, position);
         holder.calculateDiscountedPrice();
 
-        holder.edtNoteCart.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                String note = charSequence.toString();
-                productNotes.put(product.getId(), note);
-                Log.d("CartOrderAdapter", "Product ID: " + product.getId() + ", Note: " + note+", productNotes"+productNotes);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
+//        holder.edtNoteCart.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//
+//                String note = charSequence.toString();
+//                productNotes.put(product.getId(), note);
+//                Log.d("CartOrderAdapter", "Product ID: " + product.getId() + ", Note: " + note+", productNotes"+productNotes);
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable editable) {
+//            }
+//        });
     }
-
     public void updateSelectedProducts(List<AddProductToCart> selectedProducts) {
         this.selectedProducts = selectedProducts;
         notifyDataSetChanged();
     }
-
-
-
-
-
-
-
 
     @Override
     public int getItemCount() {
@@ -142,9 +134,6 @@ public class CartOrderAdapter extends RecyclerView.Adapter<CartOrderAdapter.View
 
         return totalPrice;
     }
-
-
-
     public double getDiscountedPrice(String productId) {
         return discountedPrices.get(productId) != null ? discountedPrices.get(productId) : 0;
     }
@@ -154,7 +143,6 @@ public class CartOrderAdapter extends RecyclerView.Adapter<CartOrderAdapter.View
         private TextView tvProductName, tvSize, tvPrice, tvCum, tvColor, idPR, idSl, tvColor_dt_Cart, SlProductCart, TotalPriceOneCart, ValueVoucher;
         private double totalPrice;
         LinearLayout btnShowDiscount;
-        EditText edtNoteCart;
 
         public ViewHolder(@NonNull View itemView) {
 
@@ -172,12 +160,8 @@ public class CartOrderAdapter extends RecyclerView.Adapter<CartOrderAdapter.View
             SlProductCart = itemView.findViewById(R.id.SlProductCart);
             btnShowDiscount = itemView.findViewById(R.id.btnDiscountCart);
             TotalPriceOneCart = itemView.findViewById(R.id.TotalPriceOneCart);
-            edtNoteCart = itemView.findViewById(R.id.edtNoteCart);
             totalPrice = 0;
-
-
         }
-
 
         public void bind(AddProductToCart product, List<Integer> colorList, int position) {
             SlProductCart.setText("(" + product.getQuantity_product() + " sản phẩm)");
@@ -211,12 +195,7 @@ public class CartOrderAdapter extends RecyclerView.Adapter<CartOrderAdapter.View
                     loadDiscountsFromFirebase(product.getId());
                 }
             });
-
-
-
-
         }
-
         private void calculateDiscountedPrice() {
             double originalTotalPrice = selectedProducts.get(getAdapterPosition()).getPricetotal_product() * selectedProducts.get(getAdapterPosition()).getQuantity_product();
 

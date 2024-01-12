@@ -29,7 +29,7 @@
                     android:orientation="horizontal"
                     android:layout_margin="10dp">
                     <ImageView
-                        android:id="@+id/img_product"
+                        android:id="@+id/img_byer"
                         android:layout_width="130dp"
                         android:layout_height="130dp"
                         android:adjustViewBounds="true"
@@ -42,77 +42,33 @@
                         android:layout_marginLeft="15dp"
                         android:layout_marginTop="10dp">
                         <TextView
-                            android:id="@+id/tv_nameProduct"
+                            android:id="@+id/tv_nameByer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quần Jean"
-                            android:textSize="23sp"/>
-                        <LinearLayout
+                            android:text="Ten nguoi mua"
+                            android:textSize="20sp"/>
+
+                        <TextView
+                            android:id="@+id/adresByer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Giá: "
-                                android:textSize="17sp"/>
-                            <TextView
-                                android:textColor="#ff00"
-                                android:textStyle="italic"
-                                android:id="@+id/tv_total"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="300"
-                                android:textSize="17sp"/>
-                            <TextView
-                                android:textColor="#ff00"
-                                android:textStyle="italic"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=" VNĐ"
-                                android:textSize="20dp"/>
-                        </LinearLayout>
-                        <LinearLayout
+                            android:text="Dia chi"
+                            android:textSize="17sp"/>
+
+                        <TextView
+                            android:id="@+id/phoneByer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Số lượng : "
-                                android:textSize="17sp"/>
-                            <TextView
-                                android:textStyle="bold"
-                                android:id="@+id/tv_quantity"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="3"
-                                android:textSize="17sp"/>
-                        </LinearLayout>
-                        <LinearLayout
+                            android:text="SDT"
+                            android:textSize="17sp"/>
+
+                        <TextView
+                            android:id="@+id/soluong"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Màu: "
-                                android:textSize="17sp"/>
-                            <ImageView
-                                android:layout_marginTop="5dp"
-                                android:layout_marginLeft="10dp"
-                                android:id="@+id/tv_color"
-                                android:background="#ff00"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                />
-                            <TextView
-                                android:id="@+id/tv_size"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Size"
-                                android:layout_marginLeft="40dp"/>
-                        </LinearLayout>
+                            android:text="So luong sp"
+                            android:textSize="17sp"/>
+
                         <TextView
                             android:visibility="gone"
                             android:textColor="#438E0F"
@@ -126,12 +82,21 @@
 
                 <TextView
                     android:textStyle="bold"
-                    android:textSize="20dp"
+                    android:textSize="17dp"
                     android:layout_marginLeft="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/tvNoteOrder"
                     android:text="Note"/>
+                <TextView
+                    android:textStyle="bold"
+                    android:textSize="20dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvDate"
+                    android:gravity="end"
+                    android:text="Date"/>
             </LinearLayout>
 
         </LinearLayout>
