@@ -35,7 +35,7 @@
                 android:textColor="@color/white"
                 android:text="Chi tiết đơn hàng" />
         <Button
-                android:id="@+id/btn1"
+                android:id="@+id/btnHuyDon"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:backgroundTint="#403F3F"
@@ -47,7 +47,7 @@
 
 
             <Button
-                android:id="@+id/btn2"
+                android:id="@+id/btnOut"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:backgroundTint="#403F3F"

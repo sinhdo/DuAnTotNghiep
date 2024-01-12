@@ -37,13 +37,13 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DoneForShopFragment extends Fragment implements OrderAdapter.Callback{
+public class DoneForShopFragment extends Fragment implements OrderAdapter.Callback {
     private RecyclerView recyclerView;
-    private OrderAdapter oderAdapter;
+    private OrderAdapter orderAdapter;
     private ArrayList<Order> list = new ArrayList<>();
     private FirebaseUser firebaseUser;
     private TextView noResultsTextView;
-
+    private String currentFragment = "DoneForShopFragment";
 
     public DoneForShopFragment() {
         // Required empty public constructor
@@ -55,14 +55,8 @@ public class DoneForShopFragment extends Fragment implements OrderAdapter.Callba
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_done_for_shop, container, false);
     }
 
@@ -71,87 +65,53 @@ public class DoneForShopFragment extends Fragment implements OrderAdapter.Callba
         super.onViewCreated(view, savedInstanceState);
         recyclerView = view.findViewById(R.id.rec_doneforshop);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        noResultsTextView = view.findViewById(R.id.noResultsTextView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        oderAdapter = new OrderAdapter(getContext(), list, this);
-        recyclerView.setAdapter(oderAdapter);
-        GetDataDoneListForSeller();
-    }
-    private void dialogForSeller(Order order) {
-        Dialog dialog = new Dialog(getActivity());
-        dialog.setContentView(R.layout.dialog_menu_order);
-        dialog.getWindow().setBackgroundDrawable(getActivity().getDrawable(R.drawable.bg_dialog_order));
-        Window window = dialog.getWindow();
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        WindowManager.LayoutParams windowAttributes = window.getAttributes();
-        window.setAttributes(windowAttributes);
-        windowAttributes.gravity = Gravity.BOTTOM;
-        Button btnCancel = dialog.findViewById(R.id.btn1);
-        btnCancel.setVisibility(View.GONE);
-        Button btnExit = dialog.findViewById(R.id.btn2);
-        Button btn_review = dialog.findViewById(R.id.btn_review);
-        btn_review.setVisibility(View.INVISIBLE);
-        btnExit.setOnClickListener(view -> {
-            dialog.cancel();
-        });
-        Button tt = dialog.findViewById(R.id.btn_propety);
-        tt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), InforOrderActivity.class);
-                intent.putExtra("idOrder",order.getId());
-                startActivity(intent);
-            }
-        });
+        orderAdapter = new OrderAdapter(getContext(), list, this);
+        orderAdapter.setCurrentFragment(currentFragment);
+        noResultsTextView = view.findViewById(R.id.noResultsTextView);
+        recyclerView.setAdapter(orderAdapter);
 
-        dialog.show();
-    }
-    private void GetDataDoneListForSeller() {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         String id_user = firebaseUser.getUid();
         DatabaseReference myReference = firebaseDatabase.getReference("list_order");
         myReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (list != null) {
                     list.clear();
                 }
-                for (DataSnapshot orderSnapshot : snapshot.getChildren()) {
+
+                for (DataSnapshot orderSnapshot : dataSnapshot.getChildren()) {
                     Order order = orderSnapshot.getValue(Order.class);
                     if (order != null && order.getIdSeller().equals(id_user)) {
-                        List<InfoProductOrder> productList = order.getListProduct();
-                        if (productList != null) {
-                            List<InfoProductOrder> waitingProducts = new ArrayList<>();
-                            for (InfoProductOrder product : productList) {
-                                if (product.getStatus().equals("done")) {
-                                    list.add(order);
-                                }
-                            }
+                        if (order.getStatus().equals("Done")) {
+                            list.add(order);
+                            Log.d("==abc 1", "onDataChange: " + order);
                         }
-                        Log.d("=== order", "onDataChange: "+order);
-                    }else {
+                        Log.d("=== order", "onDataChange: " + order);
+                    } else {
                         Toast.makeText(getContext(), "NULL", Toast.LENGTH_SHORT).show();
                     }
                 }
 
+                orderAdapter.notifyDataSetChanged();
                 if (list.isEmpty()) {
-                    recyclerView.setVisibility(View.GONE);
                     noResultsTextView.setVisibility(View.VISIBLE);
                 } else {
-                    recyclerView.setVisibility(View.VISIBLE);
                     noResultsTextView.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
                 }
-                oderAdapter.notifyDataSetChanged();
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Get list order failed", Toast.LENGTH_SHORT).show();
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
 
     @Override
     public void logic(Order order) {
-        dialogForSeller(order);
+
     }
 }

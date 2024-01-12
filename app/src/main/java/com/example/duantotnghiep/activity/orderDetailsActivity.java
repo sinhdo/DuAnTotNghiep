@@ -65,7 +65,7 @@ public class orderDetailsActivity extends AppCompatActivity {
      List<InfoProductOrder> infoProductOrders = new ArrayList<>();
     private OrderDetailsAdapter adapter;
     private String idProduct;
-    private DatabaseReference productRef, userRef, discountRef, buyerRef;
+    private DatabaseReference productRef, userRef, discountRef, buyerRef, mReference;
     private FirebaseUser firebaseUser;
     private int quantity = 0;
     private double delivery;
@@ -391,24 +391,46 @@ public class orderDetailsActivity extends AppCompatActivity {
                                         product.getImgProduct().get(0),
                                         product.getName(),
                                         color,
-                                        notes.getText().toString(),
-                                        date,
                                         total,
-                                        "waitting",
                                         TextUtils.join(null,product.getSize()),
                                         product.getQuantity());
                                 Log.d("Total", String.valueOf(total));
                                 list.add(infoPr);
-                                Order order = new Order(newKey,
-                                        idBuyer,
-                                        product.getSellerId(),
-                                        Double.parseDouble(txtTotal.getText().toString()),
-                                        txtAddress.getText().toString(),
-                                        txtPhone.getText().toString(),
-                                        finalPaid,
-                                        list);
+                                String id = firebaseUser.getUid();
+                                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("user").child(id);
+                                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.exists()) {
+                                            String displayName = dataSnapshot.child("username").getValue(String.class);
+                                            String photoUrl = dataSnapshot.child("img").getValue(String.class);
 
-                                On_Create_Bill(order);
+                                            int totalQuantity = calculateTotalQuantity(list);
+
+                                            Order order = new Order(newKey,
+                                                    idBuyer,
+                                                    product.getSellerId(),
+                                                    Double.parseDouble(txtTotal.getText().toString()),
+                                                    txtAddress.getText().toString(),
+                                                    txtPhone.getText().toString(),
+                                                    finalPaid,
+                                                    "Waitting",
+                                                    notes.getText().toString(),
+                                                    date,
+                                                    list,
+                                                    displayName,
+                                                    photoUrl);
+                                            order.setTotalQuantity(totalQuantity);
+
+                                            On_Create_Bill(order);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
+                                    }
+                                });
                                 Log.d("=====", "onClick: sl" + product.getSellerId() + " pr " + product.getId());
                                 if (isVoucherSelected) {
                                     Log.d("OrderDetailsActivity", "isVoucherSelected: true");
@@ -444,6 +466,13 @@ public class orderDetailsActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+    private int calculateTotalQuantity(List<InfoProductOrder> listProduct) {
+        int totalQuantity = 0;
+        for (InfoProductOrder infoProduct : listProduct) {
+            totalQuantity += infoProduct.getQuantityPr();
+        }
+        return totalQuantity;
     }
     private void showDiaLogAddress() {
         Intent intent = new Intent(orderDetailsActivity.this, ShowListLocationActivity.class);

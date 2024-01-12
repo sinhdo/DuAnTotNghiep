@@ -19,7 +19,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:textStyle="bold"
-        android:text="Danh sách sản phẩm trống"
+        android:text="Danh sách sản phẩm 0 co"
         android:textSize="30dp"
         />
 

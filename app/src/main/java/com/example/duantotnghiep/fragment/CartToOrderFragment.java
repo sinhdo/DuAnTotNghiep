@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -58,7 +59,6 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
     private CartOrderAdapter orderAdapter;
     FirebaseUser firebaseUser;
     DatabaseReference userRef, productRef;
-    private Map<String, String> productNotes = new HashMap<>();
     private double TotalPlusShip = 0;
     double TotalPay = 0;
     LinearLayout btn_addLocation_Cart, PaymentMethods;
@@ -66,7 +66,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
     double totalPrice;
     private double totalDiscount = 0;
     Button addOrderDetailCart;
-
+    EditText edtNoteCart;
     private boolean finalPaid;
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -78,7 +78,6 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
             orderAdapter = new CartOrderAdapter();
             showSelectedProducts(selectedProducts);
         }
-
         recyclerViewOrder = root.findViewById(R.id.rcvOrder_cart);
         total_price_cart = root.findViewById(R.id.total_price_Allcart);
         btn_addLocation_Cart = root.findViewById(R.id.btn_addLocation_Cart);
@@ -94,18 +93,16 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         lineCart = root.findViewById(R.id.lineCart);
         txtPayment_Cart = root.findViewById(R.id.txtPayment_Cart);
         txtSubtotalCart.setText(String.format(formatPrice(totalPrice)));
+        edtNoteCart = root.findViewById(R.id.edtNoteCart);
 
         orderAdapter.setDiscountUpdateListener(this);
-
         recyclerViewOrder.setLayoutManager(new LinearLayoutManager(root.getContext()));
-
 
         recyclerViewOrder.setAdapter(orderAdapter);
         txtName.setVisibility(View.INVISIBLE);
         txtAddress.setVisibility(View.INVISIBLE);
         txtPhone.setVisibility(View.INVISIBLE);
         lineCart.setVisibility(View.INVISIBLE);
-
 
         TotalPlusShip = totalPrice + 35000;
         txtTotalCart.setText(String.format(formatPrice(TotalPlusShip)));
@@ -119,22 +116,17 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                 showDiaLogAddress();
             }
         });
-        Log.d("sa", "productNotes" + productNotes);
+//        Log.d("sa", "productNotes" + productNotes);
         addOrderDetailCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Log.d("sa", "productNotes" + productNotes);
+//                Log.d("sa", "productNotes" + productNotes);
                 checkWalletBalanceBeforeOrder();
-
-//                CreateOrder();
 
             }
         });
-
         return root;
     }
-//    String idSeller = "ZYA1yQdRAYSzh1K24ZVYIYvHIc92";
     private void CreateOrder() {
         if (txtPayment_Cart.getText().toString().equalsIgnoreCase("Payment methods")) {
             Toast.makeText(getContext(), "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
@@ -143,7 +135,6 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         if (txtPayment_Cart.getText().toString().equals("Pay with wallet")) {
             updateWalletAfterOrder();
         }
-
         if (TextUtils.isEmpty(txtAddress.getText().toString()) || TextUtils.isEmpty(txtPhone.getText().toString())) {
             Toast.makeText(getContext(), "Vui lòng chọn địa chỉ", Toast.LENGTH_SHORT).show();
             return;
@@ -155,13 +146,11 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         Boolean paid = false;
 
         String idSeller = "ZYA1yQdRAYSzh1K24ZVYIYvHIc92";
-
         List<InfoProductOrder> productList = new ArrayList<>();
 
         for (AddProductToCart product : selectedProducts) {
-            Map<String, String> productNotes = orderAdapter.getProductNotes();
             String productId = product.getId();
-            String note = productNotes.get(productId);
+            String note = edtNoteCart.getText().toString();
             DatabaseReference productRef = FirebaseDatabase.getInstance().getReference("products").child(productId);
             productRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -169,57 +158,95 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                     if (dataSnapshot.exists()) {
                         Product associatedProduct = dataSnapshot.getValue(Product.class);
                         String date = getCurrentDate();
-                        String status = "waiting";
+                        String status = "Waiting";
                         if (product.getQuantity_product() <= associatedProduct.getQuantity()) {
+                            List<InfoProductOrder> list = new ArrayList<>();
                             InfoProductOrder infoPr = new InfoProductOrder(product.getId(),
                                     product.getImage_product(),
                                     product.getName_product(),
                                     product.getColor_product(),
-                                    note,
-                                    date,
                                     product.getPricetotal_product(),
-                                    status,
                                     product.getSize_product(),
                                     product.getQuantity_product());
                             productList.add(infoPr);
 
-//                            double discountedPrice = orderAdapter.getDiscountedPrice(productId);
-//                            Double total = discountedPrice;
-
                             if (productList.size() == selectedProducts.size()) {
                                 String orderId = userRef.child("list_order").push().getKey();
-                                Order order = new Order(
-                                        orderId,
-                                        idBuyer,
-                                        idSeller,
-                                        TotalPlusShip,
-                                        address,
-                                        numberPhone,
-                                        paid,
-                                        productList
-                                );
-
-                                DatabaseReference orderRef = userRef.child("list_order").child(orderId);
-                                orderRef.setValue(order);
-                                for (AddProductToCart product : selectedProducts) {
-                                    DatabaseReference cartItemRef = userRef.child("cart").child(firebaseUser.getUid()).child(product.getCartItemId());
-                                    cartItemRef.removeValue();
-                                    updateProductQuantity(product.getId_product(), product.getQuantity_product());
-                                }
-                                showDialogOrder();
+                                userRef.child("user").child(idBuyer).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.exists()) {
+                                            String id = firebaseUser.getUid();
+                                            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("user").child(id);
+                                            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    if (dataSnapshot.exists()) {
+                                                        String customerName = dataSnapshot.child("username").getValue(String.class);
+                                                        String customerImage = dataSnapshot.child("img").getValue(String.class);
+                                                        int totalQuantity = 0;
+                                                        for (AddProductToCart product : selectedProducts) {
+                                                            totalQuantity += product.getQuantity_product();
+                                                        }
+                                                        Order order = new Order(
+                                                                orderId,
+                                                                idBuyer,
+                                                                idSeller,
+                                                                TotalPlusShip,
+                                                                address,
+                                                                numberPhone,
+                                                                paid,
+                                                                status,
+                                                                note,
+                                                                date,
+                                                                productList,
+                                                                customerName,
+                                                                customerImage
+                                                        );
+                                                        order.setTotalQuantity(totalQuantity);
+                                                        DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference().child("list_order").push();
+                                                        String orderId = orderRef.getKey();
+                                                        order.setId(orderId); // Cập nhật orderId trong đối tượng Order
+                                                        orderRef.setValue(order);
+                                                        for (AddProductToCart product : selectedProducts) {
+                                                            DatabaseReference cartItemRef = userRef.child("cart").child(firebaseUser.getUid()).child(product.getCartItemId());
+                                                            cartItemRef.removeValue();
+                                                            updateProductQuantity(product.getId_product(), product.getQuantity_product());
+                                                        }
+                                                        showDialogOrder();
+                                                    }
+                                                }
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                    // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
+                                                }
+                                            });
+                                        }
+                                    }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        // Xử lý khi có lỗi xảy ra
+                                    }
+                                });
                             }
                         } else {
                             showOutOfStockDialog();
                         }
                     }
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
                 }
             });
         }
+    }
+    private int calculateTotalQuantity(List<InfoProductOrder> listProduct) {
+        int totalQuantity = 0;
+        for (InfoProductOrder infoProduct : listProduct) {
+            totalQuantity += infoProduct.getQuantityPr();
+        }
+        return totalQuantity;
     }
     private void showOutOfStockDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -251,11 +278,9 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                     double currentWalletAmount = dataSnapshot.getValue(Double.class);
                     if (totalDiscount > 0) {
                         TotalPay = TotalPlusShip - totalDiscount;
-//                        txtAllVoucherCart.setText(String.format("-" + formatPrice(totalSelectedDiscounts)));
                     } else {
                         TotalPay = TotalPlusShip;
                         Log.d("hhhh", "TotalPlusShip" + TotalPlusShip);
-//                        txtAllVoucherCart.setText(String.format("-" + formatPrice(totalSelectedDiscounts)));
                     }
                     double newWalletAmount = currentWalletAmount - TotalPay;
                     Log.d("Debug", "TotalPay: " + TotalPay);
@@ -406,7 +431,6 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                 txtName.setVisibility(View.VISIBLE);
                 txtName.setText(nameuser);
                 lineCart.setVisibility(View.VISIBLE);
-
             }
         }
     }
