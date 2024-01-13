@@ -33,7 +33,7 @@ public class OrderAdapterUser extends RecyclerView.Adapter<OrderAdapterUser.Orde
     private List<InfoProductOrder> infoProductOrderList;
     private String currentFragment;
 
-    public OrderAdapterUser (Context context, List<Order> list, Callback callback) {
+    public OrderAdapterUser(Context context, List<Order> list, Callback callback) {
         this.context = context;
         this.list = list;
         this.infoProductOrderList = new ArrayList<>();
@@ -47,7 +47,7 @@ public class OrderAdapterUser extends RecyclerView.Adapter<OrderAdapterUser.Orde
     @Override
     public OrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_order, parent, false);
-        return new OrderAdapterUser.OrderViewHolder(view);
+        return new OrderViewHolder(view);
     }
 
     @Override
