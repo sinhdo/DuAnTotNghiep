@@ -1,18 +1,10 @@
 package com.example.duantotnghiep.fragment;
 
-import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,14 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
-import com.example.duantotnghiep.activity.InforOrderActivity;
-import com.example.duantotnghiep.activity.ReviewsActivity;
-import com.example.duantotnghiep.adapter.OrderAdapter;
 import com.example.duantotnghiep.adapter.OrderAdapterUser;
-import com.example.duantotnghiep.model.InfoProductOrder;
 import com.example.duantotnghiep.model.Order;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -38,11 +25,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-public class DoneFragment extends Fragment implements OrderAdapter.Callback{
+public class DoneFragment extends Fragment implements OrderAdapterUser.Callback{
     private RecyclerView recyclerView;
     private OrderAdapterUser orderAdapter;
     private ArrayList<Order> list = new ArrayList<>();
@@ -75,12 +59,13 @@ public class DoneFragment extends Fragment implements OrderAdapter.Callback{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recyclerView = view.findViewById(R.id.rec_wait);
+        recyclerView = view.findViewById(R.id.rec_done);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//        orderAdapter = new OrderAdapterUser(getContext(), (List<Order>) list, (OrderAdapterUser.Callback) this);
-        orderAdapter.setCurrentFragment(currentFragment);
         noResultsTextView = view.findViewById(R.id.noResultsTextView);
+
+        orderAdapter = new OrderAdapterUser(getContext(), list, this);
+        orderAdapter.setCurrentFragment(currentFragment);
         recyclerView.setAdapter(orderAdapter);
         GetDataDoneListForBuyer();
     }
@@ -88,36 +73,30 @@ public class DoneFragment extends Fragment implements OrderAdapter.Callback{
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         String id_user = firebaseUser.getUid();
         DatabaseReference myReference = firebaseDatabase.getReference("list_order");
-        myReference.addValueEventListener(new ValueEventListener() {
+        myReference.orderByChild("idBuyer").equalTo(id_user).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (list != null) {
-                    list.clear();
-                }
-                for (DataSnapshot orderSnapshot : dataSnapshot.getChildren()) {
-                    Order order = orderSnapshot.getValue(Order.class);
-                    if (order != null && order.getIdSeller().equals(id_user)) {
-                        if (order.getStatus().equals("Done")) {
-                            list.add(order);
-                        }
-                    } else {
-                        Toast.makeText(getContext(), "NULL", Toast.LENGTH_SHORT).show();
+                list.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Order order = snapshot.getValue(Order.class);
+                    if (order != null && order.getStatus().equals("Done")) {
+                        list.add(order);
                     }
                 }
                 orderAdapter.notifyDataSetChanged();
-                if (!list.isEmpty()) {
-                    orderAdapter.setProductList(list.get(0).getListProduct());
-                }
+
                 if (list.isEmpty()) {
                     noResultsTextView.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
                 } else {
                     noResultsTextView.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
                 }
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Get list order failed", Toast.LENGTH_SHORT).show();
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Xử lý khi có lỗi xảy ra trong quá trình đọc dữ liệu từ Firebase
             }
         });
     }
