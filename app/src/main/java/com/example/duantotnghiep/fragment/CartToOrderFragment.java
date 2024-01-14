@@ -158,7 +158,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                     if (dataSnapshot.exists()) {
                         Product associatedProduct = dataSnapshot.getValue(Product.class);
                         String date = getCurrentDate();
-                        String status = "Waiting";
+                        String status = "Waitting";
                         if (product.getQuantity_product() <= associatedProduct.getQuantity()) {
                             List<InfoProductOrder> list = new ArrayList<>();
                             InfoProductOrder infoPr = new InfoProductOrder(product.getId(),
