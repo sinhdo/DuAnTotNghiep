@@ -2,6 +2,7 @@ package com.example.duantotnghiep.adapter;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.activity.ReviewsActivity;
 import com.example.duantotnghiep.model.InfoProductOrder;
 import com.example.duantotnghiep.model.Order;
 import com.google.firebase.database.DatabaseReference;
@@ -69,7 +71,12 @@ public class OrderAdapterUser extends RecyclerView.Adapter<OrderAdapterUser.Orde
         holder.tv_nameByer.setText("Đơn của: " + order.getCustomerName());
         holder.phoneByer.setText("SĐT: " +order.getNumberPhone());
         holder.adresByer.setText("Địa chỉ: " +order.getAddress());
-        holder.tvNoteOrder.setText("NOTE: " +order.getNote());
+        if (order.getNote().isEmpty()||order.getNote().equals("")||order.getNote()==""){
+            holder.tvNoteOrder.setVisibility(View.GONE);
+        }else {
+            holder.tvNoteOrder.setText("NOTE: " +order.getNote());
+        }
+
         holder.soluong.setText(String.valueOf("Số lượng SP: : " +order.getTotalQuantity()));
         holder.tvDate.setText(order.getDate());
 
@@ -115,7 +122,9 @@ public class OrderAdapterUser extends RecyclerView.Adapter<OrderAdapterUser.Orde
         btnReview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(context, ReviewsActivity.class);
+                intent.putExtra("idOrder",order.getId());
+                context.startActivity(intent);
             }
         });
         btnPropety.setOnClickListener(new View.OnClickListener() {
