@@ -38,9 +38,6 @@
             android:name=".activity.SignUpActivity"
             android:exported="false" />
         <activity
-            android:name=".AdminMainActivity"
-            android:exported="false" />
-        <activity
             android:name=".activity.ReviewsActivity"
             android:exported="false" />
         <activity
