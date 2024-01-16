@@ -127,6 +127,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         });
         return root;
     }
+
     private void CreateOrder() {
         if (txtPayment_Cart.getText().toString().equalsIgnoreCase("Payment methods")) {
             Toast.makeText(getContext(), "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
@@ -206,16 +207,19 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                                                         order.setTotalQuantity(totalQuantity);
                                                         DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference().child("list_order").push();
                                                         String orderId = orderRef.getKey();
-                                                        order.setId(orderId); // Cập nhật orderId trong đối tượng Order
+                                                        order.setId(orderId);
                                                         orderRef.setValue(order);
-                                                        for (AddProductToCart product : selectedProducts) {
-                                                            DatabaseReference cartItemRef = userRef.child("cart").child(firebaseUser.getUid()).child(product.getCartItemId());
-                                                            cartItemRef.removeValue();
-                                                            updateProductQuantity(product.getId_product(), product.getQuantity_product());
-                                                        }
+
+                                                        Log.d("CartItemDebug", "Before removing items from cart");
+                                                        removeOrderedProductsFromCart(selectedProducts);
+                                                        Log.d("CartItemDebug", "After removing items from cart");
+
+                                                        updateProductQuantity(product.getId_product(), product.getQuantity_product());
+
                                                         showDialogOrder();
                                                     }
                                                 }
+
                                                 @Override
                                                 public void onCancelled(@NonNull DatabaseError databaseError) {
                                                     // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
@@ -223,6 +227,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                                             });
                                         }
                                     }
+
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError databaseError) {
                                         // Xử lý khi có lỗi xảy ra
@@ -234,6 +239,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                         }
                     }
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
@@ -241,6 +247,21 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
             });
         }
     }
+    private void removeOrderedProductsFromCart(List<AddProductToCart> selectedProducts) {
+        String userId = firebaseUser.getUid();
+        DatabaseReference cartRef = FirebaseDatabase.getInstance().getReference("cart").child(userId);
+
+        for (AddProductToCart product : selectedProducts) {
+            String productId = product.getId_product();
+            Log.d("CartItemDebug", "Removing cart item with product ID: " + productId);
+
+
+            cartRef.child(productId).removeValue();
+        }
+    }
+
+
+
     private int calculateTotalQuantity(List<InfoProductOrder> listProduct) {
         int totalQuantity = 0;
         for (InfoProductOrder infoProduct : listProduct) {
@@ -248,6 +269,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         }
         return totalQuantity;
     }
+
     private void showOutOfStockDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Thông báo");
@@ -255,6 +277,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
         builder.show();
     }
+
     @Override
     public void onDiscountUpdated(double totalSelectedDiscounts) {
         totalDiscount = totalSelectedDiscounts;
@@ -269,6 +292,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         txtTotalCart.setText(String.format(formatPrice(TotalPay)));
         total_price_cart.setText(String.format(formatPrice(TotalPay)) + "VND");
     }
+
     private void updateWalletAfterOrder() {
         DatabaseReference buyerWalletRef = userRef.child("user").child(firebaseUser.getUid()).child("wallet");
         buyerWalletRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -287,16 +311,19 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                     buyerWalletRef.setValue(newWalletAmount);
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
     }
+
     private String getCurrentDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
         return sdf.format(new Date());
     }
+
     private void showWallet() {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         userRef = FirebaseDatabase.getInstance().getReference();
@@ -311,6 +338,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                         txtMoneyCart.setText(String.format(formatPrice(walletAmount)));
                     }
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -331,6 +359,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
             Log.e("CartToOrderFragment", "Firebase user is null");
         }
     }
+
     private void checkWalletBalanceBeforeOrder() {
         if (txtPayment_Cart.getText().toString().equals("Pay with wallet")) {
             String walletAmountString = txtMoneyCart.getText().toString().replaceAll("[^\\d.]", "");
@@ -349,6 +378,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
             CreateOrder();
         }
     }
+
     private void showInsufficientBalanceDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Thông báo");
@@ -360,6 +390,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
         builder.show();
     }
+
     private void updateProductQuantity(String productId, int purchasedQuantity) {
         DatabaseReference productRef = FirebaseDatabase.getInstance().getReference("products").child(productId);
         productRef.runTransaction(new Transaction.Handler() {
@@ -378,6 +409,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                 }
                 return Transaction.success(mutableData);
             }
+
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, boolean committed, @Nullable DataSnapshot dataSnapshot) {
                 if (committed) {
@@ -388,12 +420,14 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
             }
         });
     }
+
     private void showSelectedProducts(List<AddProductToCart> selectedProducts) {
         if (orderAdapter != null) {
             orderAdapter.updateSelectedProducts(selectedProducts);
             totalPrice = orderAdapter.calculateTotalPrice();
         }
     }
+
     private String formatPrice(double price) {
         NumberFormat format = NumberFormat.getCurrencyInstance(Locale.US);
         String formattedPrice = format.format(price);
@@ -402,6 +436,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         }
         return formattedPrice;
     }
+
     private void showDiaLogAddress() {
         Intent intent = new Intent(getContext(), ShowListLocationActivity.class);
         Bundle bundle = new Bundle();
@@ -409,6 +444,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         intent.putExtras(bundle);
         startActivityForResult(intent, Activity.RESULT_CANCELED);
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -434,6 +470,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
             }
         }
     }
+
     private void poppuGetListPayment() {
         String[] listPayment = {"Payment on delivery", "Pay with wallet"};
         PaymentMethods.setOnClickListener(view -> {
@@ -452,6 +489,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
             popupMenu.show();
         });
     }
+
     private void showDialogOrder() {
         ConstraintLayout successDialog = getActivity().findViewById(R.id.successDialog);
         View view = LayoutInflater.from(getContext()).inflate(R.layout.success_dialog_order, successDialog);
@@ -472,6 +510,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         }
         alertDialog.show();
     }
+
     private void navigateToNewScreen() {
         Intent intent = new Intent(getContext(), MainActivity.class);
         startActivity(intent);
