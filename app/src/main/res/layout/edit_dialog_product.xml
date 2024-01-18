@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/SellerProductEdit"
+    android:id="@+id/SellerProduct"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f3f3f3"
@@ -14,7 +14,27 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="2dp"
+                    tools:src="@drawable/baseline_arrow_back_24" />
+                <TextView
+                    android:id="@+id/txtOrder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Order"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="25sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
@@ -97,6 +117,7 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="180dp"
+                    android:visibility="gone"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
@@ -104,7 +125,7 @@
                     app:boxStrokeColor="#E91E63"
                     app:boxStrokeWidth="2dp">
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/QuantityProductEdit"
+                        android:id="@+id/QuantityProduct"
                         android:inputType="number"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -190,7 +211,42 @@
                     android:src="@drawable/add">
                 </ImageView>
             </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="Discount"
+                android:textColor="@color/black"
+                android:textSize="19sp"
 
+                android:textStyle="bold" />
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="horizontal">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvMutilpeDiscount"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                <ImageView
+                    android:id="@+id/btnDiscount"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/add">
+                </ImageView>
+            </LinearLayout>
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -201,6 +257,8 @@
                 app:boxStrokeColor="#E91E63"
                 app:boxStrokeWidth="2dp">
                 <com.google.android.material.textfield.TextInputEditText
+                    android:inputType="text|textMultiLine"
+                    android:gravity="start|top"
                     android:id="@+id/descriptionProductEdit"
                     android:layout_width="match_parent"
                     android:layout_height="150dp">
