@@ -25,6 +25,7 @@
         <activity
             android:name=".activity.AccountLockedActivity"
             android:exported="false" />
+        <activity
             android:name=".ChatBox.Chat.ChatActivity"
             android:exported="false" />
         <activity
