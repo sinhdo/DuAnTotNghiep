@@ -4,9 +4,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,8 +24,6 @@ import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.model.InfoProductOrder;
 import com.example.duantotnghiep.model.Order;
 import com.example.duantotnghiep.model.Product;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -94,6 +95,14 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         }
         holder.soluong.setText(String.valueOf("Số lượng SP: : " +order.getTotalQuantity()));
         holder.tvDate.setText(order.getDate());
+        holder.tvTotal.setText("Thành tiền : "+order.getTotal()+" VNĐ");
+        if (order.getStatus().equals("Deliver")||order.getStatus().equals("Done")){
+            if (order.getPaid()==true){
+                holder.tv_paid.setVisibility(View.VISIBLE);
+            }else {
+                holder.tv_paid.setVisibility(View.GONE);
+            }
+        }
 
         final int clickedPosition = position;
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -115,6 +124,12 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         Order order = list.get(position);
         Dialog menuDialog = new Dialog(context);
         menuDialog.setContentView(R.layout.dialog_menu_order);
+        menuDialog.getWindow().setBackgroundDrawable(context.getDrawable(R.drawable.bg_dialog_order));
+        Window window = menuDialog.getWindow();
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+        window.setAttributes(windowAttributes);
+        windowAttributes.gravity = Gravity.BOTTOM;
 
         Button btnReview = menuDialog.findViewById(R.id.btn_review);
         Button btnPropety = menuDialog.findViewById(R.id.btn_propety);
@@ -141,6 +156,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
                     notificationsCf(order);
                     Toast.makeText(context, "Đã xác nhận đơn!!!", Toast.LENGTH_SHORT).show();
                 } else if (currentFragment.equals("ConfirmForShopFragment")) {
+                    AddmoneyForSeller(order);
                     updateOrderStatus(order.getId(), "Deliver");
                     Toast.makeText(context, "Đơn đã được vận chuyển!!!", Toast.LENGTH_SHORT).show();
                     List<InfoProductOrder> productList = order.getListProduct();
@@ -164,6 +180,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         btnHuyDon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ReturnmoneyForBuyer(order);
                 updateOrderStatus(order.getId(), "Cancle");
                 Toast.makeText(context, "Đã hủy đơn!!!", Toast.LENGTH_SHORT).show();
                 menuDialog.dismiss();
@@ -226,6 +243,82 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     public void setCurrentFragment(String currentFragment) {
         this.currentFragment = currentFragment;
     }
+    private void ReturnmoneyForBuyer(Order order){
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference orderRef = firebaseDatabase.getReference("list_order");
+        DatabaseReference buyerRef = firebaseDatabase.getReference("user").child(order.getIdBuyer()).child("wallet");
+        String id = order.getId();
+        boolean checkPaid = order.getPaid();
+        order.setPaid(checkPaid);
+        orderRef.child(id).setValue(order, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if (error == null) {
+                    if (checkPaid) {
+                            buyerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if (snapshot.exists()) {
+                                        double buyerBalance = snapshot.getValue(Double.class);
+                                        double newBuyerBalance = buyerBalance + order.getTotal();
+                                        buyerRef.setValue(newBuyerBalance);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    Toast.makeText(context, "Update failed", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+
+                    } else {
+                        Toast.makeText(context, "Update status", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(context, "Update failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+    private void AddmoneyForSeller(Order order){
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference orderRef = firebaseDatabase.getReference("list_order");
+        DatabaseReference sellerRef = firebaseDatabase.getReference("user").child(order.getIdSeller()).child("wallet");
+        String id = order.getId();
+        boolean checkPaid = order.getPaid();
+        order.setPaid(checkPaid);
+        orderRef.child(id).setValue(order, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if (error == null) {
+                    if (checkPaid) {
+                        sellerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    double buyerBalance = snapshot.getValue(Double.class);
+                                    double newBuyerBalance = buyerBalance + order.getTotal();
+                                    sellerRef.setValue(newBuyerBalance);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Toast.makeText(context, "Update failed", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+
+                    } else {
+                        Toast.makeText(context, "Update status", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(context, "Update failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
     private void updateOrderStatus(String orderId, String status) {
         DatabaseReference ordersRef = FirebaseDatabase.getInstance().getReference("list_order");
         DatabaseReference orderRef = ordersRef.child(orderId).child("status");
@@ -265,7 +358,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     }
     public class OrderViewHolder extends RecyclerView.ViewHolder {
         private ImageView img_byer;
-        private TextView tv_nameByer, adresByer, phoneByer, soluong, tvNoteOrder, tvDate;
+        private TextView tv_nameByer, adresByer, phoneByer, soluong, tvNoteOrder, tvDate,tv_paid,tvTotal;
         private ImageView imgMenu;
 
         public OrderViewHolder(@NonNull View itemView) {
@@ -278,6 +371,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             soluong = (TextView) itemView.findViewById(R.id.soluong);
             tvNoteOrder = (TextView) itemView.findViewById(R.id.tvNoteOrder);
             tvDate = (TextView) itemView.findViewById(R.id.tvDate);
+            tv_paid = (TextView) itemView.findViewById(R.id.tv_paid);
+            tvTotal = (TextView) itemView.findViewById(R.id.tvTotal);
 
         }
     }
