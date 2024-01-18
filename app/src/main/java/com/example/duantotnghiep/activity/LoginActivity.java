@@ -81,10 +81,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         if (dataSnapshot.exists()) {
                                             boolean isAdmin = FireBaseType.isAdmin(dataSnapshot);
-                                            if (isAdmin) {
-                                                startActivity(new Intent(LoginActivity.this, AdminActivity.class));
-                                            } else {
-                                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                            boolean lock = dataSnapshot.child("lock").getValue(Boolean.class);
+                                            if (!lock){
+                                                if (isAdmin) {
+                                                    startActivity(new Intent(LoginActivity.this, AdminActivity.class));
+                                                } else {
+                                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                                }
+                                            }else {
+                                                Toast.makeText(LoginActivity.this, "Đăng nhập không thành công do tài khoản có dấu hiệu bất thường vi phạm chính sách StyleNow.", Toast.LENGTH_SHORT).show();
+                                                startActivity(new Intent(LoginActivity.this, AccountLockedActivity.class));
                                             }
                                         }
                                     }
@@ -105,5 +111,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         } else if (view.getId()==R.id.tv_forgetPass) {
             startActivity(new Intent(LoginActivity.this,ForgetPasswordActivity.class));
         }
+
+
     }
 }
