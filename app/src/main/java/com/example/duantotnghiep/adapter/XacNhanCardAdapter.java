@@ -14,16 +14,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.model.Card;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.XacNhanCardViewHolder> {
     private List<Card> cardList;
     private Context context; // Thêm context
     private List<Card> pendingCards;
     private List<Card> successCards;
-
+    private FirebaseAuth mAuth;
+    private DatabaseReference notificationRef;
+    private FirebaseUser firebaseUser;
 
     public XacNhanCardAdapter(Context context, List<Card> cardList) {
         this.context = context;
@@ -62,19 +73,58 @@ public class XacNhanCardAdapter extends RecyclerView.Adapter<XacNhanCardAdapter.
             @Override
             public void onClick(View v) {
                 card.updateStatusAndCreditUser();
+                handleTopUpSuccess(card.getCardProvider(), card.getCardValue(), card.getUserId());
                 notifyDataSetChanged();
             }
         });
-        // Xử lý sự kiện khi nút "Chuyển đổi Trạng thái (Không thành công)" được nhấn
         holder.btnToggleFailedStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 card.updateFailedStatus();
+                handleTopUpSuccess1(card.getCardProvider(), card.getCardValue(), card.getUserId());
                 notifyDataSetChanged();
             }
         });
 
 
+    }
+    private String getCurrentTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+        Date currentDate = new Date();
+        return sdf.format(currentDate);
+    }
+    private void handleTopUpSuccess(String cardProvider, String cardValue, String userId) {
+        String title = "Nạp thẻ thành công";
+        String content = String.format("Thẻ %s trị giá %s đã được Admin xác nhận, tiền đã được cộng vào tài khoản của bạn.", cardProvider, cardValue);
+        String currentTime = getCurrentTime();
+        notificationRef = FirebaseDatabase.getInstance().getReference("notifications").child(userId);
+        String notificationId = notificationRef.push().getKey();
+
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("title", title);
+        notificationData.put("content", content);
+        notificationData.put("dateTime", currentTime);
+        notificationData.put("userId", userId);
+        notificationData.put("isRead", false); // Thêm trường "isRead" với giá trị mặc định là false
+
+        notificationRef.child(notificationId).setValue(notificationData);
+    }
+
+    private void handleTopUpSuccess1(String cardProvider, String cardValue, String userId) {
+        String title = "Nạp thẻ không thành công";
+        String content = String.format("Thẻ %s trị giá %s có mã thẻ hoặc số seri không đúng, Admin đã hủy yêu cầu.", cardProvider, cardValue);
+        String currentTime = getCurrentTime();
+        notificationRef = FirebaseDatabase.getInstance().getReference("notifications").child(userId);
+        String notificationId = notificationRef.push().getKey();
+
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("title", title);
+        notificationData.put("content", content);
+        notificationData.put("dateTime", currentTime);
+        notificationData.put("userId", userId);
+        notificationData.put("isRead", false); // Thêm trường "isRead" với giá trị mặc định là false
+
+        notificationRef.child(notificationId).setValue(notificationData);
     }
     public void setCardLists(List<Card> pendingCards) {
         this.cardList.clear();

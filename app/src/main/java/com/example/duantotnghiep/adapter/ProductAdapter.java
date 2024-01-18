@@ -3,12 +3,10 @@ package com.example.duantotnghiep.adapter;
 
 
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.util.Log;
@@ -33,6 +31,7 @@ import com.bumptech.glide.Glide;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.databinding.ItemProductBinding;
+import com.example.duantotnghiep.model.ColorProduct;
 import com.example.duantotnghiep.model.Product;
 import com.example.duantotnghiep.model.Reviews;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -70,7 +69,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     EditText editTitle, editPrice, editQuantity, editBrand, editDes;
     Button editProduct;
     RecyclerView rvMultipleColorEdit, rvMultipleImgEdit;
-    private List<Integer> selectedColors = new ArrayList<>();
+    int quantity = 0;
+    private List<ColorProduct> selectedColors = new ArrayList<>();
     Spinner sizeSpinnerEdit;
     public ProductAdapter(Context context, List<Product> productList) {
         this.context = context;
@@ -166,7 +166,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 editDes = view.findViewById(R.id.descriptionProductEdit);
                 editBrand = view.findViewById(R.id.BrandProductEdit);
                 editPrice = view.findViewById(R.id.priceProductSellerEdit);
-                editQuantity = view.findViewById(R.id.QuantityProductEdit);
+
                 chooseColor = view.findViewById(R.id.btnColorEdit);
                 chooseImgEdit = view.findViewById(R.id.chooseImgEdit);
                 sizeSpinnerEdit = view.findViewById(R.id.spinnerSizeEdit);
@@ -177,7 +177,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 editPrice.setText(String.valueOf(productToEdit.getPrice()));
                 editDes.setText(productToEdit.getDescription());
                 editBrand.setText(productToEdit.getBrand());
-                editQuantity.setText(String.valueOf(productToEdit.getQuantity()));
+
 
 
                 String[] productTypeValues = context.getResources().getStringArray(R.array.product_types);
@@ -198,12 +198,15 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 }
 
 
-                List<Integer> selectedColors = productToEdit.getColor();
-                if (selectedColors != null && !selectedColors.isEmpty()) {
-                    mAdapter.updateSelectedColors(selectedColors);
+                List<ColorProduct> selectedColorProducts = productToEdit.getListColor();
+                List<String> sizeColors = productToEdit.getSize();
+                if (selectedColorProducts != null && !selectedColorProducts.isEmpty()) {
+
+                    mAdapter.updateSelectedColors(selectedColorProducts, sizeColors);
 
                     rvMultipleColorEdit.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
                     rvMultipleColorEdit.setAdapter(mAdapter);
+
                 } else {
                     Toast.makeText(context, "Danh sách màu không hợp lệ", Toast.LENGTH_SHORT).show();
                 }
@@ -242,14 +245,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 editProduct.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        quantity = selectedColorProducts.stream().map(product -> product.getQuantity().stream().reduce(0,Integer::sum)).reduce(0,Integer::sum).intValue();
 
                         String updatedTitle = editTitle.getText().toString();
                         String updatedDescription = editDes.getText().toString();
                         String updatedBrand = editBrand.getText().toString();
                         double updatedPrice = Double.parseDouble(editPrice.getText().toString());
-                        int updatedQuantity = Integer.parseInt(editQuantity.getText().toString());
-                        List<Integer> updatedColors = mAdapter.getSelectedColors();
+//                        int updatedQuantity = Integer.parseInt(editQuantity.getText().toString());
+                        List<ColorProduct> updatedColorProducts = mAdapter.getSelectedColors();
                         String selectedSize = (String) sizeSpinnerEdit.getSelectedItem();
 
 
@@ -257,9 +260,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                         productToEdit.setDescription(updatedDescription);
                         productToEdit.setBrand(updatedBrand);
                         productToEdit.setPrice(updatedPrice);
-                        productToEdit.setQuantity(updatedQuantity);
+//                        productToEdit.setQuantity(updatedQuantity);
 
-                        productToEdit.setColor(updatedColors);
+                        productToEdit.setListColor(updatedColorProducts);
+                        productToEdit.setQuantity(quantity);
 
                         productToEdit.setProductType(Product.ProductType.valueOf(selectedSize));
                         String selectedProductType = (String) sizeSpinnerEdit.getSelectedItem();
@@ -319,8 +323,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    mAdapter.updateColor(color);
+                    // handle lại giống bên AddProductFragment
+                    //                   mAdapter.updateColor(color);
 
                     button.setSelected(!button.isSelected());
                 }
@@ -335,6 +339,32 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 alertDialog.dismiss();
             }
         });
+    }
+
+    private void removeColor(int color) {
+        for (ColorProduct cl: selectedColors) {
+            if (cl.getColor() == color) {
+                selectedColors.remove(cl);
+                break;
+            }
+        }
+    }
+
+    private List<Integer> getColor(List<ColorProduct> selectedColorProducts) {
+        ArrayList<Integer> listColor = new ArrayList<>();
+        for (ColorProduct cl : selectedColorProducts) {
+            listColor.add(cl.getColor());
+        }
+        return listColor;
+    }
+
+    private boolean checkColorExist(int color) {
+        for (ColorProduct cl : selectedColors) {
+            if (cl.getColor() == color) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.duantotnghiep.adapter;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,21 +12,24 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
+import com.example.duantotnghiep.model.ColorProduct;
 import com.example.duantotnghiep.model.Product;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDetailsAdapter extends RecyclerView.Adapter<OrderDetailsAdapter.ViewHolder> {
     private List<Product> productList;
-    private List<Integer> colorList;
+    private List<ColorProduct> color;
 
     public OrderDetailsAdapter() {
         this.productList = productList;
+        this.color = new ArrayList<>();
     }
 
-    public void setColorList(List<Integer> colorList) {
-        this.colorList = colorList;
+    public void setColorList(List<ColorProduct> color) {
+        this.color = color;
         notifyDataSetChanged();
     }
 
@@ -40,7 +44,7 @@ public class OrderDetailsAdapter extends RecyclerView.Adapter<OrderDetailsAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         if (productList != null && productList.size() > position) {
             Product product = productList.get(position);
-            holder.bind(product, colorList, position);
+            holder.bind(product, color, position);
         }
     }
 
@@ -76,18 +80,21 @@ public class OrderDetailsAdapter extends RecyclerView.Adapter<OrderDetailsAdapte
             idSl = itemView.findViewById(R.id.idSL);
         }
 
-        public void bind(Product product, List<Integer> colorList, int position) {
+        public void bind(Product product, List<ColorProduct> colorPr, int position) {
 
             tvProductName.setText(product.getName());
             idPR.setText(product.getId());
             idSl.setText(product.getSellerId());
 
             tvSize.setText(String.format("Cỡ %s", TextUtils.join(", ", product.getSize())));
-
-            if (colorList != null && colorList.size() > position) {
-                int color = colorList.get(position);
+            if (colorPr != null) {
+                ColorProduct colorProduct = product.getListColor().get(position);
+                int color = colorProduct.getColor();
                 tvColor.setBackgroundColor(color);
+            } else {
+                tvColor.setBackgroundColor(-10011977);
             }
+
 
             tvPrice.setText(product.getPrice() + " VND");
 

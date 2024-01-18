@@ -31,7 +31,9 @@ import com.example.duantotnghiep.MainActivity;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.DiscountDetailsAdapter;
 import com.example.duantotnghiep.adapter.OrderDetailsAdapter;
+import com.example.duantotnghiep.model.ColorProduct;
 import com.example.duantotnghiep.model.Discount;
+import com.example.duantotnghiep.model.InfoProductOrder;
 import com.example.duantotnghiep.model.Order;
 import com.example.duantotnghiep.model.Product;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -59,15 +61,17 @@ public class orderDetailsActivity extends AppCompatActivity {
     private LinearLayout linearLayouAddress, idlr, lrlVC;
     private EditText notes;
     private List<Product> productList;
-    private List<Integer> colorList;
+    private List<ColorProduct> colorProductList;
+    List<InfoProductOrder> infoProductOrders = new ArrayList<>();
     private OrderDetailsAdapter adapter;
     private String idProduct;
-    private DatabaseReference productRef, userRef, discountRef, buyerRef;
+    private DatabaseReference productRef, userRef, discountRef, buyerRef, mReference;
     private FirebaseUser firebaseUser;
     private int quantity = 0;
     private double delivery;
     private double tax;
     private double subtotal;
+    private double total;
     private double discountedPrice;
     private double price;
     private List<Discount> discountList;
@@ -153,23 +157,26 @@ public class orderDetailsActivity extends AppCompatActivity {
                     if (bundle != null) {
                         double discountAmount = bundle.getDouble("discountAmount", 0.0);
 
-                        colorList = bundle.getIntegerArrayList("Color");
+                        int color = bundle.getInt("Color");
+                        List<ColorProduct> colorProducts = new ArrayList<>();
+                        colorProducts.add(new ColorProduct(color, new int[]{}));
+
+
                         String size = bundle.getString("Size");
                         quantity = bundle.getInt("Quantity");
                         List<String> sizeList = new ArrayList<>();
                         sizeList.add(size);
 
                         Discount discount = new Discount(discountAmount);
+                        Log.d("color ne", "onDataChange: "+color+" colorProduct "+" colorProducts "+colorProducts);
 
                         Product product = new Product(idProduct, idseller, name,null, categoryID, brand,
-                                description, imgProduct, colorList, sold, reviewId, quantity, price, Collections.singletonList(size), null);
+                                description, imgProduct, colorProducts, sold, reviewId, quantity, price, Collections.singletonList(size), null);
 
-                        product.setSelectedQuantity(quantity);
                         productList = new ArrayList<>();
                         productList.add(product);
 
                         adapter.setProductList(productList);
-                        adapter.setColorList(colorList);
 
                         rcvOrderDetail.setLayoutManager(new LinearLayoutManager(orderDetailsActivity.this));
                         rcvOrderDetail.setAdapter(adapter);
@@ -187,13 +194,14 @@ public class orderDetailsActivity extends AppCompatActivity {
                         if (!TextUtils.isEmpty(taxText)) {
                             tax = Double.parseDouble(taxText);
                         }
-                        double total = subtotal + delivery + tax;
+                        total = subtotal + delivery + tax;
                         discountedPrice = total - discountAmount;
 
                         txtSubtotal.setText(String.format("%.0f VND", subtotal));
                         txtDelivery.setText(String.format("%.0f VND", delivery));
                         txtTax.setText(String.format("%.0f VND", tax));
                         txtTotal.setText(String.valueOf(discountedPrice));
+                        Log.d("discountedPrice", "Discounted Price: " + String.valueOf(discountedPrice));
                     }
                 }
             }
@@ -329,7 +337,7 @@ public class orderDetailsActivity extends AppCompatActivity {
                     txtSubtotal.setText(String.format("%.0f VND", subtotal));
                 }
 
-                double total = Double.parseDouble(txtSubtotal.getText().toString()) + delivery + tax;
+                total = Double.parseDouble(txtSubtotal.getText().toString()) + delivery + tax;
                 txtTotal.setText(String.valueOf(total));
             }
         }
@@ -351,19 +359,19 @@ public class orderDetailsActivity extends AppCompatActivity {
         }
     }
     private void updateTotal() {
-        double subtotal = Double.parseDouble(txtSubtotal.getText().toString().replaceAll("[^\\d.]", ""));
-        double total = subtotal + delivery + tax;
+        subtotal = Double.parseDouble(txtSubtotal.getText().toString().replaceAll("[^\\d.]", ""));
+        total = subtotal + delivery + tax;
         txtTotal.setText(String.valueOf(total));
     }
     private void performNextSteps(String newKey, String idBuyer, String date) {
         DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference("products");
-        DatabaseReference discountRef = FirebaseDatabase.getInstance().getReference("discounts"); // Thêm tham chiếu đến danh sách mã voucher trong Firebase
+        DatabaseReference discountRef = FirebaseDatabase.getInstance().getReference("discounts");
 
         for (int i = 0; i < adapter.getItemCount(); i++) {
             Product product = adapter.getProduct(i);
             if (product != null) {
-                List<Integer> listColor = product.getColor();
-                int color = listColor.get(i);
+                List<ColorProduct> listColorProduct = product.getListColor();
+                int color = listColorProduct.get(i).getColor();
 
                 Bundle bundle = getIntent().getBundleExtra("productData");
                 if (bundle != null) {
@@ -375,15 +383,54 @@ public class orderDetailsActivity extends AppCompatActivity {
                             int currentQuantity = dataSnapshot.child("quantity").getValue(Integer.class);
                             int remainingQuantity = currentQuantity;
 
+
                             if (remainingQuantity >= 0) {
                                 productsRef.child(product.getId()).child("quantity").setValue(remainingQuantity);
+                                List<InfoProductOrder> list = new ArrayList<>();
+                                InfoProductOrder infoPr = new InfoProductOrder(product.getId(),
+                                        product.getImgProduct().get(0),
+                                        product.getName(),
+                                        color,
+                                        total,
+                                        TextUtils.join(null,product.getSize()),
+                                        product.getQuantity());
+                                Log.d("Total", String.valueOf(total));
+                                list.add(infoPr);
+                                String id = firebaseUser.getUid();
+                                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("user").child(id);
+                                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.exists()) {
+                                            String displayName = dataSnapshot.child("username").getValue(String.class);
+                                            String photoUrl = dataSnapshot.child("img").getValue(String.class);
 
-                                Order order = new Order(newKey, idBuyer, product.getSellerId(), product.getId(), product.getName(),
-                                        product.getImgProduct().get(0), color, Double.parseDouble(txtTotal.getText().toString()),
-                                        date, txtAddress.getText().toString(), txtPhone.getText().toString(),
-                                        receivedQuantity, notes.getText().toString(), finalPaid, "waiting");
+                                            int totalQuantity = calculateTotalQuantity(list);
 
-                                On_Create_Bill(order);
+                                            Order order = new Order(newKey,
+                                                    idBuyer,
+                                                    product.getSellerId(),
+                                                    Double.parseDouble(txtTotal.getText().toString()),
+                                                    txtAddress.getText().toString(),
+                                                    txtPhone.getText().toString(),
+                                                    finalPaid,
+                                                    "Waitting",
+                                                    notes.getText().toString(),
+                                                    date,
+                                                    list,
+                                                    displayName,
+                                                    photoUrl);
+                                            order.setTotalQuantity(totalQuantity);
+
+                                            On_Create_Bill(order);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        // Xử lý khi có lỗi xảy ra trong quá trình truy vấn Firebase
+                                    }
+                                });
                                 Log.d("=====", "onClick: sl" + product.getSellerId() + " pr " + product.getId());
                                 if (isVoucherSelected) {
                                     Log.d("OrderDetailsActivity", "isVoucherSelected: true");
@@ -419,6 +466,13 @@ public class orderDetailsActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+    private int calculateTotalQuantity(List<InfoProductOrder> listProduct) {
+        int totalQuantity = 0;
+        for (InfoProductOrder infoProduct : listProduct) {
+            totalQuantity += infoProduct.getQuantityPr();
+        }
+        return totalQuantity;
     }
     private void showDiaLogAddress() {
         Intent intent = new Intent(orderDetailsActivity.this, ShowListLocationActivity.class);
@@ -463,7 +517,7 @@ public class orderDetailsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 double walletAmount = snapshot.getValue(Double.class);
-                    boolean isWalletEnough = walletAmount >= amount;
+                boolean isWalletEnough = walletAmount >= amount;
                 if (isWalletEnough) {
                     double newWallet = walletAmount-amount;
                     buyerRef.setValue(newWallet);

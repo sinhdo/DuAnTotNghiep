@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.duantotnghiep.ChatBox.ListChatActivity;
 import com.example.duantotnghiep.activity.DiscountActivity;
 import com.example.duantotnghiep.activity.ListUserActivity;
 import com.example.duantotnghiep.activity.LocationActivity;
@@ -44,7 +45,6 @@ import com.example.duantotnghiep.activity.StatisticalActivity;
 import com.example.duantotnghiep.activity.TopUpCardActivity;
 import com.example.duantotnghiep.activity.XacNhanCardActivity;
 import com.example.duantotnghiep.database.FireBaseType;
-import com.example.duantotnghiep.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -68,7 +68,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private DatabaseReference mReference;
     private FirebaseUser firebaseUser;
     private ImageView imgUser;
-  private   CardView cvOut,cvOder,cvPayment,cvReview,cvTK,cvPromotion,cvQLUser,cvQLProduct,cvChangePass,cvAdddiachi,cvXacNhanCard;
+    private   CardView cvOut,cvOder,cvPayment, cvChatBox,cvTK,cvPromotion,cvQLUser,cvQLProduct,cvChangePass,cvAdddiachi,cvXacNhanCard;
     private TextView textViewName,textSDT,textViewEmail,textFixInfor,textWallet;
 
     private ImageView dialog_AVT;
@@ -100,9 +100,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         cvOut = view.findViewById(R.id.cvOut);
         cvOder = view.findViewById(R.id.cvOderForShop);
         cvPayment = view.findViewById(R.id.cvPayment);
-        cvReview = view.findViewById(R.id.cvReView);
+        cvChatBox = view.findViewById(R.id.cvChatBox);
         cvTK = view.findViewById(R.id.cvTK);
-        cvReview.setVisibility(View.GONE);
         cvPromotion = view.findViewById(R.id.cvPromotion);
         cvQLUser = view.findViewById(R.id.cvQLUser);
         cvQLProduct = view.findViewById(R.id.cvQLProduct);
@@ -148,25 +147,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         cvOder.setOnClickListener(this);
         cvOut.setOnClickListener(this);
         cvPromotion.setOnClickListener(this);
-        cvXacNhanCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), XacNhanCardActivity.class);
-                startActivity(intent);
-            }
+        cvXacNhanCard.setOnClickListener(view1 -> {
+            Intent intent = new Intent(getActivity(), XacNhanCardActivity.class);
+            startActivity(intent);
         });
         cvChangePass.setOnClickListener(this);
         cvQLProduct.setOnClickListener(this);
-        cvReview.setOnClickListener(this);
+        cvChatBox.setOnClickListener(this);
         cvTK.setOnClickListener(this);
         cvQLUser.setOnClickListener(this);
         cvPayment.setOnClickListener(this);
-        cvAdddiachi.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), LocationActivity.class);
-                startActivity(intent);
-            }
+        cvChatBox.setOnClickListener(this);
+        cvAdddiachi.setOnClickListener(view12 -> {
+            Intent intent = new Intent(getActivity(), LocationActivity.class);
+            startActivity(intent);
         });
         textFixInfor.setOnClickListener(this);
     }
@@ -211,7 +205,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
     private void showDialogFigProfile() {
-        Dialog dialog = new Dialog(getActivity());
+        Dialog dialog = new Dialog(requireActivity());
         dialog.setContentView(R.layout.dialog_fix_profile);
 
         TextInputEditText edUserName = dialog.findViewById(R.id.edUserName);
@@ -409,8 +403,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             startActivity(new Intent(getContext(), ListUserActivity.class));
         } else if (view.getId() == R.id.cvQLProduct) {
             startActivity(new Intent(getContext(), ManagerProductActivity.class));
-        } else if (view.getId() == R.id.cvReView) {
-
+        } else if (view.getId() == R.id.cvChatBox) {
+            startActivity(new Intent(getContext(), ListChatActivity.class));
         } else if (view.getId() == R.id.cvChangePass) {
             startActivity(new Intent(getContext(), ChangePassword_Activity.class));
         } else if (view.getId() == R.id.textFixInfor) {

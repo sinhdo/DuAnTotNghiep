@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.adapter.OrderAdapter;
 import com.example.duantotnghiep.adapter.StatisticalAdapter;
+import com.example.duantotnghiep.model.InfoProductOrder;
 import com.example.duantotnghiep.model.Order;
 import com.example.duantotnghiep.model.Statistical;
 import com.google.android.material.textfield.TextInputEditText;
@@ -49,7 +50,7 @@ public class StatisticalActivity extends AppCompatActivity {
     private ImageView imgStartDate;
     private TextInputEditText edEndDate;
     private ImageView imgEndDate;
-    private Button btnQuerry;
+    private Button btnQuerry,thismonth;
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
     private String startDate,endDate;
     int mYear, mMonth, mDate;
@@ -84,6 +85,16 @@ public class StatisticalActivity extends AppCompatActivity {
                 }
             }
         });
+        thismonth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setMonthRange();
+                startDate = edStartDate.getText().toString();
+                endDate = edEndDate.getText().toString();
+                getDataOrder(startDate,endDate);
+                recyclerView.setAdapter(adapter);
+            }
+        });
 
     }
     private void anhXa(){
@@ -96,6 +107,7 @@ public class StatisticalActivity extends AppCompatActivity {
         edEndDate = findViewById(R.id.ed_end_date);
         imgEndDate = findViewById(R.id.img_end_date);
         btnQuerry = findViewById(R.id.btnQuerry);
+        thismonth = findViewById(R.id.thismonth);
         edStartDate.setFocusable(false);
         edStartDate.setFocusableInTouchMode(false);
         edEndDate.setFocusable(false);
@@ -104,7 +116,7 @@ public class StatisticalActivity extends AppCompatActivity {
         adapter = new StatisticalAdapter(getApplicationContext(),statisticalList);
     }
 
-    private void getDataOrder(String startDay,String endDay){
+    private void getDataOrder(String startDay, String endDay) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         String id_user = firebaseUser.getUid();
@@ -115,30 +127,32 @@ public class StatisticalActivity extends AppCompatActivity {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Map<String,Statistical> statisticalMap = new HashMap<>();
+                Map<String, Statistical> statisticalMap = new HashMap<>();
                 int totalQuantitySum = 0;
                 double totalAmountSum = 0;
-               if (snapshot.exists()){
-                   for (DataSnapshot transactionSnapshot : snapshot.getChildren()) {
-                       Order order = transactionSnapshot.getValue(Order.class);
-                       if (order.getStatus().equals("done")&&order.getIdSeller().equals(id_user)){
-                           Statistical statistical = statisticalMap.get(order.getIdProduct());
-                           if (statistical == null) {
-
-                               statistical = new Statistical(order.getIdProduct(),order.getImgProduct(), order.getNameProduct(), order.getQuantity(),order.getTotal());
-                               statisticalMap.put(order.getIdProduct(), statistical);
-                           } else {
-
-                               statistical.setTotalQuantity(statistical.getTotalQuantity() + order.getQuantity());
-                               statistical.setTotalAmount(statistical.getTotalAmount() + order.getTotal());
-                           }
-                           totalQuantitySum += order.getQuantity();
-                           totalAmountSum += order.getTotal();
-                       }else {
-                           Log.d("=======", "onDataChange: Không có");
-                       }
-                   }
-               }
+                if (snapshot.exists()) {
+                    for (DataSnapshot transactionSnapshot : snapshot.getChildren()) {
+                        Order order = transactionSnapshot.getValue(Order.class);
+                        if (order.getStatus().equals("Done") && order.getIdSeller().equals(id_user)) {
+                            List<InfoProductOrder> productList = order.getListProduct();
+                            for (InfoProductOrder product : productList) {
+                                String productId = product.getIdProduct();
+                                Statistical statistical = statisticalMap.get(productId);
+                                if (statistical == null) {
+                                    statistical = new Statistical(productId, product.getImgPr(), product.getNamePr(), product.getQuantityPr(), product.getPrice());
+                                    statisticalMap.put(productId, statistical);
+                                } else {
+                                    statistical.setTotalQuantity(statistical.getTotalQuantity() + product.getQuantityPr());
+                                    statistical.setTotalAmount(statistical.getTotalAmount() + product.getPrice());
+                                }
+                                totalQuantitySum += product.getQuantityPr();
+                                totalAmountSum += product.getPrice();
+                            }
+                        } else {
+                            Log.d("=======", "onDataChange: Không có");
+                        }
+                    }
+                }
                 if (statisticalMap.isEmpty()) {
                     nullData.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
@@ -159,8 +173,8 @@ public class StatisticalActivity extends AppCompatActivity {
 
             }
         });
-
     }
+
     private void setDay(){
         DatePickerDialog.OnDateSetListener FromDate = (datePicker, year, monthOfYear, dayOfMonth) -> {
             mYear = year;
@@ -195,5 +209,28 @@ public class StatisticalActivity extends AppCompatActivity {
             dialog_end.show();
         });
     }
+    private void setMonthRange() {
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date firstDayOfMonth = calendar.getTime();
+
+        calendar.add(Calendar.MONTH, 1);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        Date lastDayOfMonth = calendar.getTime();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
+        edStartDate.setText(dateFormat.format(firstDayOfMonth));
+        edEndDate.setText(dateFormat.format(lastDayOfMonth));
+    }
+
+
+
 
 }

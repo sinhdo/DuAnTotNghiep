@@ -20,7 +20,7 @@
     <LinearLayout
         android:id="@+id/topUS"
         android:layout_width="match_parent"
-        android:layout_height="172dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/tlt"
         android:background="#DDA95B"
         android:orientation="horizontal"
@@ -113,7 +113,9 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
                 android:backgroundTint="#FFD772"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
@@ -151,7 +153,9 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
                 android:backgroundTint="#FFD772"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
@@ -188,7 +192,9 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
                 android:backgroundTint="#FFD772"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
@@ -225,7 +231,9 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
                 android:backgroundTint="#FFD772"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
@@ -262,7 +270,9 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
                 android:backgroundTint="#FFD772"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
@@ -295,12 +305,14 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cvReView"
+                android:id="@+id/cvChatBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
                 android:backgroundTint="#FFD772"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
@@ -316,14 +328,14 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_gravity="center_horizontal"
-                        android:src="@drawable/baseline_star_half_24" />
+                        android:src="@drawable/baseline_chat_24" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
                         android:gravity="center"
-                        android:text="Đánh giá của tôi"
+                        android:text="Nhắn tin"
                         android:textAlignment="center"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -341,7 +353,9 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
                 android:backgroundTint="#FFD772"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
@@ -379,8 +393,9 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-
-                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
                 android:backgroundTint="#FFD772"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
@@ -419,7 +434,9 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
                 android:backgroundTint="#FFD772"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
@@ -457,7 +474,9 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
                 android:backgroundTint="#FFD772"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">
@@ -495,7 +514,9 @@
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
                 android:backgroundTint="#FFD772"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp">

@@ -17,6 +17,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.example.duantotnghiep.database.FireBaseType;
@@ -27,6 +29,7 @@ import com.example.duantotnghiep.fragment.NotificationFragment;
 import com.example.duantotnghiep.fragment.ProfileFragment;
 
 import com.example.duantotnghiep.fragment.SearchProductFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -41,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private FragmentManager fragmentManager;
     private FirebaseAuth firebaseAuth;
-    private DatabaseReference mReference;
+    private DatabaseReference mReference, notificationsRef;
     private FirebaseUser firebaseUser;
-
+    private boolean hasNewNotification = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +59,21 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager = getSupportFragmentManager();
         HomeFragment homeFragment = new HomeFragment();
         fragmentManager.beginTransaction().replace(R.id.frame_layout, homeFragment).commit();
+        notificationsRef = FirebaseDatabase.getInstance().getReference("notifications");
         setRoleListUser();
+        updateNotificationIcon();
+        notificationsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                hasNewNotification = checkNewNotification(dataSnapshot);
+                updateNotificationIcon();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("Loi", "onCancelled: " + databaseError.getMessage());
+            }
+        });
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
@@ -112,7 +129,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    private boolean checkNewNotification(DataSnapshot dataSnapshot) {
+        for (DataSnapshot notificationSnapshot : dataSnapshot.getChildren()) {
+            Boolean isRead = notificationSnapshot.child("isRead").getValue(Boolean.class);
+            if (isRead != null && isRead.equals(Boolean.FALSE)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    private void updateNotificationIcon() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        Menu menu = bottomNavigationView.getMenu();
+        MenuItem notificationMenuItem = menu.findItem(R.id.notification);
+
+        if (hasNewNotification) {
+            notificationMenuItem.setIcon(R.drawable.baseline_notifications_gold);
+        } else {
+            notificationMenuItem.setIcon(R.drawable.baseline_notifications_24);
+        }
+    }
     private void replaceFragment(Fragment fragment) {
         fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

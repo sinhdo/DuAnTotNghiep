@@ -25,6 +25,12 @@
             android:textSize="30dp"
             android:textStyle="bold"
             android:textColor="@color/black"/>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_add_24"
+            android:id="@+id/imgAddlocation"
+            android:layout_marginLeft="100dp"/>
     </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv_showListLocation"

@@ -25,6 +25,11 @@
         <activity
             android:name=".activity.AccountLockedActivity"
             android:exported="false" />
+            android:name=".ChatBox.Chat.ChatActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChatBox.ListChatActivity"
+            android:exported="false" />
         <activity
             android:name=".AdminActivity"
             android:exported="false" />
@@ -33,9 +38,6 @@
             android:exported="false" />
         <activity
             android:name=".activity.SignUpActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AdminMainActivity"
             android:exported="false" />
         <activity
             android:name=".activity.ReviewsActivity"

@@ -41,6 +41,7 @@ import com.example.duantotnghiep.adapter.DiscountAdapter;
 import com.example.duantotnghiep.adapter.DiscountSelectionAdapter;
 import com.example.duantotnghiep.adapter.MutilpleColorAdapter;
 import com.example.duantotnghiep.adapter.MutilpleImgAdapter;
+import com.example.duantotnghiep.model.ColorProduct;
 import com.example.duantotnghiep.model.Discount;
 import com.example.duantotnghiep.model.Product;
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,7 +64,7 @@ public class AddProductFragment extends Fragment {
     ImageView btnColor, btnDiscount;
     private FirebaseAuth firebaseAuth;
     private List<Uri> selectedImageUris = new ArrayList<>();
-    private List<Integer> selectedColors = new ArrayList<>();
+    private List<ColorProduct> selectedColorProducts = new ArrayList<>();
     private MutilpleColorAdapter mAdapter = new MutilpleColorAdapter();
     private ImageView chooseImg;
     List<String> selectedSize;
@@ -73,7 +74,7 @@ public class AddProductFragment extends Fragment {
     private boolean isAddingProduct = false;
     private RecyclerView multipleImg;
     private static final int REQUEST_CODE_SELECT_IMAGES = 1;
-    EditText edtTitle, edtPrice, edtQuantity, edtBrand, edtDes;
+    EditText edtTitle, edtPrice, edtBrand, edtDes;
     Button addProduct;
     int Price;
     List<Discount> selectedDiscounts;
@@ -81,6 +82,7 @@ public class AddProductFragment extends Fragment {
     RecyclerView rvMutilpeDiscount;
     private Spinner sizeSpinner;
     Product product;
+    Integer quantity = 0 ;
     private StorageReference storageReference;
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -92,7 +94,6 @@ public class AddProductFragment extends Fragment {
         multipleImg = root.findViewById(R.id.mutilpeImg);
         edtTitle = root.findViewById(R.id.titleProduct);
         edtPrice = root.findViewById(R.id.priceProductSeller);
-        edtQuantity = root.findViewById(R.id.QuantityProduct);
         edtDes = root.findViewById(R.id.descriptionProduct);
         btnDiscount = root.findViewById(R.id.btnDiscount);
         rvMutilpeDiscount = root.findViewById(R.id.rvMutilpeDiscount);
@@ -101,29 +102,15 @@ public class AddProductFragment extends Fragment {
         multipleImg = root.findViewById(R.id.mutilpeImg);
         RecyclerView rvMutilpeColor = root.findViewById(R.id.rvMutilpeColor);
         rvMutilpeColor.setAdapter(mAdapter);
-
-        btnColor.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialogColor();
-            }
-        });
-        btnDiscount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialogDiscount();
-            }
-        });
+        btnColor.setOnClickListener(v -> showDialogColor());
+        btnDiscount.setOnClickListener(v -> showDialogDiscount());
         ((ManagerProductActivity) requireActivity()).hideFloatingActionButton();
-        chooseImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Chọn hình ảnh"), REQUEST_CODE_SELECT_IMAGES);
-            }
+        chooseImg.setOnClickListener(view -> {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, "Chọn hình ảnh"), REQUEST_CODE_SELECT_IMAGES);
         });
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -146,6 +133,9 @@ public class AddProductFragment extends Fragment {
                 }
             }
         });
+        // default
+        selectedSize = new ArrayList<>();
+        selectedSize.addAll(Arrays.asList("S", "M", "L", "XL", "XXL"));
 
         ArrayAdapter<String> sizeAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
         sizeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -164,6 +154,8 @@ public class AddProductFragment extends Fragment {
                 } else if ("FOOTWEAR".equals(selectedProductType)) {
                     selectedSize.addAll(Arrays.asList("36", "37", "38", "39", "40", "41", "42", "43", "44"));
                 }
+                mAdapter.updateSelectedColors(selectedColorProducts, selectedSize);
+                rvMutilpeColor.setAdapter(mAdapter);
             }
 
             @Override
@@ -189,7 +181,7 @@ public class AddProductFragment extends Fragment {
         discountsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                 allDiscounts = new ArrayList<>();
+                allDiscounts = new ArrayList<>();
                 FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -214,13 +206,10 @@ public class AddProductFragment extends Fragment {
             }
         });
 
-        builder.setPositiveButton("Xác nhận", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                DiscountSelectionAdapter discountSelectionAdapter1 = (DiscountSelectionAdapter) recyclerView.getAdapter();
-                selectedDiscounts = discountSelectionAdapter1.getSelectedDiscountIds();
-                showSelectedDiscounts(selectedDiscounts);
-            }
+        builder.setPositiveButton("Xác nhận", (dialog, which) -> {
+            DiscountSelectionAdapter discountSelectionAdapter1 = (DiscountSelectionAdapter) recyclerView.getAdapter();
+            selectedDiscounts = discountSelectionAdapter1.getSelectedDiscountIds();
+            showSelectedDiscounts(selectedDiscounts);
         });
 
         builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
@@ -282,31 +271,51 @@ public class AddProductFragment extends Fragment {
         alertDialog.show();
 
         GridLayout gridLayout = view.findViewById(R.id.grid);
-
+        updateRecyclerView(view, getColor(selectedColorProducts));
 
         for (int i = 0; i < gridLayout.getChildCount(); i++) {
             final ImageButton button = (ImageButton) gridLayout.getChildAt(i);
             final int color = ((ColorDrawable) button.getBackground()).getColor();
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (selectedColors.contains(color)) {
-                        selectedColors.remove(selectedColors.indexOf(color));
-                    } else {
-                        selectedColors.add(color);
-                    }
-                    updateRecyclerView(view, selectedColors);
+            button.setOnClickListener(v -> {
+                if (!checkColorExist(color)) {
+                    selectedColorProducts.add(new ColorProduct(color));
+                } else {
+                    removeColor(color);
                 }
+                updateRecyclerView(view, getColor(selectedColorProducts));
             });
         }
         Button addButton = view.findViewById(R.id.b21);
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAdapter.updateSelectedColors(selectedColors);
-                alertDialog.dismiss();
-            }
+        addButton.setOnClickListener(v -> {
+            mAdapter.updateSelectedColors(selectedColorProducts, selectedSize);
+            alertDialog.dismiss();
         });
+    }
+
+    private void removeColor(int color) {
+        for (ColorProduct cl: selectedColorProducts) {
+            if (cl.getColor() == color) {
+                selectedColorProducts.remove(cl);
+                break;
+            }
+        }
+    }
+
+    private List<Integer> getColor(List<ColorProduct> selectedColorProducts) {
+        ArrayList<Integer> listColor = new ArrayList<>();
+        for (ColorProduct cl : selectedColorProducts) {
+            listColor.add(cl.getColor());
+        }
+        return listColor;
+    }
+
+    private boolean checkColorExist(int color) {
+        for (ColorProduct cl : selectedColorProducts) {
+            if (cl.getColor() == color) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void updateRecyclerView(View view, List<Integer> selectedColors) {
@@ -333,7 +342,6 @@ public class AddProductFragment extends Fragment {
         Brand = String.valueOf(edtBrand.getText()).trim();
 
         String selectedProductType = (String) sizeSpinner.getSelectedItem();
-        int Quantity = Integer.parseInt(String.valueOf(edtQuantity.getText()));
 
         Product.ProductType productType = Product.ProductType.valueOf(selectedProductType);
         List<String> imageUrls = new ArrayList<>();
@@ -352,9 +360,10 @@ public class AddProductFragment extends Fragment {
 
                     if (imageUrls.size() == selectedImageUris.size()) {
                         String userId = firebaseAuth.getCurrentUser().getUid();
+                        quantity = selectedColorProducts.stream().map(product -> product.getQuantity().stream().reduce(0,Integer::sum)).reduce(0,Integer::sum).intValue();
                         Product product = new Product(
                                 productId, userId, Title, productType,
-                                "categoryID", Brand, Des, imageUrls, selectedColors, 0, "ngon", Quantity, (double) Price, selectedSize,  selectedDiscounts
+                                "categoryID", Brand, Des, imageUrls, selectedColorProducts, 0, "ngon", quantity, (double) Price, selectedSize,  selectedDiscounts
                         );
                         product.setUserProduct(true);
 
@@ -376,7 +385,6 @@ public class AddProductFragment extends Fragment {
     private boolean validateInput() {
         String title = edtTitle.getText().toString().trim();
         String priceString = edtPrice.getText().toString().trim();
-        String quantityString = edtQuantity.getText().toString().trim();
         String brand = edtBrand.getText().toString().trim();
         String description = edtDes.getText().toString().trim();
 
@@ -389,11 +397,6 @@ public class AddProductFragment extends Fragment {
             showToast("Giá không được để trống");
             return false;
         }
-        if (quantityString.isEmpty()) {
-            showToast("Số lượng không được để trống");
-            return false;
-        }
-
         if (brand.isEmpty()) {
             showToast("Hãng không được để trống");
             return false;
@@ -407,7 +410,7 @@ public class AddProductFragment extends Fragment {
             return false;
         }
 
-        if (selectedColors.isEmpty()) {
+        if (selectedColorProducts.isEmpty()) {
             showToast("Bạn cần chọn ít nhất một màu");
             return false;
         }
