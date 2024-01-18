@@ -43,6 +43,13 @@ public class ShowListLocationActivity extends AppCompatActivity implements ShowL
                 startActivity(intent);
             }
         });
+        binding.imgAddlocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), AddLocationActivity.class);
+                startActivity(intent);
+            }
+        });
         showList();
         binding.imgBack.setOnClickListener(view -> {
             finish();
@@ -72,9 +79,11 @@ public class ShowListLocationActivity extends AppCompatActivity implements ShowL
                 if (list.isEmpty()){
                     binding.addLocation.setVisibility(View.VISIBLE);
                     binding.rcvShowListLocation.setVisibility(View.GONE);
+                    binding.imgAddlocation.setVisibility(View.GONE);
                 }else {
                     binding.addLocation.setVisibility(View.GONE);
                     binding.rcvShowListLocation.setVisibility(View.VISIBLE);
+                    binding.imgAddlocation.setVisibility(View.VISIBLE);
                 }
                 adapter.notifyDataSetChanged();
             }
