@@ -27,6 +27,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ManagerProductActivity extends AppCompatActivity {
@@ -141,7 +143,9 @@ public class ManagerProductActivity extends AppCompatActivity {
                 }
                 if (numRatings > 0) {
                     float averageRating = totalRating / numRatings;
-                    rateStart.setText(String.valueOf(averageRating));
+                    DecimalFormat decimalFormat = new DecimalFormat("0.0");
+                    String formattedRating = decimalFormat.format(averageRating);
+                    rateStart.setText(formattedRating);
                 } else {
                     rateStart.setText("5.0");
                 }
