@@ -86,6 +86,14 @@
                     android:layout_marginLeft="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:id="@+id/tvTotal"
+                    android:text="Tổng cộng : "/>
+                <TextView
+                    android:textStyle="bold"
+                    android:textSize="17dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:id="@+id/tvNoteOrder"
                     android:text="Note"/>
                 <TextView
