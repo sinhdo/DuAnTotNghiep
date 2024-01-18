@@ -83,9 +83,10 @@ public class ProductHomeAdapter2 extends RecyclerView.Adapter<ProductHomeAdapter
 
                 if (numRatings > 0) {
                     float averageRating = totalRating / numRatings;
-                    holder.binding.tvStart.setText(String.valueOf(averageRating));
+                    DecimalFormat decimalFormat = new DecimalFormat("0.0");
+                    String formattedRating = decimalFormat.format(averageRating);
+                    holder.binding.tvStart.setText(formattedRating);
                 } else {
-                    // Nếu không có đánh giá, đặt số sao mặc định là 5
                     holder.binding.tvStart.setText("5.0");
                 }
             }

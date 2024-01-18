@@ -45,6 +45,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -136,7 +137,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
                 if (numRatings > 0) {
                     float averageRating = totalRating / numRatings;
-                    holder.binding.start.setText(String.valueOf(averageRating));
+                    DecimalFormat decimalFormat = new DecimalFormat("0.0");
+                    String formattedRating = decimalFormat.format(averageRating);
+                    holder.binding.start.setText(String.valueOf(formattedRating));
                     productRef.child("averageRating").setValue(averageRating);
                     productRef.child("numRatings").setValue(numRatings);
                 } else {

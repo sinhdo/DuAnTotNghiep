@@ -120,7 +120,9 @@ public class ListUserActivity extends AppCompatActivity implements UserAdapter.C
                 }
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
-                    list.add(user);
+                    if (!user.getId().equals("ZYA1yQdRAYSzh1K24ZVYIYvHIc92")) {
+                        list.add(user);
+                    }
                 }
                 adapter.notifyDataSetChanged();
             }

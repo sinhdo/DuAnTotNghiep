@@ -165,6 +165,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
                         String productId = product.getIdProduct();
                         int quantityPr = product.getQuantityPr();
                         updateProductSold(productId, quantityPr);
+                        updateProductQuantity(productId, quantityPr);
                     }
                 }
                 menuDialog.dismiss();
@@ -205,6 +206,31 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
                 if (product != null) {
                     int sold = product.getSold() + quantityPr;
                     product.setSold(sold);
+                    mutableData.setValue(product);
+                }
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, boolean committed, @Nullable DataSnapshot dataSnapshot) {
+                if (committed) {
+                    // Cập nhật thành công
+                } else {
+                    // Xử lý lỗi nếu cần
+                }
+            }
+        });
+    }
+    private void updateProductQuantity(String productId, int quantityPr) {
+        DatabaseReference productRef = FirebaseDatabase.getInstance().getReference("products").child(productId);
+        productRef.runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                Product product = mutableData.getValue(Product.class);
+                if (product != null) {
+                    int quantity = product.getQuantity() - quantityPr;
+                    product.setQuantity(quantity);
                     mutableData.setValue(product);
                 }
                 return Transaction.success(mutableData);

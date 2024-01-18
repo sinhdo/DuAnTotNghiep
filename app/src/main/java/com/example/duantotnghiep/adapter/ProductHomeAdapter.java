@@ -50,7 +50,6 @@ public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.
         Product product = productList.get(position);
         DecimalFormat decimalFormat = new DecimalFormat("#,###");
         holder.binding.tvPriceHome.setText(decimalFormat.format(product.getPrice()) + " VND");
-//        holder.binding.tvPriceHome.setText(String.valueOf(product.getPrice()) + " VND");
         holder.binding.tvTitleHome.setText(product.getName());
         holder.binding.tvSoldHome.setText(String.valueOf("Đã bán " + product.getSold()));
         if (product.getImgProduct() != null && !product.getImgProduct().isEmpty()) {
@@ -67,7 +66,6 @@ public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.
                 context.startActivity(intent);
             }
         });
-        // Truy cập đến nhánh "reviews" trong Firebase
         DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference("reviews");
         DatabaseReference productRef = FirebaseDatabase.getInstance().getReference("products").child(product.getId());
         reviewsRef.addValueEventListener(new ValueEventListener() {
@@ -86,11 +84,12 @@ public class ProductHomeAdapter extends RecyclerView.Adapter<ProductHomeAdapter.
 
                 if (numRatings > 0) {
                     float averageRating = totalRating / numRatings;
-                    holder.binding.tvStart.setText(String.valueOf(averageRating));
+                    DecimalFormat decimalFormat = new DecimalFormat("0.0");
+                    String formattedRating = decimalFormat.format(averageRating);
+                    holder.binding.tvStart.setText(formattedRating);
                     productRef.child("averageRating").setValue(averageRating);
                     productRef.child("numRatings").setValue(numRatings);
                 } else {
-                    // Nếu không có đánh giá, đặt số sao mặc định là 5
                     holder.binding.tvStart.setText("5.0");
                 }
             }
