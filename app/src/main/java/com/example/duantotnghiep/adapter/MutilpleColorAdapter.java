@@ -160,6 +160,7 @@ public class MutilpleColorAdapter extends RecyclerView.Adapter<MutilpleColorAdap
             colorProductList.addAll(selectedColorProducts);
             this.selectedSize.clear();
             this.selectedSize.addAll(selectedSize);
+
         }
         notifyDataSetChanged();
     }

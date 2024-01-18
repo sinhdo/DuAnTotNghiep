@@ -69,6 +69,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     EditText editTitle, editPrice, editQuantity, editBrand, editDes;
     Button editProduct;
     RecyclerView rvMultipleColorEdit, rvMultipleImgEdit;
+    int quantity = 0;
     private List<ColorProduct> selectedColors = new ArrayList<>();
     Spinner sizeSpinnerEdit;
     public ProductAdapter(Context context, List<Product> productList) {
@@ -165,7 +166,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 editDes = view.findViewById(R.id.descriptionProductEdit);
                 editBrand = view.findViewById(R.id.BrandProductEdit);
                 editPrice = view.findViewById(R.id.priceProductSellerEdit);
-                editQuantity = view.findViewById(R.id.QuantityProductEdit);
+
                 chooseColor = view.findViewById(R.id.btnColorEdit);
                 chooseImgEdit = view.findViewById(R.id.chooseImgEdit);
                 sizeSpinnerEdit = view.findViewById(R.id.spinnerSizeEdit);
@@ -176,7 +177,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 editPrice.setText(String.valueOf(productToEdit.getPrice()));
                 editDes.setText(productToEdit.getDescription());
                 editBrand.setText(productToEdit.getBrand());
-                editQuantity.setText(String.valueOf(productToEdit.getQuantity()));
+
 
 
                 String[] productTypeValues = context.getResources().getStringArray(R.array.product_types);
@@ -198,11 +199,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
 
                 List<ColorProduct> selectedColorProducts = productToEdit.getListColor();
+                List<String> sizeColors = productToEdit.getSize();
                 if (selectedColorProducts != null && !selectedColorProducts.isEmpty()) {
-                    mAdapter.updateSelectedColors(selectedColorProducts, new ArrayList<>());
+
+                    mAdapter.updateSelectedColors(selectedColorProducts, sizeColors);
 
                     rvMultipleColorEdit.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
                     rvMultipleColorEdit.setAdapter(mAdapter);
+
                 } else {
                     Toast.makeText(context, "Danh sách màu không hợp lệ", Toast.LENGTH_SHORT).show();
                 }
@@ -241,13 +245,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 editProduct.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        quantity = selectedColorProducts.stream().map(product -> product.getQuantity().stream().reduce(0,Integer::sum)).reduce(0,Integer::sum).intValue();
 
                         String updatedTitle = editTitle.getText().toString();
                         String updatedDescription = editDes.getText().toString();
                         String updatedBrand = editBrand.getText().toString();
                         double updatedPrice = Double.parseDouble(editPrice.getText().toString());
-                        int updatedQuantity = Integer.parseInt(editQuantity.getText().toString());
+//                        int updatedQuantity = Integer.parseInt(editQuantity.getText().toString());
                         List<ColorProduct> updatedColorProducts = mAdapter.getSelectedColors();
                         String selectedSize = (String) sizeSpinnerEdit.getSelectedItem();
 
@@ -256,9 +260,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                         productToEdit.setDescription(updatedDescription);
                         productToEdit.setBrand(updatedBrand);
                         productToEdit.setPrice(updatedPrice);
-                        productToEdit.setQuantity(updatedQuantity);
+//                        productToEdit.setQuantity(updatedQuantity);
 
                         productToEdit.setListColor(updatedColorProducts);
+                        productToEdit.setQuantity(quantity);
 
                         productToEdit.setProductType(Product.ProductType.valueOf(selectedSize));
                         String selectedProductType = (String) sizeSpinnerEdit.getSelectedItem();

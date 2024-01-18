@@ -46,13 +46,18 @@ public class InStockFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String userId = firebaseAuth.getCurrentUser().getUid();
                 productList.clear();
+
                 for (DataSnapshot productSnapshot : dataSnapshot.getChildren()) {
                     Product product = productSnapshot.getValue(Product.class);
-                    if (product.getSellerId().equals(userId)&& product.getQuantity() > 0) {
+
+                    if (product != null && product.getSellerId() != null && product.getSellerId().equals(userId) && product.getQuantity() > 0) {
                         productList.add(product);
                     }
+                }
+
                 productAdapter.notifyDataSetChanged();
-            }}
+            }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
