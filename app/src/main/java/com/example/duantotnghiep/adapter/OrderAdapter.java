@@ -67,7 +67,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.tv_nameByer.setText("Đơn của: " + order.getCustomerName());
         holder.phoneByer.setText("SĐT: " +order.getNumberPhone());
         holder.adresByer.setText("Địa chỉ: " +order.getAddress());
-        holder.tvNoteOrder.setText("NOTE: " +order.getNote());
+        if (order.getNote().isEmpty()||order.getNote().equals("")||order.getNote()==""){
+            holder.tvNoteOrder.setVisibility(View.GONE);
+        }else {
+            holder.tvNoteOrder.setText("NOTE: " +order.getNote());
+        }
         holder.soluong.setText(String.valueOf("Số lượng SP: : " +order.getTotalQuantity()));
         holder.tvDate.setText(order.getDate());
 
