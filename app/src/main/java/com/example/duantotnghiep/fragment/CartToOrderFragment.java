@@ -148,7 +148,7 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         String idBuyer = firebaseUser.getUid();
         String address = txtAddress.getText().toString();
         String numberPhone = txtPhone.getText().toString();
-        Boolean paid = false;
+        Boolean paid = txtPayment_Cart.getText().toString().equals("Pay with wallet");
 
         String idSeller = "ZYA1yQdRAYSzh1K24ZVYIYvHIc92";
         List<InfoProductOrder> productList = new ArrayList<>();
@@ -193,11 +193,12 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
                                                         for (AddProductToCart product : selectedProducts) {
                                                             totalQuantity += product.getQuantity_product();
                                                         }
+
                                                         Order order = new Order(
                                                                 orderId,
                                                                 idBuyer,
                                                                 idSeller,
-                                                                TotalPlusShip,
+                                                                TotalPay,
                                                                 address,
                                                                 numberPhone,
                                                                 paid,
@@ -311,10 +312,11 @@ public class CartToOrderFragment extends Fragment implements CartOrderAdapter.Di
         totalDiscount = totalSelectedDiscounts;
         if (totalDiscount > 0) {
             TotalPay = TotalPlusShip - totalDiscount;
+
             txtAllVoucherCart.setText(String.format("-" + formatPrice(totalSelectedDiscounts)));
         } else {
             TotalPay = TotalPlusShip;
-            Log.d("hhhh", "TotalPlusShip" + TotalPlusShip);
+            Log.d("hhhh", "TotalPlusShip" + TotalPay);
             txtAllVoucherCart.setText(String.format("-" + formatPrice(totalSelectedDiscounts)));
         }
         txtTotalCart.setText(String.format(formatPrice(TotalPay)));
