@@ -3,16 +3,34 @@
     android:layout_width="340dp"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="50dp"
         android:background="#D97E14"
-        android:gravity="center"
-        android:id="@+id/tlt"
-        android:text="Chi tiết đơn hàng"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:id="@+id/tlt"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="4dp"
+            android:text="Chi tiết đơn hàng: "
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:id="@+id/idOrder"
+            android:layout_marginTop="7dp"
+            android:text="Mã"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            />
+    </LinearLayout>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

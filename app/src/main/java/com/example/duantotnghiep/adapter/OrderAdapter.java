@@ -13,18 +13,30 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duantotnghiep.R;
 import com.example.duantotnghiep.model.InfoProductOrder;
 import com.example.duantotnghiep.model.Order;
+import com.example.duantotnghiep.model.Product;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
     private Context context;
@@ -32,13 +44,19 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     private Callback callback;
     private List<InfoProductOrder> infoProductOrderList;
     private String currentFragment;
+    private List<Order> orderList;
+    private DatabaseReference notificationRef;
+    private String orderId;
     public OrderAdapter(Context context, List<Order> list, Callback callback) {
         this.context = context;
         this.list = list;
         this.infoProductOrderList = new ArrayList<>();
         this.currentFragment = currentFragment;
         this.callback = callback;
+        this.orderList = orderList;
+        orderId = "";
     }
+
     public List<InfoProductOrder> getInfoProductOrderList() {
         return infoProductOrderList;
     }
@@ -51,6 +69,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
         Order order = list.get(position);
+        orderId = order.getId();
+
         if (order == null) {
             return;
         }
@@ -101,10 +121,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             btnReview.setText("Xác nhận đơn hàng");
         } else if (currentFragment.equals("ConfirmForShopFragment")) {
             btnReview.setText("Vận chuyển đơn hàng");
-        }else if (currentFragment.equals("DeliverForShopFragment")){
-            btnReview.setText("Hoàn thành đơn hàng");
-        }else if (currentFragment.equals("CancleForShopFragment")){
-            btnReview.setText("Mua lại đơn hàng");
+        }else if (currentFragment.equals("DoneForShopFragment") || currentFragment.equals("CancleForShopFragment") || currentFragment.equals("DeliverForShopFragment")){
+            btnReview.setVisibility(View.GONE);
         }
         if (currentFragment.equals("WaitForShopFragment")) {
             btnHuyDon.setVisibility(View.VISIBLE);
@@ -116,13 +134,18 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             public void onClick(View v) {
                 if (currentFragment.equals("WaitForShopFragment")) {
                     updateOrderStatus(order.getId(), "Confirm");
+                    notificationsCf(order);
                     Toast.makeText(context, "Đã xác nhận đơn!!!", Toast.LENGTH_SHORT).show();
                 } else if (currentFragment.equals("ConfirmForShopFragment")) {
                     updateOrderStatus(order.getId(), "Deliver");
                     Toast.makeText(context, "Đơn đã được vận chuyển!!!", Toast.LENGTH_SHORT).show();
-                }else if (currentFragment.equals("DeliverForShopFragment")){
-                    updateOrderStatus(order.getId(), "Done");
-                    Toast.makeText(context, "Đơn đã hoàn thành!!!", Toast.LENGTH_SHORT).show();
+                    List<InfoProductOrder> productList = order.getListProduct();
+
+                    for (InfoProductOrder product : productList) {
+                        String productId = product.getIdProduct();
+                        int quantityPr = product.getQuantityPr();
+                        updateProductSold(productId, quantityPr);
+                    }
                 }
                 menuDialog.dismiss();
             }
@@ -151,6 +174,51 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
         menuDialog.show();
     }
+    private void updateProductSold(String productId, int quantityPr) {
+        DatabaseReference productRef = FirebaseDatabase.getInstance().getReference("products").child(productId);
+        productRef.runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                Product product = mutableData.getValue(Product.class);
+                if (product != null) {
+                    int sold = product.getSold() + quantityPr;
+                    product.setSold(sold);
+                    mutableData.setValue(product);
+                }
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, boolean committed, @Nullable DataSnapshot dataSnapshot) {
+                if (committed) {
+                    // Cập nhật thành công
+                } else {
+                    // Xử lý lỗi nếu cần
+                }
+            }
+        });
+    }
+    private String getCurrentTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
+        Date currentDate = new Date();
+        return sdf.format(currentDate);
+    }
+    private void notificationsCf(Order order) {
+        String title = String.format( "Đơn hàng %s", orderId);
+        String content = "Đơn hàng của bạn đã được xác nhận và giao cho đơn vị vận chuyển nhanh EXpress, đơn sẽ được giao đến bạn trong vài ngày tới.";
+        String currentTime = getCurrentTime();
+        String userId = order.getIdBuyer(); // Lấy idBuyer từ đối tượng Order
+
+        notificationRef = FirebaseDatabase.getInstance().getReference("notifications").child(userId); // Gửi thông báo cho người đặt hàng
+        String notificationId = notificationRef.push().getKey();
+
+        notificationRef.child(notificationId).child("title").setValue(title);
+        notificationRef.child(notificationId).child("content").setValue(content);
+        notificationRef.child(notificationId).child("dateTime").setValue(currentTime);
+        notificationRef.child(notificationId).child("userId").setValue(userId);
+    }
+
     public void setCurrentFragment(String currentFragment) {
         this.currentFragment = currentFragment;
     }
@@ -168,6 +236,12 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         recyclerView.setAdapter(productOrderAdapter);
         productOrderAdapter.setProductList(productList);
         orderDetailDialog.show();
+
+        // Tìm TextView và thiết lập giá trị id
+        TextView idOrderTextView = orderDetailDialog.findViewById(R.id.idOrder);
+        if (idOrderTextView != null) {
+            idOrderTextView.setText(orderId);
+        }
 
         // Log danh sách sản phẩm
         for (InfoProductOrder product : productList) {

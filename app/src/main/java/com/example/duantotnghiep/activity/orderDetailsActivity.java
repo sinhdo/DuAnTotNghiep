@@ -51,8 +51,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class orderDetailsActivity extends AppCompatActivity {
     private Button btnOrder;
@@ -65,9 +67,11 @@ public class orderDetailsActivity extends AppCompatActivity {
     List<InfoProductOrder> infoProductOrders = new ArrayList<>();
     private OrderDetailsAdapter adapter;
     private String idProduct;
-    private DatabaseReference productRef, userRef, discountRef, buyerRef, mReference;
+    private DatabaseReference productRef, userRef, discountRef, buyerRef, notificationRef;
     private FirebaseUser firebaseUser;
+    private FirebaseAuth mAuth;
     private int quantity = 0;
+    private String buyerUsername;
     private double delivery;
     private double tax;
     private double subtotal;
@@ -103,8 +107,11 @@ public class orderDetailsActivity extends AppCompatActivity {
         userRef = FirebaseDatabase.getInstance().getReference();
         poppuGetListPayment();
 
+
         Intent intent = getIntent();
         idProduct = intent.getStringExtra("idPro");
+        mAuth = FirebaseAuth.getInstance();
+        getUsernameFromFirebase();
         discountRef = FirebaseDatabase.getInstance().getReference().child("products").child(idProduct).child("selectedDiscounts");
         productRef = FirebaseDatabase.getInstance().getReference().child("products").child(idProduct);
         String buyerID = firebaseUser.getUid();
@@ -218,6 +225,7 @@ public class orderDetailsActivity extends AppCompatActivity {
                 String idBuyer = firebaseUser.getUid();
                 String date = getCurrentTime();
 
+
                 if (txtAddress.getText().toString().equalsIgnoreCase("Enter your address")) {
                     Toast.makeText(orderDetailsActivity.this, "Vui lòng chọn địa chỉ", Toast.LENGTH_SHORT).show();
                     return;
@@ -239,6 +247,29 @@ public class orderDetailsActivity extends AppCompatActivity {
                 } else {
                     performNextSteps(newKey, idBuyer, date);
                 }
+            }
+        });
+    }
+    private void getUsernameFromFirebase() {
+        String userId = mAuth.getCurrentUser().getUid();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("user").child(userId);
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    String username = dataSnapshot.child("username").getValue(String.class);
+                    if (username != null) {
+                        buyerUsername = username;
+                    } else {
+                    }
+                } else {
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Xử lý khi có lỗi xảy ra trong quá trình truy vấn cơ sở dữ liệu
             }
         });
     }
@@ -421,7 +452,7 @@ public class orderDetailsActivity extends AppCompatActivity {
                                                     displayName,
                                                     photoUrl);
                                             order.setTotalQuantity(totalQuantity);
-
+                                            notifications();
                                             On_Create_Bill(order);
                                         }
                                     }
@@ -564,5 +595,42 @@ public class orderDetailsActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
         Date currentDate = new Date();
         return sdf.format(currentDate);
+    }
+    private void notifications() {
+        // Xử lý khi người dùng nạp thẻ thành công
+        String title = "Đặt hàng";
+        String content = String.format("Đơn hàng của bạn đã được đặt, vui lòng chờ Admin xác nhận trong ít phút.");
+        String currentTime = getCurrentTime();
+        String userId = mAuth.getUid();
+        notificationRef = FirebaseDatabase.getInstance().getReference("notifications").child(firebaseUser.getUid());
+        String notificationId = notificationRef.push().getKey();
+
+        notificationsToAdmin();
+
+        // Gửi thông báo lên Firebase Realtime Database
+        notificationRef.child(notificationId).child("title").setValue(title);
+        notificationRef.child(notificationId).child("content").setValue(content);
+        notificationRef.child(notificationId).child("dateTime").setValue(currentTime);
+        notificationRef.child(notificationId).child("userId").setValue(userId);
+    }
+    private void notificationsToAdmin() {
+        String adminId = "ZYA1yQdRAYSzh1K24ZVYIYvHIc92";
+
+        String username = buyerUsername;
+        String title = "Đơn hàng";
+        String content = String.format("Người dùng %s vừa đặt đơn hàng, vui lòng kiểm tra và duyệt.", username);
+        String currentTime = getCurrentTime();
+
+        DatabaseReference adminNotificationRef = FirebaseDatabase.getInstance().getReference("notifications").child(adminId);
+        String notificationId = adminNotificationRef.push().getKey();
+
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("title", title);
+        notificationData.put("content", content);
+        notificationData.put("dateTime", currentTime);
+        notificationData.put("userId", firebaseUser.getUid());
+//        notificationData.put("isRead", false);
+
+        adminNotificationRef.child(notificationId).setValue(notificationData);
     }
 }
