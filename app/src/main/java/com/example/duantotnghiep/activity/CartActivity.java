@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -39,7 +40,7 @@ import java.util.Set;
 
 public class CartActivity extends AppCompatActivity implements CartAdapter.Callback {
     private RecyclerView recyclerViewCart;
-    private TextView total_item,totalPriceCart;
+    private TextView total_item,totalPriceCart, noResultsTextView;
     private CartAdapter cartAdapter;
     private AddProductToCart product;
     private List<AddProductToCart> list = new ArrayList<>();
@@ -48,6 +49,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.Callb
 
     Button addOrderDetail;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,12 +58,12 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.Callb
         total_item = findViewById(R.id.total_item);
         checkboxAllItem = findViewById(R.id.checkboxAllItem);
         addOrderDetail = findViewById(R.id.addOrderDetail);
-        totalPriceCart =findViewById(R.id.total_price_cart);
+        totalPriceCart = findViewById(R.id.total_price_cart);
+        noResultsTextView = findViewById(R.id.noResults);
         recyclerViewCart.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         getListProductAddCart();
         cartAdapter = new CartAdapter(CartActivity.this, list, this, totalPriceCart);
         recyclerViewCart.setAdapter(cartAdapter);
-//        sumPriceProduct();
         addOrderDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,6 +118,13 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.Callb
                 }
                 cartAdapter.notifyDataSetChanged();
                 Log.d("=====", "onDataChange: "+snapshot+"  data   "+ myReference);
+                if (list.isEmpty()) {
+                    noResultsTextView.setVisibility(View.VISIBLE);
+                    recyclerViewCart.setVisibility(View.GONE);
+                } else {
+                    noResultsTextView.setVisibility(View.GONE);
+                    recyclerViewCart.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
